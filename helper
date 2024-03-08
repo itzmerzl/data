@@ -2204,7 +2204,7 @@ ClearSpaces = var[2]:find("got ") + 6
 ClearSpace = var[2]:find("``!") - 1
 SpunNumber = var[2]:sub(ClearSpaces, ClearSpace)
 
-if HostMode == "Qeme" then Qeme = SpunNumber%10 if Qeme > 10 then Qeme = Qeme%10 elseif Qeme == (10 or 0) then Qeme = "`20" end
+if HostMode == "Qeme" then Qeme = SpunNumber%10 if Qeme > 10 then Qeme = Qeme%10 elseif Qeme == 10  then Qeme = "`20" elseif Qeme == 0 then Qeme = "1" end
 SendVariantList({[0] = "OnTalkBubble", [1] = var[1], [2] = "`7[`2REAL`7] "..var[2].." `6QEME `w: `6"..Qeme}) table.insert(LogSpin, {spin = "\nadd_label_with_icon_button|small|`7[`2REAL`7] "..var[2].." `6QEME `w: `6"..Qeme.."|left|758|"..var[1].."|\n", netid = var[1], spins = "`7[`2REAL`7] "..var[2].." `6QEME `w: `6"..Qeme})
 elseif HostMode == "Reme" then Num1, Num2 = SpunNumber//10, SpunNumber%10 Reme = Num1 + Num2 if Reme > 10 then Reme = Reme%10 elseif Reme == 10 then Reme = "`20" elseif Reme == 0 then Reme = "`20" end
 SendVariantList({[0] = "OnTalkBubble", [1] = var[1], [2] = "`7[`2REAL`7] "..var[2].." `5REME `w: `5"..Reme}) table.insert(LogSpin, {spin = "\nadd_label_with_icon_button|small|`7[`2REAL`7] "..var[2].." `5REME `w: `5"..Reme.."|left|758|"..var[1].."|\n", netid = var[1], spins = "`7[`2REAL`7] "..var[2].." `5REME `w: `5"..Reme})
