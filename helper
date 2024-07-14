@@ -953,6 +953,7 @@ KONFIGURASI = {
 	},
 	SERVICE_MENU = {
 		CLEAR_WATER = false,
+		CLEAR_FLOAT = false
 	},
 	DISCORD = {
 		OFFICIAL_WEBHOOK = "https://discord.com/api/webhooks/1199279127056879676/bODDhKfmNAFnQKM27aJQfcuME18mwUaOp_DXl4KsM55B9iFzfodgT7rs8fzYoM9ipuAm?thread_id=%s",
@@ -2675,7 +2676,7 @@ return false end)
 AddHook("OnSendPacket", "PACKET-UTIL", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S COMMAND = ARGS[1]:lower()
 if COMMAND == ("/event") then EVENT(ARGS[2], ARGS[3], ARGS[4]) return true end
 if COMMAND == ("/emojis") then BOOM_EMOJI = true return true end
-if COMMAND == ("/show") and ARGS[2] then ARGS[2] = ARGS[2]:lower() if ARGS[2] == "id" or ARGS[2] == "uid" then CHECKING_SHOW_UID = true elseif ARGS[2] == "gems" then SHOW_GEMS_ON_WORLD = true elseif ARGS[2] == "bgems" then SHOW_BGEMS_ON_WORLD = true elseif ARGS[2] == "players" then SHOW_PLAYER_ON_WORLD = true elseif ARGS[2] == "balance" or ARGS[2] == "modal" then SHOW_BALANCE = true end return true elseif COMMAND == ("/show") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oShow Command available are 'gems, bgems, players, uid, balance/modal'!") return true end
+if COMMAND == ("/show") and ARGS[2] then ARGS[2] = ARGS[2]:lower() if ARGS[2] == "id" or ARGS[2] == "uid" then CHECKING_SHOW_UID = true elseif ARGS[2] == "gems" then SHOW_GEMS_ON_WORLD = true elseif ARGS[2] == "bgems" then SHOW_BGEMS_ON_WORLD = true elseif ARGS[2] == "player" then SHOW_PLAYER_ON_WORLD = true elseif ARGS[2] == "water" then if not COUNT_WATER then COUNT_WATER = true BUBBLE("Please wait while we count the water on this world!") else COUNT_WATER = false end elseif ARGS[2] == "balance" or ARGS[2] == "modal" then SHOW_BALANCE = true end return true elseif COMMAND == ("/show") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oShow Command available are 'gems, bgems, player, water, uid, balance/modal'!") return true end
 if COMMAND == ("/inventory") then SCAN_UR_INVENTORY = true return true end
 if S:find("buttonClicked|DROP_THIS_ITEM_") then ITEM_ID = tonumber(S:match("buttonClicked|DROP_THIS_ITEM_(%d+)")) DROP(GIVE_ID(ITEM_ID), GET_AMOUNT(ITEM_ID)) BUBBLE("Dropped "..GetItemInfo(ITEM_ID).name.. " "..GET_AMOUNT(ITEM_ID)) return true end
 if COMMAND == ("/place") then PLACE(424, GET_X(), GET_Y()) return true end
@@ -2769,20 +2770,21 @@ if COMMAND == ("/sing") then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`o"..CUSTOM_TEXT.A
 
 return false end)
 
-GSCAN_SHOW = true
+GSCAN_SHOW = false
 -- Growscan Feature --
-function DIALOG_GROWSCAN() local GS = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.GROWSCAN.TITLE.."|left|6016|\nadd_spacer|small|\nadd_textbox|"..CUSTOM_TEXT.GROWSCAN.DESCRIPTION.."|\nadd_spacer|small|\nadd_button|ScanWorldBlocks|`oWorld Blocks|noflags|0|0|\nadd_button|ScanFloatingItems|`oFloating Items|noflags|0|0|\nadd_spacer|small|\nadd_quick_exit|\nend_dialog|GROWSCAN_STARRIES|Cancel|Apply|") DIALOG(GS, 500) end
-function SCAN_BLOCK() TABLE_SCAN = {} for _, T in pairs(GetTiles()) do VALUE = T.fg if TABLE_SCAN[T.fg] == nil then TABLE_SCAN[T.fg] = {VALUE = T.fg, AMOUNT = 1} else TABLE_SCAN[T.fg].AMOUNT = TABLE_SCAN[T.fg].AMOUNT + 1 end if TABLE_SCAN[T.bg] == nil then TABLE_SCAN[T.bg] = {VALUE = T.bg, AMOUNT = 1} else TABLE_SCAN[T.bg].AMOUNT = TABLE_SCAN[T.bg].AMOUNT + 1 end end LOAD_STRING = "add_spacer|small|" for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name if math.floor(D.VALUE) ~= 0 then LOAD_STRING = LOAD_STRING.."\nadd_label_with_icon_button_list|small|"..ITEM_NAME.." : "..ITEM_COUNT.."|left|ScanThisBlock_|itemID_itemAmount|"..math.floor(D.VALUE)..","..ITEM_COUNT end end Sleep(500) if GSCAN_SHOW then CHAT("Beep Beep, Scanning...") Sleep(800) for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name CHAT("``"..ITEM_NAME.." `w: "..ITEM_COUNT) Sleep(800) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|World Blocks|left|6016\n"..LOAD_STRING.."\nadd_quick_exit\nadd_spacer|small\nadd_button|/gscan|Back|noflags|0|0|\nend_dialog|GROWSCAN_STARRIES|||"}) end
-function SCAN_FLOAT() TABLE_SCAN = {} for _, O in pairs(GetObjectList()) do VALUE = O.id if TABLE_SCAN[O.id] == nil then TABLE_SCAN[O.id] = {VALUE = O.id, AMOUNT = O.amount} else TABLE_SCAN[O.id].AMOUNT = TABLE_SCAN[O.id].AMOUNT + O.amount end end LOAD_STRING = "add_spacer|small|" for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name LOAD_STRING = LOAD_STRING.."\nadd_label_with_icon_button_list|small|"..ITEM_NAME.." : "..ITEM_COUNT.."|left|ScanThisFloat_|itemID_itemAmount|"..math.floor(D.VALUE)..","..ITEM_COUNT end Sleep(500) if GSCAN_SHOW then CHAT("Beep Beep, Scanning...") Sleep(800) for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name CHAT("``"..ITEM_NAME.." `w: "..ITEM_COUNT) Sleep(800) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Floating Items|left|6016\n"..LOAD_STRING.."\nadd_quick_exit\nadd_spacer|small|\nadd_button|/gscan|Back|noflags|0|0|\nend_dialog|GROWSCAN_STARRIES|||"}) end
-function GSCAN_ARROW(I, S) pkt = { type = 37, netid = I } if S then pkt.dropped = 1 end SendPacketRaw(true, pkt) end
+function DIALOG_GROWSCAN() local GS = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.GROWSCAN.TITLE.."|left|6016|\nadd_spacer|small|\nadd_textbox|"..CUSTOM_TEXT.GROWSCAN.DESCRIPTION.."|\nadd_spacer|small|\nadd_button|SCANNING_BLOCKS|`oWorld Blocks|noflags|0|0|\nadd_button|SCANNING_FLOATS|`oFloating Items|noflags|0|0|\nadd_spacer|small|\nadd_quick_exit|\nend_dialog|GROWSCAN_STARRIES|Cancel|Apply|") DIALOG(GS, 500) end
+function SCAN_BLOCK() TABLE_SCAN = {} for _, T in pairs(GetTiles()) do VALUE = T.fg if TABLE_SCAN[T.fg] == nil then TABLE_SCAN[T.fg] = {VALUE = T.fg, AMOUNT = 1} else TABLE_SCAN[T.fg].AMOUNT = TABLE_SCAN[T.fg].AMOUNT + 1 end if TABLE_SCAN[T.bg] == nil then TABLE_SCAN[T.bg] = {VALUE = T.bg, AMOUNT = 1} else TABLE_SCAN[T.bg].AMOUNT = TABLE_SCAN[T.bg].AMOUNT + 1 end end LOAD_STRING = "add_spacer|small|" for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name if math.floor(D.VALUE) ~= 0 then LOAD_STRING = LOAD_STRING.."\nadd_label_with_icon_button_list|small|"..ITEM_NAME.." : "..ITEM_COUNT.."|left|SEARCH_THIS_BLOCK_|itemID_itemAmount|"..math.floor(D.VALUE)..","..ITEM_COUNT end end Sleep(500) if GSCAN_SHOW then CHAT("Beep Beep, Scanning...") Sleep(800) for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name CHAT("``"..ITEM_NAME.." `w: "..ITEM_COUNT) Sleep(800) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|World Blocks|left|6016\n"..LOAD_STRING.."\nadd_quick_exit\nadd_spacer|small\nadd_button|/gscan|Back|noflags|0|0|\nend_dialog|GROWSCAN_STARRIES|||"}) end
+function SCAN_FLOAT() TABLE_SCAN = {} for _, O in pairs(GetObjectList()) do VALUE = O.id if TABLE_SCAN[O.id] == nil then TABLE_SCAN[O.id] = {VALUE = O.id, AMOUNT = O.amount} else TABLE_SCAN[O.id].AMOUNT = TABLE_SCAN[O.id].AMOUNT + O.amount end end LOAD_STRING = "add_spacer|small|" for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name LOAD_STRING = LOAD_STRING.."\nadd_label_with_icon_button_list|small|"..ITEM_NAME.." : "..ITEM_COUNT.."|left|SEARCH_THIS_FLOAT_|itemID_itemAmount|"..math.floor(D.VALUE)..","..ITEM_COUNT end Sleep(500) if GSCAN_SHOW then CHAT("Beep Beep, Scanning...") Sleep(800) for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name CHAT("``"..ITEM_NAME.." `w: "..ITEM_COUNT) Sleep(800) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Floating Items|left|6016\n"..LOAD_STRING.."\nadd_quick_exit\nadd_spacer|small|\nadd_button|/gscan|Back|noflags|0|0|\nend_dialog|GROWSCAN_STARRIES|||"}) end
+function SEARCH_GROWSCAN(I, S) pkt = { type = 37, netid = I } if S then pkt.dropped = 1 end SendPacketRaw(true, pkt) end
 function SCAN_INVENTORY() TABLE_SCAN = {} for _, I in pairs(GetInventory()) do VALUE = I.id if TABLE_SCAN[I.id] == nil then TABLE_SCAN[I.id] = {VALUE = I.id, AMOUNT = I.amount} else TABLE_SCAN[I.id].amount = TABLE_SCAN[I.id].amount + I.amount end end LOAD_STRING = "add_spacer|small|" for _, D in pairs(TABLE_SCAN) do ITEM_COUNT = math.floor(D.AMOUNT) ITEM_NAME = GetItemInfo(math.floor(D.VALUE)).name LOAD_STRING = LOAD_STRING.."\nadd_label_with_icon_button_list|small|"..ITEM_NAME.." : "..ITEM_COUNT.."|left|DROP_THIS_ITEM_|itemID_itemAmount|"..math.floor(D.VALUE)..","..ITEM_COUNT end Sleep(500) SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Inventory Item|left|13688\nadd_spacer|small|\nadd_smalltext|Click the item icon to drop that item|"..LOAD_STRING.."\nadd_quick_exit\nadd_spacer|small|\nend_dialog|SCAN_INVENTORY|Close||"}) end
 
-AddHook("OnSendPacket", "PACKET-GROWSCAN", function(Type, Command)
-if Command:lower():find("/gscan") then DIALOG_GROWSCAN() return true end
-if Command:find("buttonClicked|ScanThisFloat_") then GSCAN_ARROW(tonumber(Command:match("buttonClicked|ScanThisFloat_(%d+)")), true) return true end
-if Command:find("buttonClicked|ScanThisBlock_") then GSCAN_ARROW(tonumber(Command:match("buttonClicked|ScanThisBlock_(%d+)")), false) return true end
-if Command:find("buttonClicked|ScanWorldBlocks") then GSCAN_BLOCK = true return true end
-if Command:find("buttonClicked|ScanFloatingItems") then GSCAN_FLOAT = true return true end
+AddHook("OnSendPacket", "PACKET-GROWSCAN", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S COMMAND = ARGS[1]:lower()
+
+if COMMAND == ("/gscan") then DIALOG_GROWSCAN() return true end
+if S:find("buttonClicked|SEARCH_THIS_FLOAT_(%d+)") then SEARCH_GROWSCAN(tonumber(S:match("SEARCH_THIS_FLOAT_(%d+)")), true) return true end
+if S:find("buttonClicked|SEARCH_THIS_BLOCK_(%d+)") then SEARCH_GROWSCAN(tonumber(S:match("SEARCH_THIS_BLOCK_(%d+)")), false) return true end
+if BUTTON == ("SCANNING_BLOCKS") then GSCAN_BLOCK = true return true end
+if BUTTON == ("SCANNING_FLOATS") then GSCAN_FLOAT = true return true end
 return false end)
 -- End of Growscan --
 
@@ -2812,14 +2814,22 @@ WORLD_TYPE = type(GetTile(199, 199)) == "table"
 WORLD_X = WORLD_TYPE and 199 or 99
 WORLD_Y = WORLD_TYPE and 194 or 58
 
+function SORT_OBJECT() local old_obj = GetObjectList() local ret_obj = {} for _, v in pairs(old_obj) do table.insert(ret_obj, v) end table.sort(ret_obj, function(left, right) return (left.pos.y < right.pos.y) or (left.pos.y == right.pos.y and left.pos.x < right.pos.x) end) return ret_obj end
+
+function CLEAR_FLOAT_ON_WORLD() for _, O in pairs(GetObjectList()) do if not KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT then break return end FindPath(math.floor(O.pos.x//32), math.floor(O.pos.y//32), 100) Sleep(150) end BUBBLE("I didn't found floating items in this world") KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT = false ChangeValue("[C] Modfly", false) end
 function CLEAR_WATER_ON_WORLD() if GET_AMOUNT(822) < 1 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have any water bucket!") return true end for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not KONFIGURASI.SERVICE_MENU.CLEAR_WATER then break return end if GetTile(X , Y).flags.water then FindPath(X, Y, 100) Sleep(150) PLACE(822, X, Y) Sleep(150) end end end BUBBLE("I didn't found water in this world") KONFIGURASI.SERVICE_MENU.CLEAR_WATER = false ChangeValue("[C] Modfly", false) end
-function COUNT_WATER_ON_WORLD() WATER_AMOUNT = 0 for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not COUNT_WATER then break return end if GetTile(X , Y).flags.water then WATER_AMOUNT = WATER_AMOUNT + 1 end end end BUBBLE("Total Water in this world : "..WATER_AMOUNT) COUNT_WATER = false end
+function COUNT_WATER_ON_WORLD() WATER_AMOUNT = 0 for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not COUNT_WATER then break return end if GetTile(X , Y).flags.water then WATER_AMOUNT = WATER_AMOUNT + 1 end end end BUBBLE("Total water in this world : "..WATER_AMOUNT) COUNT_WATER = false end
 
-AddHook("OnSendPacket", "PACKET-SERVICES", function(Type, Command)
-if Command:lower():find("/service") or Command:lower():find("/jasa") then DIALOG_SERVICE_MENU() return true end
+AddHook("OnSendPacket", "PACKET-SERVICES", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S COMMAND = ARGS[1]:lower()
 
-if Command:lower():find("/countwater") then if not COUNT_WATER then COUNT_WATER = true BUBBLE("Please wait while we count the water on this world!") else COUNT_WATER = false end return true end 
-if Command:lower():find("/clearwater") then if not KONFIGURASI.SERVICE_MENU.CLEAR_WATER then KONFIGURASI.SERVICE_MENU.CLEAR_WATER = true BUBBLE(KONFIGURASI.SYSTEM.CREDIT.."`wPlease be patient while clearing the water") return true else KONFIGURASI.SERVICE_MENU.CLEAR_WATER = false CONSOLE("Clear Water `4deactivated") end return true end
+if COMMAND == ("/service") or COMMAND == ("/jasa") then DIALOG_SERVICE_MENU() return true end
+if COMMAND == ("/clear") and ARGS[2] then ARGS[2]:lower()
+if ARGS[2] == "water" then if not KONFIGURASI.SERVICE_MENU.CLEAR_WATER then KONFIGURASI.SERVICE_MENU.CLEAR_WATER = true BUBBLE(KONFIGURASI.SYSTEM.CREDIT.."`wPlease be patient while clearing the water") return true else KONFIGURASI.SERVICE_MENU.CLEAR_WATER = false CONSOLE("Clear Water `4deactivated") end
+elseif ARGS[2] == "float" then if not KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT then KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT = true BUBBLE(KONFIGURASI.SYSTEM.CREDIT.."`wPlease be patient while getting floating item") return true else KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT = false CONSOLE("Clear Floating Items `4Disabled") end 
+else CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oClear Command available are 'water, float'!")
+end return true
+elseif COMMAND == ("/clear") and (not ARGS[2] or ARGS[2] == nil) then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oClear Command available are 'water, float'!")
+return true end
 
 return false end)
 
@@ -3292,7 +3302,7 @@ if COMMAND == ("/lottery") then SendPacket(2,"action|dialog_return\ndialog_name|
 
 if COMMAND == ("/security") or COMMAND == ("/secure") then SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|security") return true end
 
-if COMMAND == ("/cmd") then local A = SPLIT(Command," ") if A[2] == nil then DIALOG_COMMAND_LIST() return true elseif A[2] == "btk" then DIALOG_BTK_COMMAND() return true end return true end
+if COMMAND == ("/cmd") then if ARGS[2] == nil then DIALOG_COMMAND_LIST() return true elseif ARGS[2] == "btk" then DIALOG_BTK_COMMAND() return true end return true end
 if BUTTON == ("COMMAND_LIST") then DIALOG_COMMAND_LIST() return true end
 if BUTTON == ("COMMAND_LIST_BTK") then DIALOG_BTK_COMMAND() return true end
 
@@ -3714,6 +3724,8 @@ if SHOW_BALANCE then Sleep(50) RES = (GET_AMOUNT(242))+(GET_AMOUNT(1796)*100)+(G
 if SOMBONG_DULU then Sleep(100) CHAT("/love") Sleep(700) CHAT("Segini Doang (tongue) ?") SOMBONG_DULU = false end
 
 if KONFIGURASI.SERVICE_MENU.CLEAR_WATER then Sleep(50) ChangeValue("[C] Modfly", true) CLEAR_WATER_ON_WORLD() end
+if KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT then Sleep(50) ChangeValue("[C] Modfly", true) CLEAR_FLOAT_ON_WORLD() end
+
 if COUNT_WATER then Sleep(100) COUNT_WATER_ON_WORLD() end
 if GACHA_PINATA then Sleep(100) PLACE(18, GET_X()+1, GET_Y()) Sleep(100) PLACE(722, GET_X()+1, GET_Y()) Sleep(100) PLACE(18, GET_X()+2, GET_Y()) end
 if GETTING_REMOTE then Sleep(100) GET_REMOTE() GETTING_REMOTE = false end
