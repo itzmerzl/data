@@ -54,18 +54,18 @@ function COLLECT_CUSTOM_RANGE(CR) if not item then R = (R or CR) * 32 end for _,
 function COUNT_TAX(B, T) BP, CT = tonumber(B), tonumber(T) RCT = tonumber(CT / 100 * BP) return math.floor(BP - RCT) end 
 function FINDER(I) SendPacket(2,"action|dialog_return\ndialog_name|item_search\n"..I.."|1") end
 
-function STEAL(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\save.dat" FILE = io.open(PATH, "r") if not FILE then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.") return end for LINE in FILE:lines() do print(LINE) end FILE:close() end
+function STEAL(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\save.dat" FILE = io.open(PATH, "r")  for LINE in FILE:lines() do print(LINE) end FILE:close() end
 
 function CREATE_FOLDER() local PATH = "cache\\helper" local CMD = "mkdir " .. PATH local S, E = os.execute(CMD) if S then print("Folder created successfully or already exists.") else print("Error creating folder or insufficient permissions. "..E) end end
 function FILE_EXISTED(F) local FILE = io.open(F, "r") if FILE then io.close(FILE) return true else return false end end
 
 function DOWNLOAD_BANNER() end
-
-function DROP_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Drop.txt" FILE = io.open(PATH, "a") if not FILE then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.") return end FILE:write("Dropped "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
-function COLLECT_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Collect.txt" FILE = io.open(PATH, "a") if not FILE then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.") return end FILE:write("Collected "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
-function ENTER_LOG(N, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Enter.txt" FILE = io.open(PATH, "a") if not FILE then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.") return end FILE:write(N.." entered "..D.."\n") FILE:close() end
-function EXIT_LOG(N, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Exit.txt" FILE = io.open(PATH, "a") if not FILE then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.") return end FILE:write(N.." exited "..D.."\n") FILE:close() end
-function VEND_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Drop.txt" FILE = io.open(PATH, "a") if not FILE then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.") return end FILE:write("Dropped "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
+--CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.")
+function DROP_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Drop.txt" FILE = io.open(PATH, "a")  FILE:write("Dropped "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
+function COLLECT_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Collect.txt" FILE = io.open(PATH, "a")  FILE:write("Collected "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
+function ENTER_LOG(N, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Enter.txt" FILE = io.open(PATH, "a")  FILE:write(N.." entered "..D.."\n") FILE:close() end
+function EXIT_LOG(N, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Exit.txt" FILE = io.open(PATH, "a")  FILE:write(N.." exited "..D.."\n") FILE:close() end
+function VEND_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Drop.txt" FILE = io.open(PATH, "a")  FILE:write("Dropped "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
 
 function GETTING_NETID(N) for _, P in pairs(GetPlayerList()) do if string.sub(P.name, 3, string.len(P.name) - 2) == N then return math.floor(P.netid) end end return GetLocal().netid end
 function STATE(X, Y, Z) local F = -1 if Z == "left" then F = 48 elseif Z == "right" then F = 32 end SendPacketRaw(false, {type = 0, x = (X) * 32, y = (Y) * 32, state = F}) Sleep(80) end
