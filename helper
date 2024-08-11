@@ -1171,6 +1171,21 @@ end
 end
 end
 
+FIND_MOONCAKE, DROP_MOONCAKE = false, false
+
+AddHook("OnSendPacket", "O", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S COMMAND = ARGS[1]:lower()
+
+if COMMAND == ("/mf") then if not FIND_MOONCAKE then FIND_MOONCAKE = true else FIND_MOONCAKE = false end return true end
+if COMMAND == ("/md") then if not DROP_MOONCAKE then DROP_MOONCAKE = true else DROP_MOONCAKE = false end return true end
+
+return false end)
+
+AddHook("OnVariant", "O", function(V)
+if FIND_MOONCAKE then
+if V[0] == "OnDialogRequest" and V[1]:find("Item Finder") then return true end 
+end
+return false end)
+
 --AddHook("OnVariant", "VARIANT-DEVELOPER", VARIANT_DEVELOPER)
 
 function HELPER()
@@ -4026,6 +4041,9 @@ CONSOLE(CUSTOM_TEXT.START.B) Sleep(50) CONSOLE(CUSTOM_TEXT.START.C.." `w"..GET_B
 
 while true do Sleep(250) if INAPPRORIATE then break end
 
+if FIND_MOONCAKE then Sleep(100) FINDER(GetItemInfo("Longevity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Prosperity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Balance Mooncake").id) Sleep(250) FIND_MOONCAKE = false end
+if DROP_MOONCAKE then Sleep(100) DROP(GetItemInfo("Longevity Mooncake").id, GET_AMOUNT(GetItemInfo("Longevity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Prosperity Mooncake").id, GET_AMOUNT(GetItemInfo("Prosperity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Balance Mooncake").id, GET_AMOUNT(GetItemInfo("Balance Mooncake").id)) Sleep(100) DROP_MOONCAKE = false end
+
 if KONFIGURASI.AUTO_SPAM.TOGGLE and not CDROP then Sleep(50) SPAMMING() if not CDROP then Sleep(KONFIGURASI.AUTO_SPAM.DELAY) end end
 if CDROP then Sleep(100) CUSTOM_DROP() DROP_AMOUNT = 0 CDROP = false end
 
@@ -4149,7 +4167,7 @@ return false end)
 
 AddHook("OnVariant", "VARIANT-GUARD", function(Var)
 if Var[0] == "OnConsoleMessage" then
-if Var[1]:find("(.+) bought 1 VIP Entrance for 100000 World Locks.``") then DEPOSITED = true end
+if Var[1]:find("(.+) bought 1 VIP Entrance for 50000 World Locks.``") then DEPOSITED = true end
 end
 return false end)
 
