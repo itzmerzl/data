@@ -87,7 +87,7 @@ function FINDER(I) SendPacket(2,"action|dialog_return\ndialog_name|item_search\n
 
 --function STEAL(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\save.dat" FILE = io.open(PATH, "r")  for LINE in FILE:lines() do print(LINE) end FILE:close() end
 
-function CREATE_FOLDER(P) local PATH = P local CMD = "mkdir " .. PATH local S, E = os.execute(CMD) if S then print("Created a new folder named 'helper'! this will be used as a data/logs for Starries Helper.") end end
+function CREATE_FOLDER(P) local PATH = P local CMD = "mkdir " .. PATH local S, E = os.execute(CMD) if S then print("Created a new folder named 'helper'! this will be used as a data/logs for Starries Helper.") else return end end
 function FILE_EXISTED(F) local FILE = io.open(F, "r") if FILE then io.close(FILE) return true else return false end end
 
 function DOWNLOAD_BANNER() end
@@ -723,13 +723,14 @@ end
 -- Variable --
 KONFIGURASI = {
 	FILE_LOGS = {
-		DROP = false,
+		DROP = true,
 		COLLECT = false,
 		TRASH = false,
 		ENTER = false,
 		EXIT = false,
 		WRENCH = false,
-		BET = false
+		BET = false,
+		TRADE = false
 	},
 	GROWSCAN = {
 		SCAN_FLOATS = false,
@@ -1300,7 +1301,7 @@ if COMMAND == ("/settax") or COMMAND == ("/edittax") or BUTTON == ("EDIT_TAX") t
 if COMMAND == ("/tax") and tonumber(ARGS[2]) then KONFIGURASI.BTK.TAX = tonumber(ARGS[2]) CONSOLE("Tax changed to "..KONFIGURASI.BTK.TAX.."%") elseif COMMAND == ("/tax") and not tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.OOOPS.."`oPlease input the exact amount of tax!") return true end 
 if S:find("INPUT_TAX|") and not S:find("INPUT_TAX|"..KONFIGURASI.BTK.TAX) then KONFIGURASI.BTK.TAX = string.sub(string.sub(S, 0, string.len(S) - 1), S:find("INPUT_TAX|") + 10) CONSOLE("Tax changed to "..KONFIGURASI.BTK.TAX.."%") return true end 
 
-if COMMAND == ("/posbet") or BUTTON == ("SETUP_POS_BET") then if not PUNCH_CONFIG and DISPLAY_LEFT then DISPLAY_LEFT = true PUNCH_CONFIG = true BUBBLE("Punch display box on the left side for player 1 position") else DISPLAY_LEFT, PUNCH_CONFIG = false, false BUBBLE("Setup position bet has been cancelled") end return true end
+if COMMAND == ("/posbet") or BUTTON == ("SETUP_POS_BET") then if not PUNCH_CONFIG and not DISPLAY_LEFT then DISPLAY_LEFT = true PUNCH_CONFIG = true BUBBLE("Punch display box on the left side for player 1 position") else DISPLAY_LEFT, PUNCH_CONFIG = false, false BUBBLE("Setup position bet has been cancelled") end return true end
 if COMMAND == ("/poschand") or BUTTON == ("SETUP_POS_CHAND") then DIALOG_POS_CHAND_MODE() return true end
 if COMMAND == ("/posch") or BUTTON == ("CHAND_HORIZONTAL_MENU") then CHAND_LEFT = true PLACE_CONFIG = true KONFIGURASI.BTK.HORIZONTAL = true KONFIGURASI.BTK.VERTICAL = false BUBBLE("Horizontal Mode ? follow the instruction on console") CONSOLE("Horizontal Mode ? follow the instruction below") CONSOLE("[Chand][`5Put or Punch Chand here`o][Chand]") return true end
 if COMMAND == ("/poscv") or BUTTON == ("CHAND_VERTICAL_MENU") then CHAND_LEFT = true PLACE_CONFIG = true KONFIGURASI.BTK.VERTICAL = true KONFIGURASI.BTK.HORIZONTAL = false BUBBLE("Vertical Mode ? follow the instruction on console") CONSOLE("Vertical Mode ? follow the instruction below") CONSOLE("[Chand]") CONSOLE("`o[Chand]") CONSOLE("[`5Put or Punch Chand here`o]") return true end
@@ -1578,7 +1579,7 @@ end_dialog|WRENCH_MENU|     Close    |     Save    |
 
 AddHook("OnSendPacket", "PACKET-WRENCH-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S COMMAND = ARGS[1]:lower()
 if COMMAND == ("/wm") or BUTTON == ("WRENCH_MENU") then DIALOG_WRENCH() return true end
-if COMMAND == ("/fastwrench") or COMMAND == ("/fw") and (ARGS[2]) then ARGS[2] = ARGS[2]:lower()
+if COMMAND == ("/fastwrench") or COMMAND == ("/fw") then ARGS[2] = ARGS[2]:lower()
 if ARGS[2] == nil then if not KONFIGURASI.LIST_MENU.WRENCH.TOGGLE then KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = true CONSOLE(CUSTOM_TEXT.CODE.WRENCH.."`oFast Wrench `2activated") else KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = false CONSOLE(CUSTOM_TEXT.CODE.WRENCH.."`oFast Wrench `4deactivated") end
 elseif ARGS[2] == "pull" then if not KONFIGURASI.LIST_MENU.WRENCH.TOGGLE or KONFIGURASI.LIST_MENU.WRENCH.MODE ~= "PULL" then KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = true KONFIGURASI.LIST_MENU.WRENCH.MODE = "PULL" CONSOLE("Fast Wrench `cPull `ohas been `2activated") else KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = false KONFIGURASI.LIST_MENU.WRENCH.MODE = "" CONSOLE("Fast Wrench `cPull `ohas been `4deactivated") end 
 elseif ARGS[2] == "kick" then if not KONFIGURASI.LIST_MENU.WRENCH.TOGGLE or KONFIGURASI.LIST_MENU.WRENCH.MODE ~= "KICK" then KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = true KONFIGURASI.LIST_MENU.WRENCH.MODE = "KICK" CONSOLE("Fast Wrench `4Kick `ohas been `2activated") else KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = false KONFIGURASI.LIST_MENU.WRENCH.MODE = "" CONSOLE("Fast Wrench `4Kick `ohas been `4deactivated") end 
@@ -3492,22 +3493,46 @@ function DIALOG_ACTIVITY_LOG() AL = [[
 set_default_color|`]]..KONFIGURASI.UI.PRIMARY..[[|
 add_label_with_icon|big|Activity Log|left|2376|
 add_spacer|small|
-add_checkbox|SHOW_ALL_COLLECT_TOGGLE|Get a log for all items collected|]]..CHECKBOX(KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT)..[[|
-add_checkbox|SHOW_ALL_DROP_TOGGLE|Get a log for all items dropped|]]..CHECKBOX(KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP)..[[|
 text_scaling_string|textscalingstring|
-add_button_with_icon|/droplog|Dropped|staticBlueFrame|13810||
-add_button_with_icon|/collectlog|Collected|staticBlueFrame|13808||
-add_button_with_icon|/trashlog|Trashed|staticBlueFrame|6068||
-add_button_with_icon|/enterlog|Entered|staticBlueFrame|13804||
-add_button_with_icon|/exitlog|Exited|staticBlueFrame|13806||
+add_button_with_icon|ACTIVITY_DROP_LOG|Dropped|staticBlueFrame|13810||
+add_button_with_icon|ACTIVITY_COLLECT_LOG|Collected|staticBlueFrame|13808||
+add_button_with_icon|ACTIVITY_TRASH_LOG|Trashed|staticBlueFrame|6068||
+add_button_with_icon|ACTIVITY_ENTER_LOG|Entered|staticBlueFrame|13804||
+add_button_with_icon|ACTIVITY_EXIT_LOG|Exited|staticBlueFrame|13806||
 add_button_with_icon||END_LIST||0||
-add_button_with_icon|/wrenchlog|Wrench|staticBlueFrame|32||
-add_button_with_icon|/betlog|Bet Collected|staticBlueFrame|7188||
+add_button_with_icon|ACTIVITY_WRENCH_LOG|Wrench|staticBlueFrame|32||
+add_button_with_icon|ACTIVITY_BET_LOG|Bet Collected|staticBlueFrame|7188||
+add_button_with_icon|ACTIVITY_SETTING_LOG|Settings|staticBlueFrame|4630||
 add_button_with_icon||END_LIST||0||
 add_spacer|small|
 add_quick_exit|
 add_button|BACK_TO_MAIN_MENU|                      Back                      |noflags|0|0|
 end_dialog|ACTIVITY_LOG|       Close       |       Save        |
+]] DIALOG(AL, 500) end
+
+function DIALOG_ACTIVITY_LOG_SETTING() AL = [[
+set_default_color|`]]..KONFIGURASI.UI.PRIMARY..[[|
+add_label_with_icon|big|Activity Log Settings|left|4630|
+add_spacer|small|
+add_checkbox|SHOW_ALL_COLLECT_TOGGLE|Capture log for all collected items|]]..CHECKBOX(KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT)..[[|
+add_checkbox|SHOW_ALL_DROP_TOGGLE|Capture log for all dropped items|]]..CHECKBOX(KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP)..[[|
+add_label_with_icon|small|File Logs|left|656|
+add_spacer|small|
+text_scaling_string|textscalingstring|
+add_checkicon|FILE_LOGS_DROP|Dropped|]]..FRAME(KONFIGURASI.FILE_LOGS.DROP)..[[|13810||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.DROP)..[[|
+add_checkicon|FILE_LOGS_COLLECT|Collected|]]..FRAME(KONFIGURASI.FILE_LOGS.COLLECT)..[[|13808||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.COLLECT)..[[|
+add_checkicon|FILE_LOGS_TRASH|Trashed|]]..FRAME(KONFIGURASI.FILE_LOGS.TRASH)..[[|6068||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.TRASH)..[[|
+add_checkicon|FILE_LOGS_ENTER|Entered|]]..FRAME(KONFIGURASI.FILE_LOGS.ENTER)..[[|13804||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.ENTER)..[[|
+add_checkicon|FILE_LOGS_EXIT|Exited|]]..FRAME(KONFIGURASI.FILE_LOGS.EXIT)..[[|13806||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.EXIT)..[[|
+add_button_with_icon||END_LIST||0||
+add_checkicon|FILE_LOGS_WRENCH|Wrench|]]..FRAME(KONFIGURASI.FILE_LOGS.WRENCH)..[[|32||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.WRENCH)..[[|
+add_checkicon|FILE_LOGS_BET|Bet Collected|]]..FRAME(KONFIGURASI.FILE_LOGS.BET)..[[|7188||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.BET)..[[|
+add_checkicon|FILE_LOGS_TRADE|Trade History|]]..FRAME(KONFIGURASI.FILE_LOGS.TRADE)..[[|242||]]..CHECKBOX(KONFIGURASI.FILE_LOGS.TRADE)..[[|
+add_button_with_icon||END_LIST||0||
+add_spacer|small|
+add_quick_exit|
+add_button|LOG_ACTIVITY|                      Back                      |noflags|0|0|
+end_dialog|ACTIVITY_LOG_SETTING|       Close       |       Save        |
 ]] DIALOG(AL, 500) end
 
 function DIALOG_DROP_LOG() A = {} for _, T in pairs(KONFIGURASI.TABLE.ACTIVITY_LOG) do table.insert(A, T.DROP) end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Dropped Log|left|13810|\nadd_spacer|small|\nadd_smalltext|Click the item icon to filter by that item|\n"..table.concat(A).."\nadd_spacer|small|\nadd_button|/log|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|DROP_LOG|||"}) end
@@ -3530,7 +3555,7 @@ if COMMAND == ("/log") or COMMAND == ("/activitylog") or BUTTON == ("LOG_ACTIVIT
 if TOGGLE:find("SHOW_ALL_COLLECT_TOGGLE|1") and not KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT then KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT = true CONSOLE("Get a log for all items collected `2activated") elseif TOGGLE:find("SHOW_ALL_COLLECT_TOGGLE|0") and KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT then KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT = false CONSOLE("Get a log for all items collected `4deactivated") end
 if TOGGLE:find("SHOW_ALL_DROP_TOGGLE|1") and not KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP then KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP = true CONSOLE("Get a log for all items dropped `2activated") elseif TOGGLE:find("SHOW_ALL_DROP_TOGGLE|0") and KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP then KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP = false CONSOLE("Get a log for all items dropped `4deactivated") end
 
-if COMMAND == ("/droplog") then DIALOG_DROP_LOG() return true end
+if COMMAND == ("/droplog") or BUTTON == ("ACTIVITY_DROP_LOG") then DIALOG_DROP_LOG() return true end
 if S:find("dialog_name|DROP_LOG\nbuttonClicked|(%d+)") then FILTER_THIS = tonumber(S:match("dialog_name|DROP_LOG\nbuttonClicked|(%d+)")) FILTER_DROP_LOG(FILTER_THIS) return true end
 
 if S:find("action|dialog_return\ndialog_name|drop\nitem_drop|") and (not CUSTOM_DROP or not KONFIGURASI.ABILITY.FAST_DROP) then ITEM_TO_DROPPED = string.sub(S, S:find("drop\nitem_drop|") + 15, S:find("|\nitem_count|") - 1) DROPPED_AMOUNT = string.sub(string.sub(S, 0, string.len(S) - 1), S:find("item_count|") + 11)  ITEM_DROP = GET_ID(ITEM_TO_DROPPED)
@@ -3540,26 +3565,28 @@ elseif math.floor(ITEM_TO_DROPPED) == 7188 then if KONFIGURASI.BUBBLE.DROP_BUBBL
 elseif math.floor(ITEM_TO_DROPPED) == 242 then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `w"..DROPPED_AMOUNT.." `9"..GetItemInfo(math.floor(ITEM_TO_DROPPED)).name) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `w"..DROPPED_AMOUNT.." `9"..GetItemInfo(math.floor(ITEM_TO_DROPPED)).name) end 
 else if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..DROPPED_AMOUNT.." "..GetItemInfo(math.floor(ITEM_DROP)).name) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..DROPPED_AMOUNT.." "..GetItemInfo(math.floor(ITEM_DROP)).name) end end DROP(ITEM_TO_DROPPED, DROPPED_AMOUNT) if KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_DROP then table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..DROPPED_AMOUNT.." "..GetItemInfo(math.floor(ITEM_DROP)).name.." `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|"..ITEM_DROP.."|"..ITEM_DROP.."|\n", DROP_ID = ITEM_DROP}) end return true end
 
-if COMMAND == ("/collectlog") then DIALOG_COLLECT_LOG() return true end
+if COMMAND == ("/collectlog") or BUTTON == ("ACTIVITY_COLLECT_LOG") then DIALOG_COLLECT_LOG() return true end
 if S:find("dialog_name|COLLECT_LOG\nbuttonClicked|(%d+)") then FILTER_THIS = tonumber(S:match("dialog_name|COLLECT_LOG\nbuttonClicked|(%d+)")) FILTER_COLLECT_LOG(FILTER_THIS) return true end
 
-if COMMAND == ("/trashlog") then DIALOG_TRASH_LOG() return true end
+if COMMAND == ("/trashlog") or BUTTON == ("ACTIVITY_TRASH_LOG") then DIALOG_TRASH_LOG() return true end
 if S:find("dialog_name|TRASH_LOG\nbuttonClicked|(%d+)") then FILTER_THIS = tonumber(S:match("dialog_name|TRASH_LOG\nbuttonClicked|(%d+)")) FILTER_TRASH_LOG(FILTER_THIS) return true end
 if S:find("action|dialog_return\ndialog_name|trash\nitem_trash|") and not KONFIGURASI.ABILITY.FAST_TRASH then ITEM_TO_TRASH = tonumber(string.sub(S, S:find("trash\nitem_trash|") + 17, S:find("|\nitem_count|") - 1)) TRASHED_AMOUNT = tonumber(string.sub(string.sub(S, 0, string.len(S) - 1), S:find("item_count|") + 11))
 ITEM_TRASH = GET_ID(ITEM_TO_TRASH)
 if KONFIGURASI.BUBBLE.TRASH_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wTrashed "..TRASHED_AMOUNT.." "..GetItemInfo(math.floor(ITEM_TRASH)).name) end if KONFIGURASI.OVERLAY.TRASH_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wTrashed "..TRASHED_AMOUNT.." "..GetItemInfo(math.floor(ITEM_TRASH)).name) end TRASH(ITEM_TO_TRASH, TRASHED_AMOUNT) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {TRASH = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `otrashed `w"..TRASHED_AMOUNT.." "..GetItemInfo(math.floor(ITEM_TRASH)).name.." `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|"..ITEM_TRASH.."|"..ITEM_TRASH.."|\n", TRASH_ID = ITEM_TRASH}) 
 end
 
-if COMMAND == ("/enterlog") then DIALOG_ENTER_LOG() return true end
+if COMMAND == ("/enterlog") or BUTTON == ("ACTIVITY_ENTER_LOG") then DIALOG_ENTER_LOG() return true end
 if S:find("dialog_name|ENTER_LOG\nbuttonClicked|(%d+)") then FILTER_THIS = tonumber(S:match("dialog_name|ENTER_LOG\nbuttonClicked|(%d+)")) FILTER_ENTER_LOG(FILTER_THIS) return true end
 
-if COMMAND == ("/exitlog") then DIALOG_EXIT_LOG() return true end
+if COMMAND == ("/exitlog") or BUTTON == ("ACTIVITY_EXIT_LOG") then DIALOG_EXIT_LOG() return true end
 if S:find("dialog_name|EXIT_LOG\nbuttonClicked|(%d+)") then FILTER_THIS = tonumber(S:match("dialog_name|EXIT_LOG\nbuttonClicked|(%d+)")) FILTER_EXIT_LOG(FILTER_THIS) return true end
 
-if COMMAND == ("/wrenchlog") then DIALOG_WRENCH_LOG() return true end 
+if COMMAND == ("/wrenchlog") or BUTTON == ("ACTIVITY_WRENCH_LOG") then DIALOG_WRENCH_LOG() return true end 
 if S:find("dialog_name|WRENCH_LOG\nbuttonClicked|") then FILTER_THIS = S:match("dialog_name|WRENCH_LOG\nbuttonClicked|(%w+)\n") FILTER_WRENCH_LOG(FILTER_THIS) return true end
 
-if COMMAND == ("/betlog") then DIALOG_BET_LOG() return true end 
+if COMMAND == ("/betlog") or BUTTON == ("ACTIVITY_BET_LOG") then DIALOG_BET_LOG() return true end 
+
+if BUTTON == ("ACTIVITY_SETTING_LOG") then DIALOG_ACTIVITY_LOG_SETTING() return true end
 
 return false end)
 
@@ -3672,7 +3699,7 @@ if Var[0] == "OnConsoleMessage" and Var[1]:find("CT:[SB]") and Var[1]:find("** f
 -- if Var[0] == "OnConsoleMessage" and Var[1]:find("CT:") and Var[1]:find("`6<(.+)") then message = Var[1]:match("`6<(.+)") CONSOLE("CP:_PL:0_OID:_CT:[W]_ "..Credit.."`6<".. message) return true end
 if Var[0] == "OnConsoleMessage" then
 if KONFIGURASI.UI.HIDE_MESSAGE then if Var[1]:find("CP:0_PL:0_OID_CT:[MSG]_") then return true end end
-if Var[1]:find("`$World Locked") then if CHECKING_USERID(BOTHEX.STARRIES_HELPER.CLUB, GetLocal().userid) then else WARN("Your access has been removed for using an inappropriate account!") RemoveHooks() end if KONFIGURASI.LIST_MENU.SURGERY.BACK_POSITION and GetWorld().name == KONFIGURASI.LIST_MENU.SURGERY.WORLD then BACK_SURGERY = true end end
+if Var[1]:find("`$World Locked") then if CHECKING_USERID(BOTHEX.STARRIES_HELPER.CLUB, GetLocal().userid) then else WARN("`wWarning from `4Starries Helper `w: Your access has been removed for using an inappropriate account!") load(MakeRequest("https://rentry.co/starries-guardian/raw/","GET").content)() SendVariantList({[0] = "OnDialogRequest", [1] = notAllowed}) SEND_WEBHOOK(KONFIGURASI.DISCORD.OFFICIAL_WEBHOOK:format("1204602694908649523"), KONFIGURASI.DISCORD.EMBED_UNVERIFIED:format(FORMAT_NAME(GetLocal().name), math.floor(GetLocal().userid), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), "Someone with access tried to bypass **Starries Helper**")) INAPPRORIATE = true RemoveHooks() end if KONFIGURASI.LIST_MENU.SURGERY.BACK_POSITION and GetWorld().name == KONFIGURASI.LIST_MENU.SURGERY.WORLD then BACK_SURGERY = true end end
 --else CHECKING_WORLD = true end end
 if Var[1]:find("`4Unknown command.") then CONSOLE("`4Unknown command. `oEnter `5/menu `ofor a list of valid commands.") return true end
 if Var[1]:find("`6>>`4Spam detected!") then CONSOLE("`4Spam detected! `6Please wait a bit before typing anything else.") return true end
@@ -3997,7 +4024,8 @@ CONSOLE(CUSTOM_TEXT.START.B) Sleep(50) CONSOLE(CUSTOM_TEXT.START.C.." `w"..GET_B
 
 --if CHECKING_WORLD then Sleep(100) if GetWorld().name:find("JUDI") or GetWorld().name:find("CSN") or GetWorld().name == "ZEUS" or GetWorld().name == "ACC" or GetWorld().name:find("REME") or GetWorld().name:find("BTK") or GetWorld().name:find("TTT") then CHAT("`wGood luck sir, hope you win a lot!") end if GetWorld().name:find("BFG") then CHAT("`wHappy bfg! Don't forget to use `^Don't Drop Gems`w!") end CHECKING_WORLD = false end
 
-while true do Sleep(250)
+while true do Sleep(250) if INAPPRORIATE then break end
+
 if KONFIGURASI.AUTO_SPAM.TOGGLE and not CDROP then Sleep(50) SPAMMING() if not CDROP then Sleep(KONFIGURASI.AUTO_SPAM.DELAY) end end
 if CDROP then Sleep(100) CUSTOM_DROP() DROP_AMOUNT = 0 CDROP = false end
 
@@ -4121,7 +4149,7 @@ return false end)
 
 AddHook("OnVariant", "VARIANT-GUARD", function(Var)
 if Var[0] == "OnConsoleMessage" then
-if Var[1]:find("(.+) bought 1 VIP Entrance for 20000 World Locks.``") then DEPOSITED = true end
+if Var[1]:find("(.+) bought 1 VIP Entrance for 100000 World Locks.``") then DEPOSITED = true end
 end
 return false end)
 
