@@ -1177,6 +1177,7 @@ AddHook("OnSendPacket", "O", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S
 
 if COMMAND == ("/mf") then if not FIND_MOONCAKE then FIND_MOONCAKE = true else FIND_MOONCAKE = false end return true end
 if COMMAND == ("/md") then if not DROP_MOONCAKE then DROP_MOONCAKE = true else DROP_MOONCAKE = false end return true end
+if COMMAND == ("/ds") then DROP(GetItemInfo("Songpyeon").id, GET_AMOUNT(GetItemInfo("Songpyeon").id)) return true end
 
 return false end)
 
@@ -4135,7 +4136,7 @@ if BOOM_EMOJI then Sleep(50) CHAT("(agree) (alien) (bheart) (build) (bunny) (cac
 if SHOW_GEMS_ON_WORLD then Sleep(50) CHAT("Beep Beep, Scanning ...") Sleep(1000) local GEMS_COUNT = GET_FLOAT_AMOUNT(112) if GEMS_COUNT > 0 then CHAT("Scan Results : `5"..GEMS_COUNT.." ``Gems (gems)") else CHAT("We don't find Gems here!") end SHOW_GEMS_ON_WORLD = false end
 if SHOW_BGEMS_ON_WORLD then Sleep(50) CHAT("Beep Beep, Scanning ...") Sleep(1000) local BGEMS_COUNT = GET_FLOAT_AMOUNT(GetItemInfo("Black Gems").id) if BGEMS_COUNT > 0 then CHAT("Scan Result : `5"..BGEMS_COUNT.." ``Black Gems (yes)") else CHAT("No Black Gems here!") end SHOW_BGEMS_ON_WORLD = false end
 if SHOW_PLAYER_ON_WORLD then Sleep(50) CHAT("Beep Beep, Scanning ...") Sleep(1000) local PLAYERS_COUNT = GET_PLAYER_COUNT() if PLAYERS_COUNT > 1 then CHAT("Scan Results : `5"..PLAYERS_COUNT.." ``Players (tongue)") else CHAT("This world is lonely like you (cry)") end SHOW_PLAYER_ON_WORLD = false end
-if SHOW_BALANCE then Sleep(50) RES = (GET_AMOUNT(242))+(GET_AMOUNT(1796)*100)+(GET_AMOUNT(7188)*10000)+(GET_AMOUNT(115500)*1000000) CHAT("Your balance : "..GET_DATA(RES)) SHOW_BALANCE = false end
+if SHOW_BALANCE then Sleep(50) RES = (GET_AMOUNT(242))+(GET_AMOUNT(1796)*100)+(GET_AMOUNT(7188)*10000)+(GET_AMOUNT(11550)*1000000) CHAT("Your balance : "..GET_DATA(RES)) SHOW_BALANCE = false end
 
 if SOMBONG_DULU then Sleep(100) CHAT("/love") Sleep(700) CHAT("Segini Doang (tongue) ?") SOMBONG_DULU = false end
 
