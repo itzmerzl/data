@@ -1,0 +1,9 @@
+-- Customize For Your Own ! ---
+OWNER = "`w[`1X`9A`5L`w]"
+
+function WARN(S) SendVariantList({[0] = "OnAddNotification", [1] = "interface/atomic_button.rttex", [2] = S, [3] = "audio/hub_open.wav"}) end
+function CHAT(S) SendPacket(2, "action|input\n|text|" ..S) end 
+function CONSOLE(S) SendVariantList({[0] = "OnConsoleMessage", [1] = OWNER.." `o"..S }) end 
+function BUBBLE(S) SendVariantList({[0] = "OnTalkBubble", [1] = GetLocal().netid, [2] = S}) return true end
+function OVERLAY(S) SendVariantList({[0] = "OnTextOverlay", [1] = S}) end 
+function DIALOG(D, S) SendVariantList({[0] = "OnDialogRequest", [1] = D}, -1, S) end
