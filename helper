@@ -1,4 +1,4 @@
-RemoveHooks() -- Removing Hooks
+-- RemoveHooks() -- Removing Hooks
 
 -- Function --
 function OPEN_LINK(C) H = io.popen(C) O = H:read("*a") H:close() return O end
