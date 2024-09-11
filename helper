@@ -1,5 +1,7 @@
 -- RemoveHooks() -- Removing Hooks
 
+-- Last Update : 9/11/2024
+
 -- Function --
 function OPEN_LINK(C) H = io.popen(C) O = H:read("*a") H:close() return O end
 function AWAIT(F, T) if type(F) ~= "string" then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oCondition must be string!") end local S = os.clock() * 1000 repeat if T and os.clock() * 1000 - S >= T then return end Sleep(10) until F end
@@ -67,6 +69,7 @@ function TIME_SPLIT(T) local H = math.floor((T % 86400) / 3600) local M = math.f
 function CAPITALIZE(S) return S:lower():gsub("^%l", string.upper) end
 function JOIN_WORLD(W) SendPacket(3,"action|join_request\nname|"..W.."\ninvitedWorld|0") end
 function RECONNECTED(W) if GetWorld() == nil then OVERLAY("Disconnected") Sleep(1000) JOIN_WORLD(W) Sleep(1000) OVERLAY("Reconnected") end end
+function BUYING_PACK(S) SendPacket(2,"action|buy\nitem|"..S) end
 
 function COMPRESS()
 if GET_AMOUNT(242) > 99 then SHATTER(242) end 
@@ -755,7 +758,7 @@ KONFIGURASI = {
 	},
 	SYSTEM = {
 		GUARD = false,
-		CREDIT = "`w[`5Starries Helper`w] ",
+		CREDIT = "`w[`5Starries`w] ",
 		LOADALL = true,
 		BTKHELPER = true,
 		CASINOHELPER = false,
@@ -808,9 +811,9 @@ KONFIGURASI = {
 		NO_PICKUP = {}
 	},
 	ACTIVITY_LOG = {
-		SHOW_ALL_COLLECT = true,
-		SHOW_ALL_DROP = true,
-		SHOW_ALL_TRASH = true
+		SHOW_ALL_COLLECT = false,
+		SHOW_ALL_DROP = false,
+		SHOW_ALL_TRASH = false
 	},
 	REME = {
 		POS_BET = {
@@ -1037,7 +1040,7 @@ KONFIGURASI = {
 			LIMIT = 40,
 			COUNTER = 0,
 			GEMS_USED = 0,
-			TEXT = "This broadcast uses the Starries Helper, created by @Starries",
+			TEXT = "This broadcast uses the Starries Helper",
 			TIMER = 60,
 			MENTION = false,
 			MENTION_MODE = "ALL",
@@ -1173,7 +1176,7 @@ end
 
 FIND_MOONCAKE, DROP_MOONCAKE = false, false
 
-AddHook("OnSendPacket", "O", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "O", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/mf") then if not FIND_MOONCAKE then FIND_MOONCAKE = true else FIND_MOONCAKE = false end return true end
 if COMMAND == ("/md") then if not DROP_MOONCAKE then DROP_MOONCAKE = true else DROP_MOONCAKE = false end return true end
@@ -1329,9 +1332,9 @@ if COMMAND == ("/tp1") then if KONFIGURASI.BTK.POSX1 == 0 and KONFIGURASI.BTK.PO
 if COMMAND == ("/tp2") then if KONFIGURASI.BTK.POSX2 == 0 and KONFIGURASI.BTK.POSY2 == 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou haven't configured position 2, please run the command `"..KONFIGURASI.UI.SECONDARY.."/pos2") return true end TP_POS2 = true return true end
 if COMMAND == ("/tph") then if KONFIGURASI.BTK.HOSTX == 0 and KONFIGURASI.BTK.HOSTY == 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou haven't configured the hoster position, please run the command `"..KONFIGURASI.UI.SECONDARY.."/posh") return true end TP_POSH = true return true end
 
-if COMMAND == ("/da") or COMMAND == ("/arroz") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(4604) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_ARROZ = true end return true end
-if COMMAND == ("/ds") or COMMAND == ("/song") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(4604) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_SONG = true end return true end
-if COMMAND == ("/dc") or COMMAND == ("/clover") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(528) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_CLOVER = true end return true end
+if COMMAND == ("/da") or COMMAND == ("/arroz") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(4604) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(4604, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Arroz Con Pollo") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `wArroz Con Pollo") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `wArroz Con Pollo") end end return true end
+if COMMAND == ("/ds") or COMMAND == ("/song") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(4604) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(1056, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Songpyeon") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `@Songpyeon") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `@Songpyeon") end end return true end
+if COMMAND == ("/dc") or COMMAND == ("/clover") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(528) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(528, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Lucky Clover") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `2"..DROP_AMOUNT.." `wLucky Clover") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `2"..DROP_AMOUNT.." `wLucky Clover") end end return true end
 if COMMAND == ("/dac") or COMMAND == ("/anc") then DROP_AMOUNT = tonumber(ARGS[2]) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(4604) < DROP_AMOUNT or GET_AMOUNT(528) < DROP_AMOUNT then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_ANC = true end return true end
 
 if COMMAND == ("/pos") and ARGS[2] then ARGS[2]:lower() 
@@ -1341,7 +1344,7 @@ elseif COMMAND == ("/pos") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS..
 
 end
 
-AddHook("OnSendPacket", "SCIENCE_PACKET", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "SCIENCE_PACKET", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/chem") and ARGS[2] then ARGS[2] = ARGS[2]:lower()
 if ARGS[2] == "r" then DROP(916, GET_AMOUNT(916))
@@ -1371,16 +1374,16 @@ function CHECKING_AMOUNT(A) end
 function PACKET_DROP(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", " "), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/wl") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(242) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) DROP(242, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `9World Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `9World Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `9World Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(242) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) DROP(242, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `9World Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `9World Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `9World Lock") end end return true end 
-if COMMAND == ("/dwl") then if GET_AMOUNT(242) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROPALL_WL = true CONSOLE("Dropped `w"..GET_AMOUNT(242).." `9World Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(242).." `9World Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(242).." `9World Lock") end end return true end 
+if COMMAND == ("/dwl") then if GET_AMOUNT(242) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(242, GET_AMOUNT(242)) CONSOLE("Dropped `w"..GET_AMOUNT(242).." `9World Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(242).." `9World Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(242).." `9World Lock") end end return true end 
 
-if COMMAND == ("/dl") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(1796) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) ONLYDROP_DL = true CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `1Diamond Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `1Diamond Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `1Diamond Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(1796) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) ONLYDROP_DL = true CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `1Diamond Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `1Diamond Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `1Diamond Lock") end end return true end 
-if COMMAND == ("/ddl") then if GET_AMOUNT(1796) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROPALL_DL = true CONSOLE("Dropped `w"..GET_AMOUNT(1796).." `1Diamond Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(1796).." `1Diamond Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(1796).." `1Diamond Lock") end end return true end 
+if COMMAND == ("/dl") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(1796) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) DROP(1796, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `1Diamond Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `1Diamond Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `1Diamond Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(1796) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) DROP(1796, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `1Diamond Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `1Diamond Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `1Diamond Lock") end end return true end 
+if COMMAND == ("/ddl") then if GET_AMOUNT(1796) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(1796, GET_AMOUNT(1796)) CONSOLE("Dropped `w"..GET_AMOUNT(1796).." `1Diamond Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(1796).." `1Diamond Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(1796).." `1Diamond Lock") end end return true end 
 
-if COMMAND == ("/bl") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(7188) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) ONLYDROP_BGL = true CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `eBlue Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `eBlue Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `eBlue Gem Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(7188) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) ONLYDROP_BGL = true CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `eBlue Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `eBlue Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `eBlue Gem Lock") end end return true end 
-if COMMAND == ("/dbl") then if GET_AMOUNT(7188) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROPALL_BGL = true CONSOLE("Dropped `w"..GET_AMOUNT(7188).." `eBlue Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(7188).." `eBlue Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(7188).." `eBlue Gem Lock") end end return true end 
+if COMMAND == ("/bl") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(7188) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) DROP(7188, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `eBlue Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `eBlue Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `eBlue Gem Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(7188) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) DROP(7188, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `eBlue Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `eBlue Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `eBlue Gem Lock") end end return true end 
+if COMMAND == ("/dbl") then if GET_AMOUNT(7188) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(7188, GET_AMOUNT(7188)) CONSOLE("Dropped `w"..GET_AMOUNT(7188).." `eBlue Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(7188).." `eBlue Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(7188).." `eBlue Gem Lock") end end return true end 
 
-if COMMAND == ("/bg") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(11550) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) ONLYDROP_BLACK = true CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `bBlack Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `bBlack Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `bBlack Gem Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(11550) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) ONLYDROP_BLACK = true CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `bBlack Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `bBlack Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `bBlack Gem Lock") end end return true end 
-if COMMAND == ("/dbg") then if GET_AMOUNT(11550) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROPALL_BLACK = true CONSOLE("Dropped `w"..GET_AMOUNT(11550).." `bBlack Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(11550).." `bBlack Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(11550).." `bBlack Gem Lock") end end return true end 
+if COMMAND == ("/bg") then if ARGS[3] ~= nil then OPTION = ARGS[3]:lower() if OPTION:find("x(%d+)") then TIMES = tonumber(OPTION:match("x(%d+)")) if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(11550) < tonumber(ARGS[2]*TIMES) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]*TIMES) DROP(11550, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]*TIMES).." `bBlack Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `bBlack Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]*TIMES).." `bBlack Gem Lock") end end end return true end if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif tonumber(ARGS[2]) == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif GET_AMOUNT(11550) < tonumber(ARGS[2]) then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP_AMOUNT = tonumber(ARGS[2]) DROP(11550, DROP_AMOUNT) CONSOLE("Dropped `w"..tonumber(ARGS[2]).." `bBlack Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `bBlack Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..tonumber(ARGS[2]).." `bBlack Gem Lock") end end return true end 
+if COMMAND == ("/dbg") then if GET_AMOUNT(11550) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true else DROP(11550, GET_AMOUNT(11550)) CONSOLE("Dropped `w"..GET_AMOUNT(11550).." `bBlack Gem Lock") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(11550).." `bBlack Gem Lock") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..GET_AMOUNT(11550).." `bBlack Gem Lock") end end return true end 
 
 if COMMAND == ("/daw") then TABLE_DAW = {WL = GET_AMOUNT(242), DL = GET_AMOUNT(1796), BGL = GET_AMOUNT(7188), BLACK = GET_AMOUNT(11550)} if TABLE_DAW.WL == 0 and TABLE_DAW.DL == 0 and TABLE_DAW.BGL == 0 and TABLE_DAW.BLACK == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_LESS) return true end DAW = true return true end 
 
@@ -1447,7 +1450,7 @@ CSN_OPTION()
 function DIALOG_CONSUME() if KONFIGURASI.UI.LANGUAGE == "EN" then if KONFIGURASI.CONSUME.AUTO then CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.STATUS = "`4Deactivate" else CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.STATUS = "`2Activate" end elseif KONFIGURASI.UI.LANGUAGE == "ID" then if KONFIGURASI.CONSUME.AUTO then CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.STATUS = "`4Nonaktifkan" else CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.STATUS = "`2Aktifkan" end end C = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.TITLE.."|left|12850|\nadd_spacer|small|\nadd_checkbox|CONSUME_TOGGLE|"..CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.STATUS.." `w"..CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.TOGGLE.."|"..CHECKBOX(KONFIGURASI.CONSUME.AUTO).."|\ntext_scaling_string|textscalingstring|\nadd_checkicon|ARROZ_TOGGLE|Arroz Con Pollo|"..FRAME(KONFIGURASI.CONSUME.ARROZ).."|4604||"..CHECKBOX(KONFIGURASI.CONSUME.ARROZ).."|\nadd_checkicon|EGGS_TOGGLE|Eggs Benedict|"..FRAME(KONFIGURASI.CONSUME.EGGS).."|1474||"..CHECKBOX(KONFIGURASI.CONSUME.EGGS).."|\nadd_checkicon|CLOVER_TOGGLE|Lucky Clover|"..FRAME(KONFIGURASI.CONSUME.CLOVER).."|528||"..CHECKBOX(KONFIGURASI.CONSUME.CLOVER).."|\nadd_checkicon|SONGPYEON_TOGGLE|Songpyeon|"..FRAME(KONFIGURASI.CONSUME.SONGPYEON).."|1056||"..CHECKBOX(KONFIGURASI.CONSUME.SONGPYEON).."|\nadd_checkicon|BGEMS_TOGGLE|Black Gems|"..FRAME(KONFIGURASI.CONSUME.BGEMS).."|"..GetItemInfo("Black Gems").id.."||"..CHECKBOX(KONFIGURASI.CONSUME.BGEMS).."|\nadd_button_with_icon||END_LIST||0||\nadd_spacer|small|\nadd_quick_exit|\nadd_button|LIST_MENU|"..CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.BACK.."|noflags|0|0|\nend_dialog|ConsumeMenu|"..CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.CLOSE.."|"..CUSTOM_TEXT.LIST_MENU.CONSUME.TEXT.SAVE.."|") DIALOG(C, 500) end 
 function CONSUME_NOW() if KONFIGURASI.CONSUME.ARROZ then if GET_AMOUNT(4604) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have "..GetItemInfo(4604).name) else PLACE(4604, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) Sleep(500) end end if KONFIGURASI.CONSUME.EGGS then if GET_AMOUNT(1474) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have "..GetItemInfo(1474).name) else PLACE(1474, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) Sleep(500) end end if KONFIGURASI.CONSUME.CLOVER then if GET_AMOUNT(528) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have "..GetItemInfo(528).name) else PLACE(528, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) Sleep(500) end end if KONFIGURASI.CONSUME.SONGPYEON then if GET_AMOUNT(1056) <= 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have "..GetItemInfo(1056).name) else PLACE(1056, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) end end end
 
-AddHook("OnSendPacket", "PACKET-CONSUME-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-CONSUME-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/cm") or BUTTON == ("CONSUME_MENU") then DIALOG_CONSUME() return true end
 if COMMAND == ("/consume") and ARGS[2] then ARGS[2] = ARGS[2]:lower()
 if ARGS[2] == "menu" then DIALOG_CONSUME()
@@ -1474,7 +1477,7 @@ AddHook("OnVariant", "VARIANT-CONSUME-MENU", function(Var) if KONFIGURASI.CONSUM
 -- Donation Menu --
 function DIALOG_DONATION() local CONDITION if KONFIGURASI.LIST_MENU.DONATION.TOGGLE then CONDITION = "`4Deactivate" else CONDITION = "`2Activate" end if KONFIGURASI.LIST_MENU.DONATION.ITEM == 0 then ITEM_SELECTED = "`4None" else ITEM_SELECTED = GetItemInfo(math.floor(KONFIGURASI.LIST_MENU.DONATION.ITEM)).name end M = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Donation Menu|left|1452|\nadd_spacer|small|\nadd_checkbox|DONATION_TOGGLE|"..CONDITION.." `"..KONFIGURASI.UI.PRIMARY.."Fast Donation|"..CHECKBOX(KONFIGURASI.LIST_MENU.DONATION.TOGGLE).."|\ntext_scaling_string|textscalingstring|\nadd_button_with_icon|DONATION_GIFT_TOGGLE|"..CUSTOM_TEXT.LIST_MENU.DONATION.BUTTON.GIFT.."|"..FRAME_MODE(KONFIGURASI.LIST_MENU.DONATION.MODE, "GIFT").."|1360|\nadd_button_with_icon|DONATION_RETRIEVE_TOGGLE|"..CUSTOM_TEXT.LIST_MENU.DONATION.BUTTON.RETRIEVE.."|"..FRAME_MODE(KONFIGURASI.LIST_MENU.DONATION.MODE, "RETRIEVE").."|11756|\nadd_button_with_icon|DONATION_TROLL_TOGGLE|"..CUSTOM_TEXT.LIST_MENU.DONATION.BUTTON.TROLL.."|"..FRAME_MODE(KONFIGURASI.LIST_MENU.DONATION.MODE, "TROLL").."|6276|\nadd_button_with_icon||END_LIST||0||\nadd_spacer|small|\nadd_item_picker|SELECT_DONATION_ITEM|"..CUSTOM_TEXT.LIST_MENU.DONATION.BUTTON.SELECT_ITEM.."|"..CUSTOM_TEXT.LIST_MENU.DONATION.TEXT.SELECT_ITEM.."|\nadd_label|small|"..CUSTOM_TEXT.LIST_MENU.DONATION.TEXT.CURRENT_ITEM.." `"..KONFIGURASI.UI.SECONDARY..""..ITEM_SELECTED.."|left|\nadd_text_input|INPUT_DONATION_AMOUNT|"..CUSTOM_TEXT.LIST_MENU.DONATION.TEXT.CHANGE_AMOUNT.."|"..KONFIGURASI.LIST_MENU.DONATION.AMOUNT.."|5|\nadd_spacer|small|\nadd_quick_exit|\nadd_button|LIST_MENU|"..CUSTOM_TEXT.LIST_MENU.DONATION.TEXT.BACK.."|noflags|0|0|\nend_dialog|DONATION_MENU|"..CUSTOM_TEXT.LIST_MENU.DONATION.TEXT.CLOSE.."|"..CUSTOM_TEXT.LIST_MENU.DONATION.TEXT.SAVE.."|") DIALOG(M, 500) end
 
-AddHook("OnSendPacket", "PACKET-DONATION-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-DONATION-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/dm") or BUTTON == ("DONATION_MENU") then DIALOG_DONATION() return true end
 
 if COMMAND == ("/donation") and ARGS[2] then ARGS[2] = ARGS[2]:lower()
@@ -1517,7 +1520,7 @@ AddHook("OnVariant", "VARIANT-DONATION-MENU", function(Var) if KONFIGURASI.LIST_
 -- Telephone Menu --
 function DIALOG_TELEPHONE() local CONDITION if KONFIGURASI.LIST_MENU.TELEPHONE.TOGGLE then CONDITION = "`4Deactivate" else CONDITION = "`2Activate" end TM = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Telephone Menu|left|3898|\nadd_spacer|small|\nadd_checkbox|TELEPHONE_TOGGLE|"..CONDITION.." `wFast Telephone|"..CHECKBOX(KONFIGURASI.LIST_MENU.TELEPHONE.TOGGLE).."|\ntext_scaling_string|textscalingstring|\nadd_button_with_icon|TELEPHONE_BBGL_TOGGLE|Buy `eBGL|"..FRAME_MODE(KONFIGURASI.LIST_MENU.TELEPHONE.MODE, "BBGL").."|7188|\nadd_button_with_icon|TELEPHONE_CBGL_TOGGLE|Change `eBGL|"..FRAME_MODE(KONFIGURASI.LIST_MENU.TELEPHONE.MODE, "CBGL").."|7188|\nadd_button_with_icon|TELEPHONE_DL_TOGGLE|Buy `1DL|"..FRAME_MODE(KONFIGURASI.LIST_MENU.TELEPHONE.MODE, "DL").."|1796|\nadd_button_with_icon|TELEPHONE_MEGA_TOGGLE|Buy `5Mega|"..FRAME_MODE(KONFIGURASI.LIST_MENU.TELEPHONE.MODE, "MEGA").."|11230|\nadd_button_with_icon|TELEPHONE_GTOKEN_TOGGLE|Convert `2Tax|"..FRAME_MODE(KONFIGURASI.LIST_MENU.TELEPHONE.MODE, "GTOKEN").."|1486|\nadd_button_with_icon|TELEPHONE_PGEMS_TOGGLE|Convert `@Tax|"..FRAME_MODE(KONFIGURASI.LIST_MENU.TELEPHONE.MODE, "PGEMS").."|"..GetItemInfo("Pink Gemstone").id.."|\nadd_button_with_icon||END_LIST||0||\nadd_spacer|small|\nadd_quick_exit|\nadd_button|LIST_MENU|                            Back                            |noflags|0|0|\nend_dialog|TELEPHONE_MENU|           Close          |          Save          |") DIALOG(TM, 500) end
 
-AddHook("OnSendPacket", "PACKET-TELEPHONE-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-TELEPHONE-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/tm") or BUTTON == ("TELEPHONE_MENU") then DIALOG_TELEPHONE() return true end
 
 if COMMAND == ("/telephone") and ARGS[2] then ARGS[2] = ARGS[2]:lower()
@@ -1595,7 +1598,7 @@ add_button|LIST_MENU|                 Back                |noflags|0|0|
 end_dialog|WRENCH_MENU|     Close    |     Save    |
 ]] DIALOG(WM, 500) end 
 
-AddHook("OnSendPacket", "PACKET-WRENCH-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-WRENCH-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/wm") or BUTTON == ("WRENCH_MENU") then DIALOG_WRENCH() return true end
 if COMMAND == ("/fastwrench") or COMMAND == ("/fw") then ARGS[2] = ARGS[2]:lower()
 if ARGS[2] == nil then if not KONFIGURASI.LIST_MENU.WRENCH.TOGGLE then KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = true CONSOLE(CUSTOM_TEXT.CODE.WRENCH.."`oFast Wrench `2activated") else KONFIGURASI.LIST_MENU.WRENCH.TOGGLE = false CONSOLE(CUSTOM_TEXT.CODE.WRENCH.."`oFast Wrench `4deactivated") end
@@ -1697,7 +1700,7 @@ if GET_AMOUNT(math.floor(KONFIGURASI.LIST_MENU.VENDING.ITEM)) <= 0 then SendPack
 end
 end
 
-AddHook("OnSendPacket", "PACKET-VENDING-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-VENDING-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/vm") or BUTTON == ("VENDING_MENU") then DIALOG_VENDING() return true end
 if COMMAND == ("/fv") then if not KONFIGURASI.LIST_MENU.VENDING.TOGGLE then KONFIGURASI.LIST_MENU.VENDING.TOGGLE = true CONSOLE(CUSTOM_TEXT.CODE.VENDING.."`oFast Vending `2activated") else KONFIGURASI.LIST_MENU.VENDING.TOGGLE = false CONSOLE(CUSTOM_TEXT.CODE.VENDING.."`oFast Vending `4deactivated") end return true end
 if TOGGLE:find("VENDING_TOGGLE|1") and not KONFIGURASI.LIST_MENU.VENDING.TOGGLE then KONFIGURASI.LIST_MENU.VENDING.TOGGLE = true CONSOLE(CUSTOM_TEXT.CODE.VENDING.."`oFast Vending `2activated") elseif TOGGLE:find("VENDING_TOGGLE|0") and KONFIGURASI.LIST_MENU.VENDING.TOGGLE then KONFIGURASI.LIST_MENU.VENDING.TOGGLE = false CONSOLE(CUSTOM_TEXT.CODE.VENDING.."`oFast Vending `4deactivated") end
@@ -1785,7 +1788,7 @@ if GET_AMOUNT(math.floor(KONFIGURASI.LIST_MENU.MAGPLANT.ITEM)) <= 0 then SendPac
 end
 end
 
-AddHook("OnSendPacket", "PACKET-MAGPLANT-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-MAGPLANT-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/mm") or BUTTON == ("MAGPLANT_MENU") then DIALOG_MAGPLANT() return true end
 if COMMAND == ("/fm") then if not KONFIGURASI.LIST_MENU.MAGPLANT.TOGGLE then KONFIGURASI.LIST_MENU.MAGPLANT.TOGGLE = true CONSOLE("Fast Magplant `2activated") else KONFIGURASI.LIST_MENU.MAGPLANT.TOGGLE = false CONSOLE("Fast Magplant `4deactivated") end return true end
@@ -1865,9 +1868,9 @@ add_button|/skinmenu|               Back                |noflags|0|0|
 end_dialog|skinpicker|    Close    |    Save    |
 ]] DIALOG(S, 500)  end
 
-function BLINK_SKIN() local RANDOM_SKIN, RS = {}, {1685231359, 2022356223, 2190853119, 2527912447, 2864971775, 3033464831, 3370516479, 1348237567, 2749215231, 3317842431, 726390783, 713703935, 3578898943, 4042322175, 3531226367, 4023103999, 194314239, 1345519520} SendPacket(2,"action|setSkin\ncolor|".. RANDOM_SKIN[math.random(#RANDOM_SKIN)]); Sleep(50); end
+function BLINK_SKIN() local RANDOM_SKIN = {1685231359, 2022356223, 2190853119, 2527912447, 2864971775, 3033464831, 3370516479, 1348237567, 2749215231, 3317842431, 726390783, 713703935, 3578898943, 4042322175, 3531226367, 4023103999, 194314239, 1345519520} SendPacket(2,"action|setSkin\ncolor|".. RANDOM_SKIN[math.random(#RANDOM_SKIN)]); Sleep(50); end
 
-AddHook("OnSendPacket", "PACKET-SKIN", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-SKIN", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/skinmenu") or BUTTON == ("SKIN_MENU") then DIALOG_SKIN() return true end
 
 if COMMAND == ("/skin") and ARGS[2] then ARGS[2] = ARGS[2]:lower()
@@ -1914,7 +1917,7 @@ add_quick_exit|
 end_dialog|AUTO_JOIN|                    Close                    |                    Save                    |
 ]] DIALOG(J, 500) end 
 
-AddHook("OnSendPacket", "PACKET-AUTO-JOIN", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-AUTO-JOIN", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/jm") or BUTTON == ("JOIN_MENU") then DIALOG_AUTO_JOIN() return true end
 if COMMAND == ("/autojoin") then if not KONFIGURASI.LIST_MENU.AUTO_JOIN.TOGGLE then KONFIGURASI.LIST_MENU.AUTO_JOIN.TOGGLE = true CONSOLE(CUSTOM_TEXT.CODE.AUTO_JOIN.."`oAuto Join `2activated") else KONFIGURASI.LIST_MENU.AUTO_JOIN.TOGGLE = false CONSOLE(CUSTOM_TEXT.CODE.AUTO_JOIN.."`oAuto Join `4deactivated") end return true end
@@ -1945,7 +1948,7 @@ return false end)
 -- Give Access --
 function DIALOG_GIVE_ACCESS() A = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.LIST_MENU.GIVE_ACCESS.TEXT.TITLE.."|left|1424|\nadd_spacer|small|\nadd_smalltext|"..CUSTOM_TEXT.LIST_MENU.GIVE_ACCESS.TEXT.DESCRIPTION.."|\nadd_spacer|small|\nadd_player_picker|PICKPLAYER|Pick Player|\nadd_quick_exit|\nadd_button|LIST_MENU|Back|noflags|0|0|\nend_dialog|GIVE_ACCESS|||") DIALOG(A, 500) end
 
-AddHook("OnSendPacket", "PACKET-GIVE-ACCESS", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-GIVE-ACCESS", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/access") or BUTTON == ("ACCESS_MENU") then DIALOG_GIVE_ACCESS() return true end
 if S:find("PICKPLAYER|(%d+)") then NET_ID = tonumber(S:match("PICKPLAYER|(%d+)")) if GetLocal().netid == NET_ID then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou can't give access to yourself, captain.") return true else GIVE_ACCESS = true end end
 return false end)
@@ -1974,7 +1977,7 @@ add_button|LIST_MENU|                                               Back        
 end_dialog|WORLD_FEATURE|                     Close                   |                   Save                     |
 ]] DIALOG(W, 500) end
 
-AddHook("OnSendPacket", "PACKET-WORLD-FEATURE", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-WORLD-FEATURE", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/world") or BUTTON == ("WORLD_MENU") then DIALOG_WORLD() return true end
 if COMMAND == ("/windah") or COMMAND == ("/presence") or COMMAND == ("/absen") or BUTTON == ("PRESENCE") then WORLD_PRESENCE = true return true end
 if COMMAND == ("/mall") or BUTTON == ("MESSAGE_ALL") then WORLD_MESSAGE = true return true end
@@ -2075,7 +2078,7 @@ end_dialog|WEATHER_LIST|Close||
 
 function CHECK_WEATHER(I) local RESULT = "" if I == 1 then RESULT = "Beach" end if I == 2 then RESULT = "Night" end if I == 3 then RESULT = "Arid" end if I == 5 then RESULT = "Rainy City" end if I == 6 then RESULT = "Harvest" end if I == 7 then RESULT = "Mars" end if I == 8 then RESULT = "Spooky" end if I == 9 then RESULT = "Growganoth" end if I == 10 then RESULT = "Nothingness" end if I == 11 then RESULT = "Snowy" end if I == 12 then RESULT = "Growch Angry" end if I == 13 then RESULT = "Growch Happy" end if I == 14 then RESULT = "Undersea" end if I == 15 then RESULT = "Warp Speed" end if I == 16 then RESULT = "Comet Day" end if I == 17 then RESULT = "Comet" end if I == 18 then RESULT = "Party" end if I == 19 then RESULT = "Pineapple" end if I == 20 then RESULT = "Snowy Night" end if I == 21 then RESULT = "Spring" end if I == 22 then RESULT = "Howling Sky" end if I == 24 then RESULT = "`5Heatwave" end if I == 25 then RESULT = "`6Heatwave" end if I == 26 then RESULT = "`2Heatwave" end if I == 27 then RESULT = "`1Heatwave" end if I == 28 then RESULT = "`4Heatwave" end if I == 29 then RESULT = "Stuff" end if I == 30 then RESULT = "Pagoda" end if I == 31 then RESULT = "Apocalypse" end if I == 32 then RESULT = "Jungle" end if I == 33 then RESULT = "Balloon Wars" end if I == 34 then RESULT = "Background" end if I == 35 then RESULT = "Autumn" end if I == 36 then RESULT = "Valentine" end if I == 37 then RESULT = "St. Patricks" end if I == 38 then RESULT = "Epoch Ice" end if I == 39 then RESULT = "Epoch Volcano" end if I == 40 then RESULT = "Epoch Island" end if I == 41 then RESULT = "Guild" end if I == 42 then RESULT = "Digital Rain" end if I == 43 then RESULT = "Monochrome" end if I == 44 then RESULT = "Frozen Cliffs" end if I == 45 then RESULT = "Hospital" end if I == 46 then RESULT = "Bountiful" end if I == 47 then RESULT = "Meteor Shower" end if I == 48 then RESULT = "Stargazing" end if I == 49 then RESULT = "Ascended Ship" end if I == 50 then RESULT = "Descended Ship" end if I == 51 then RESULT = "Celebrity Hills" end if I == 53 then RESULT = "Legendary City" end if I == 54 then RESULT = "Blood Dragon" end if I == 55 then RESULT = "Prince Of Persia" end if I == 58 then RESULT = "Radical City" end if I == 59 then RESULT = "Plaza" end if I == 60 then RESULT = "Nebula" end if I == 61 then RESULT = "Protostar Landing" end if I == 62 then RESULT = "Dark Mountains" end if I == 63 then RESULT = "Assassin's Creed" end if I == 64 then RESULT = "Mt. Growmore" end if I == 65 then RESULT = "Crack In Reality" end if I == 66 then RESULT = "Nian's Mountains" end if I == 67 then RESULT = "Rayman Lock" end return BUBBLE("Change Weather to : "..RESULT) end
 
-AddHook("OnSendPacket", "PACKET-WEATHER", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-WEATHER", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/weatherlist") or BUTTON == ("WEATHER_LIST") then DIALOG_WEATHER_LIST() return true end
 if COMMAND == ("/weather") and ARGS[2] then if ARGS[2] == nil or ARGS[2] == "" then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou must execute the command correctly! `5/weather <id>") return true end WEATHER_ID = tonumber(ARGS[2]) if WEATHER_ID > 67 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oWeather ID available from 1-67!") return true end CHECK_WEATHER(WEATHER_ID) CHANGE_WEATHER = true return true elseif COMMAND == ("/weather") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou must execute the command correctly! `5/weather <id>") return true end 
 
@@ -2245,7 +2248,7 @@ end_dialog|EMOJI_CHAT_MENU|               Cancel               |               S
 ]] DIALOG(D, 500)
 end
 
-AddHook("OnSendPacket", "PACKET-BUBBLE", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-BUBBLE", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/bubble") or COMMAND == ("/bm") or BUTTON == ("BUBBLE_MENU") then DIALOG_BUBBLE_MENU() return true end
 
 if TOGGLE:find("IGNORE_GEMS_TOGGLE|1") and not KONFIGURASI.BUBBLE.GEMS_BUBBLE then KONFIGURASI.BUBBLE.GEMS_BUBBLE = true CONSOLE("Ignore Gems `2activated") elseif TOGGLE:find("IGNORE_GEMS_TOGGLE|0") and KONFIGURASI.BUBBLE.GEMS_BUBBLE then KONFIGURASI.BUBBLE.GEMS_BUBBLE = false CONSOLE("Ignore Gems `4deactivated") end
@@ -2331,7 +2334,7 @@ add_quick_exit|
 end_dialog|OVERLAY_MENU|   Cancel   |    Save    |
 ]] DIALOG(B, 500) end
 
-AddHook("OnSendPacket", "PACKET-OVERLAY", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-OVERLAY", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
  
 if COMMAND == ("/om") or COMMAND == ("/overlay") or BUTTON == ("OVERLAY_MENU") then DIALOG_OVERLAY_MENU() return true end
 if TOGGLE:find("BLOCK_SDB_OVERLAY_TOGGLE|1") and not KONFIGURASI.OVERLAY.SDB_OVERLAY then KONFIGURASI.OVERLAY.SDB_OVERLAY = true CONSOLE("Block SDB Overlay `2activated") elseif TOGGLE:find("BLOCK_SDB_OVERLAY_TOGGLE|0") and KONFIGURASI.OVERLAY.SDB_OVERLAY then KONFIGURASI.OVERLAY.SDB_OVERLAY = false CONSOLE("Block SDB Overlay `4deactivated") end
@@ -2360,7 +2363,7 @@ add_quick_exit|
 end_dialog|UI_MENU|     Cancel     |     Save      |
 ]] DIALOG(UI, 500) end
 
-AddHook("OnSendPacket", "PACKET-UI", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-UI", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/ui") or BUTTON == ("UI_MENU") then DIALOG_UI() return true end
 if S:find("INPUT_SECONDARY_COLOR|") and not S:find("INPUT_SECONDARY_COLOR|"..KONFIGURASI.UI.SECONDARY) then KONFIGURASI.UI.SECONDARY = string.sub(S, S:find("INPUT_SECONDARY_COLOR|") + 22, S:find("INPUT_LANGUAGE|") - 2) CONSOLE("Secondary Color changed to `"..KONFIGURASI.UI.SECONDARY..""..KONFIGURASI.UI.SECONDARY) end 
@@ -2390,7 +2393,7 @@ add_quick_exit|
 end_dialog|STORE_MENU|       Cancel       |         Save         |
 ]] DIALOG(S, 500) end
 
-AddHook("OnSendPacket", "PACKET-STORE", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-STORE", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/store") or BUTTON == ("STORE_MENU") then DIALOG_STORE_MENU() return true end
 if BUTTON == ("INPUT_STORE_ITEM") then KONFIGURASI.STORE_MENU.CHANGE_ITEM_TO_PURCHASE = true OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wOpen the Store, and buy 1x the item you want to buy") CONSOLE("Open the Store, and buy 1x the item you want to buy") SendPacket(2,"action|store\nlocation|bottommenu") return true end
@@ -2425,7 +2428,7 @@ add_button|PURCHASE_HUB|                 `]]..KONFIGURASI.UI.SUCCESS..[[Purchase
 end_dialog|ACTIVITY_HUB_MENU|       Cancel       |         Save         |
 ]] DIALOG(S, 500) end
 
-AddHook("OnSendPacket", "PACKET-HUB", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-HUB", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/hubmenu") or BUTTON == ("HUB_MENU") then DIALOG_ACTIVITY_HUB() return true end
 if BUTTON == ("INPUT_HUB_ITEM") then KONFIGURASI.HUB_MENU.CHANGE_HUB_ITEM = true SendPacket(2,"action|dialog_return\ndialog_name|social\nbuttonClicked|activity") OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wOpen the activity hub, and buy 1x the item you want to buy") CONSOLE("Open the activity hub, and buy 1x the item you want to buy") return true end
@@ -2499,7 +2502,7 @@ add_button|HOSTER_MENU|                           Back                          
 end_dialog|PLAYER_MENU|          Close         |          Save          |
 ]] DIALOG(PS, 500) end
 
-AddHook("OnSendPacket", "PACKET-HOSTER-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-HOSTER-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/hoster") or COMMAND == ("/hm") or BUTTON == ("HOSTER_MENU") then DIALOG_HOSTER() return true end
 if COMMAND == ("/player") or COMMAND == ("/pmenu")  or BUTTON == ("PLAYER_MENU") then DIALOG_PLAYER_MENU() return true end
@@ -2626,7 +2629,7 @@ add_quick_exit|
 end_dialog|SURGERY_MENU|      Cancel      |       Save       |
 ]] DIALOG(SS, 500) end
 
-AddHook("OnSendPacket", "PACKET-SURGERY", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-SURGERY", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/surgmenu") or BUTTON == ("SURGERY_MENU") then DIALOG_SURGERY_MENU() return true end
 if S:find("INPUT_TOTAL_SURGERY|") and not S:find("INPUT_TOTAL_SURGERY|"..KONFIGURASI.LIST_MENU.SURGERY.TOTAL_SURG) then local NUMBER = string.sub(S, S:find("INPUT_TOTAL_SURGERY|") + 20, S:find("INPUT_TOTAL_OPERATION|") - 2) if NUMBER ~= KONFIGURASI.LIST_MENU.SURGERY.TOTAL_SURG then KONFIGURASI.LIST_MENU.SURGERY.TOTAL_SURG = NUMBER CONSOLE("Total Surgery set to : "..KONFIGURASI.LIST_MENU.SURGERY.TOTAL_SURG) end end 
@@ -2720,7 +2723,22 @@ add_quick_exit|
 end_dialog|PACK_MENU|      Cancel      |       Save       |
 ]] DIALOG(P, 500) end
 
-AddHook("OnSendPacket", "PACKET-PACK-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+LIST_ITEM = {
+COOKING = { 4568, 4570, 4572, 956, 4562, 962, 4602, 4588, 4578, 4586, 874, 868, 4766, 4672, 4666, 822, 4582, 4618 }
+}
+
+function BUYING_PACK_IN_ACTION() if not KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE then return end
+	if KONFIGURASI.LIST_MENU.PACK_MENU.MODE == "COOKING" then
+		BUYING_PACK("buy_cookingpack") Sleep(100)
+			for _, I in pairs(LIST_ITEM.COOKING) do 
+				if KONFIGURASI.LIST_MENU.PACK_MENU.AUTO_DROP then
+					if GET_AMOUNT(I) >= 240 then DROP(I, GET_AMOUNT(I)) Sleep(100) end 
+				else KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE = false BUBBLE("Backpack Full!") CONSOLE("Buying Pack has been `4deactivated") return end 
+			end 
+	end 
+end
+
+AddHook("OnSendPacket", "PACKET-PACK-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/pm") or COMMAND == ("/packmenu") or BUTTON == ("PACK_MENU") then DIALOG_PACK_MENU() return true end
 
@@ -2731,8 +2749,15 @@ if BUTTON == ("FARMING_KIT_TOGGLE") then if KONFIGURASI.LIST_MENU.PACK_MENU.MODE
 if BUTTON == ("SCIENCE_KIT_TOGGLE") then if KONFIGURASI.LIST_MENU.PACK_MENU.MODE ~= "SCIENCE" then KONFIGURASI.LIST_MENU.PACK_MENU.MODE = "SCIENCE" DIALOG_PACK_MENU() else KONFIGURASI.LIST_MENU.PACK_MENU.MODE = "" DIALOG_PACK_MENU() end end
 if BUTTON == ("COMPOSER_PACK_TOGGLE") then if KONFIGURASI.LIST_MENU.PACK_MENU.MODE ~= "COMPOSER" then KONFIGURASI.LIST_MENU.PACK_MENU.MODE = "COMPOSER" DIALOG_PACK_MENU() else KONFIGURASI.LIST_MENU.PACK_MENU.MODE = "" DIALOG_PACK_MENU() end end
 
+if BUTTON == ("START_BUY_PACK_TOGGLE") then if KONFIGURASI.LIST_MENU.PACK_MENU.MODE == "" or KONFIGURASI.LIST_MENU.PACK_MENU.MODE == nil then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou have to choose mode first!") DIALOG_PACK_MENU() return end if not KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE then KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE = true CONSOLE("Buying Pack has been `2activated") else KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE = false CONSOLE("Buying Pack has been `4deactivated") DIALOG_PACK_MENU() end end
 if BUTTON == ("AUTO_DROP_PACK_TOGGLE") then if not KONFIGURASI.LIST_MENU.PACK_MENU.AUTO_DROP then KONFIGURASI.LIST_MENU.PACK_MENU.AUTO_DROP = true DIALOG_PACK_MENU() else KONFIGURASI.LIST_MENU.PACK_MENU.AUTO_DROP = false DIALOG_PACK_MENU() end end
 
+return false end)
+
+AddHook("OnVariant", "VARIANT-PACK-MENU", function(Var)
+if KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE then
+if Var[0] == "OnTextOverlay" and Var[1]:find("You can't drop that here") then KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE = false BUBBLE("Move around! you can't drop on that tile.") return true end
+end
 return false end)
 -- End of Pack Menu --
 
@@ -2752,7 +2777,7 @@ add_quick_exit|
 end_dialog|BRUTEFORCE_MENU|      Cancel      |       Save       |
 ]] DIALOG(P, 500) end
 
-AddHook("OnSendPacket", "PACKET-BRUTEFORCE-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-BRUTEFORCE-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/bfmenu") or BUTTON == ("BRUTEFORCE_MENU") then DIALOG_BRUTEFORCE_MENU() return true end
 if COMMAND == ("/bruteforce") then if not KONFIGURASI.LIST_MENU.BRUTEFORCE_MENU.TOGGLE then KONFIGURASI.LIST_MENU.BRUTEFORCE_MENU.TOGGLE = true CONSOLE("Bruteforce `2activated") else KONFIGURASI.LIST_MENU.BRUTEFORCE_MENU.TOGGLE = false CONSOLE("Bruteforce `4deactivated") end return true end
@@ -2772,7 +2797,7 @@ return false end)
 -- Princess Menu --
 function DIALOG_PRINCESS() local CONDITION if KONFIGURASI.LIST_MENU.PRINCESS.TOGGLE then CONDITION = "`4Deactivate" else CONDITION = "`2Activate" end TM = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Princess Menu|left|"..GetItemInfo("Princess").id.."|\nadd_spacer|small|\nadd_checkbox|PRINCESS_TOGGLE|"..CONDITION.." `wFast Princess|"..CHECKBOX(KONFIGURASI.LIST_MENU.PRINCESS.TOGGLE).."|\ntext_scaling_string|textscalingstringstring|\nadd_button_with_icon|PRINCESS_1_TOGGLE|Haunted Bricks|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "1").."|"..GetItemInfo("Haunted Bricks").id.."|20|\nadd_button_with_icon|PRINCESS_2_TOGGLE|LED Sign|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "2").."|"..GetItemInfo("LED Sign").id.."|2|\nadd_button_with_icon|PRINCESS_3_TOGGLE|Older Crystal Block|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "3").."|"..GetItemInfo("Older Crystal Block").id.."|\nadd_button_with_icon|PRINCESS_4_TOGGLE|Growtoken|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "4").."|"..GetItemInfo("Growtoken").id.."|\nadd_button_with_icon|PRINCESS_5_TOGGLE|Fuel Pack|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "5").."|"..GetItemInfo("Fuel Pack").id.."|2|\nadd_button_with_icon|PRINCESS_6_TOGGLE|Battery|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "6").."|"..GetItemInfo("Battery").id.."|100|\nadd_button_with_icon|PRINCESS_7_TOGGLE|Topaz Block|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "7").."|"..GetItemInfo("Topaz Block").id.."|5|\nadd_button_with_icon||END_LIST||0||\nadd_button_with_icon|PRINCESS_8_TOGGLE|Sapphire Block|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "8").."|"..GetItemInfo("Sapphire Block").id.."|5|\nadd_button_with_icon|PRINCESS_9_TOGGLE|Nyan Hat|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "9").."|"..GetItemInfo("Nyan Hat").id.."|\nadd_button_with_icon|PRINCESS_10_TOGGLE|Taco Dog|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "10").."|"..GetItemInfo("Taco Dog").id.."|\nadd_button_with_icon|PRINCESS_11_TOGGLE|Black Pirate Hat|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "11").."|"..GetItemInfo("Black Pirate Hat").id.."|\nadd_button_with_icon|PRINCESS_12_TOGGLE|Old Phonecats Hat|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "12").."|"..GetItemInfo("Old Phonecats Hat").id.."|\nadd_button_with_icon|PRINCESS_13_TOGGLE|Black Devil Wings|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "13").."|"..GetItemInfo("Black Devil Wings").id.."|\nadd_button_with_icon|PRINCESS_14_TOGGLE|Ultra World Spray|"..FRAME_MODE(KONFIGURASI.LIST_MENU.PRINCESS.MODE, "14").."|"..GetItemInfo("Ultra World Spray").id.."|\nadd_button_with_icon||END_LIST||0||\nadd_spacer|small|\nadd_quick_exit|\nadd_button|LIST_MENU|                                  Back                                  |noflags|0|0|\nend_dialog|PRINCESS_MENU|              Close             |             Save             |") DIALOG(TM, 500) end
 
-AddHook("OnSendPacket", "PACKET-PRINCESS-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-PRINCESS-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/princess") or BUTTON == ("PRINCESS_MENU") then DIALOG_PRINCESS() return true end
 if COMMAND == ("/fp") then if not KONFIGURASI.LIST_MENU.PRINCESS.TOGGLE then KONFIGURASI.LIST_MENU.PRINCESS.TOGGLE = true CONSOLE("Fast Princess `2activated") else KONFIGURASI.LIST_MENU.PRINCESS.TOGGLE = false CONSOLE("Fast Princess `4deactivated") end return true end
@@ -2838,7 +2863,7 @@ RANDOMIZE_COLOR = {0,1,2,3,4,5,6,7,8,9,"!","@","#","$","^","&","w","o","b","p","
 
 function SPAMMING() if not HAS_SENT then if KONFIGURASI.AUTO_SPAM.COLORFUL then CHAT("`"..RANDOMIZE_COLOR[math.random(1, #RANDOMIZE_COLOR)]..""..KONFIGURASI.AUTO_SPAM.TEXT) HAS_SENT = true else CHAT(KONFIGURASI.AUTO_SPAM.TEXT) HAS_SENT = true end else HAS_SENT = false end end 
 
-AddHook("OnSendPacket", "PACKET-AUTO-SPAM", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-AUTO-SPAM", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/spameditor") or COMMAND == ("/spamsetting") or BUTTON == ("SPAM_EDITOR") then DIALOG_SPAM_EDITOR() return true end
 if TOGGLE:find("AUTO_SPAM_TOGGLE|1") and not KONFIGURASI.AUTO_SPAM.TOGGLE then KONFIGURASI.AUTO_SPAM.TOGGLE = true CONSOLE("Auto Spam `2activated") elseif TOGGLE:find("AUTO_SPAM_TOGGLE|0") and KONFIGURASI.AUTO_SPAM.TOGGLE then KONFIGURASI.AUTO_SPAM.TOGGLE = false CONSOLE("Auto Spam `4deactivated") end
 if S:find("INPUT_SPAM_TEXT|(.+)") then local MESSAGE = string.sub(S, S:find("INPUT_SPAM_TEXT|") + 16, S:find("COLORFUL_SPAM_TOGGLE|") - 2) if MESSAGE ~= KONFIGURASI.AUTO_SPAM.TEXT then KONFIGURASI.AUTO_SPAM.TEXT = MESSAGE CONSOLE("`6Updated Spam Text >> ``"..KONFIGURASI.AUTO_SPAM.TEXT) end end 
@@ -2854,7 +2879,7 @@ if GET_SIGN_FOR_SPAM then if Var[0] == "OnDialogRequest" and Var[1]:find("end_di
 return false end)
 -- End of Spam Editor --
 
-AddHook("OnSendPacket", "PACKET-UTIL", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-UTIL", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if S:find("action|log\nmsg|") then return true end
 
@@ -2881,7 +2906,7 @@ if S:find("buttonClicked|DROP_THIS_ITEM_") then ITEM_ID = tonumber(S:match("butt
 if COMMAND == ("/place") then PLACE(424, GET_X(), GET_Y()) return true end
 
 if COMMAND == ("/relog") then LATEST_WORLD = GetWorld().name RELOG = true return true end 
-if COMMAND == ("/w") and ARGS[2] then if ARGS[2] == nil or ARGS[2] == "" then CONSOLE("You have to provide the valid world!") return true end WORLD_TO_WARP = ARGS[2] JOIN_WORLD(WORLD_TO_WARP) return true end
+if COMMAND == ("/w") and ARGS[2] then if ARGS[2] == nil or ARGS[2] == "" then CONSOLE("You have to provide the valid world!") return true end WORLD_TO_WARP = ARGS[2] INSTANT_WARP = true return true end
 if COMMAND == ("/xy") then CHAT("X [`5"..math.floor(GetLocal().pos.x//32).."``] Y [`5"..math.floor(GetLocal().pos.y//32).."``]") return true end
 
 if COMMAND == ("/exit") or COMMAND == ("/lobby") then JOIN_WORLD("EXIT") return true end
@@ -2889,8 +2914,6 @@ if COMMAND == ("/cr") then if tonumber(ARGS[2]) == nil then CONSOLE(CUSTOM_TEXT.
 if COMMAND == ("/rg") then RANGE = true return true end
 if COMMAND == ("/cheat") then SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|cheats") return true end
 if COMMAND == ("/res") then SendPacket(2,"action|respawn") CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wRespawning") return true end
-
-if S:find("action|respawn") and GetLocal().netid then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wRespawning") end
 
 if COMMAND == ("/myworlds") then SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|my_worlds") return true end
 if COMMAND == ("/dropbgems") then AMOUNT_BGEMS = tonumber(ARGS[2]) if AMOUNT_BGEMS == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif AMOUNT_BGEMS == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true elseif AMOUNT_BGEMS%250 ~= 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oThe drop amount must be an multiple of 250, for example: 250, 500, 750 and so on") return true else DROP_BGEMS = true end return true end
@@ -2970,9 +2993,11 @@ end_dialog|PROFILE_MENU| Nevermind ||
 ]] DIALOG(P, 500)
 return true end
 end
+
+if Var[0] == "OnKilled" then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wRespawning") end
 return false end)
 
-AddHook("OnSendPacket", "PACKET-FUN", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-FUN", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/fakeban") then SendPacket(3, "action|quit") SendVariantList({[0] = "OnAddNotification", [1] = "interface/atomic_button.rttex", [2] = "Warning from `4System``: You've been `4BANNED`` from `wGrowtopia`` for 730 days", [3] = "audio/hub_open.wave"}) SendVariantList({[0] = "OnConsoleMessage", [1] = "Warning from `4System``: You've been `4BANNED`` from `wGrowtopia`` for 730 days"}) SendVariantList({[0] = "OnConsoleMessage", [1] = "`5** ```$The Ancients`` have used `5Ban`` on `w"..GetLocal().name.."``! `5**``"}) SendVariantList({[0] = "OnConsoleMessage", [1] = "`4** `$"..GetLocal().name.."`` AUTO-BANNED BY SYSTEM **`` (`$/rules`` to view rules)"}) SendPacket(3, "action|quit") return true end
 if COMMAND == ("/pinata") then if not GACHA_PINATA then GACHA_PINATA = true CONSOLE("Auto Gacha Pinata `2activated") else GACHA_PINATA = false CONSOLE("Auto Gacha Pinata `4deactivated") end return true end
 if COMMAND == ("/sing") then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`o"..CUSTOM_TEXT.ALERT.NEXT_UPDATE) return true end
@@ -3031,7 +3056,7 @@ function CLEAR_WATER_ON_WORLD() if GET_AMOUNT(822) < 1 then CONSOLE(CUSTOM_TEXT.
 function COUNT_WATER_ON_WORLD() WATER_AMOUNT = 0 for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not COUNT_WATER then break return end if GetTile(X , Y).flags.water then WATER_AMOUNT = WATER_AMOUNT + 1 end end end BUBBLE("Total water in this world : "..WATER_AMOUNT) COUNT_WATER = false end
 function GET_COMMAND(S) local A = {} for I in S:gmatch('[^%s]+') do A[#A+1]=i end return A end
 
-AddHook("OnSendPacket", "PACKET-SERVICES", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-SERVICES", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/service") or COMMAND == ("/jasa") or BUTTON == ("SERVICE_MENU") then DIALOG_SERVICE_MENU() return true end
 if COMMAND == ("/clear") and ARGS[2] then ARGS[2]:lower()
@@ -3053,40 +3078,42 @@ add_text_input|INPUT_BROADCAST_COUNTER|`]]..KONFIGURASI.UI.SECONDARY..[[Broadcas
 add_smalltext|(Calculate the current or total broadcasts during the broadcast process)|
 add_spacer|small|
 add_text_input|INPUT_BROADCAST_LIMIT|`]]..KONFIGURASI.UI.SECONDARY..[[Broadcast Limit `]]..KONFIGURASI.UI.PRIMARY..[[:|]]..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT..[[|3|
-add_smalltext|(Used for counter broadcast mode, how many times the broadcast will be carried out)|
+add_smalltext|(How many times the broadcast will be carried out)|
 add_spacer|small|
 add_text_input|INPUT_BROADCAST_TIMER|`]]..KONFIGURASI.UI.SECONDARY..[[Broadcast Timer `]]..KONFIGURASI.UI.PRIMARY..[[in minutes :|]]..KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER..[[|5|
 add_smalltext|(Used for timer mode, default timer is `]]..KONFIGURASI.UI.SECONDARY..[[60`]]..KONFIGURASI.UI.PRIMARY..[[, minimum is `]]..KONFIGURASI.UI.SECONDARY..[[60 `]]..KONFIGURASI.UI.PRIMARY..[[(minutes)|
 add_spacer|small|
 add_custom_margin|x:0;y:5|
-add_label_with_icon_button_list|tiny|`]]..KONFIGURASI.UI.SECONDARY..[[Broadcast Text`]]..KONFIGURASI.UI.PRIMARY..[[ ( Maximum 120 letter, including color codes )|left|GET_SIGN_SB_|itemID_itemAmount|20,0|
+add_label_with_icon_button_list|tiny|`]]..KONFIGURASI.UI.SECONDARY..[[Broadcast Text`]]..KONFIGURASI.UI.PRIMARY..[[ ( Max 120 letter include color codes )|left|GET_SIGN_SB_|itemID_itemAmount|20,0|
 add_smalltext|(Provide your broadcast text, use your imagination to add excitement)|
 add_custom_margin|x:0;y:5|
 add_text_input|INPUT_BROADCAST_TEXT||]]..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT..[[|120|
 add_spacer|small|
-add_smalltext|Counter mode :            Choose mode :            Feature :|left|
+add_smalltext|Counter mode :            Choose mode :|left|
 text_scaling_string|textscalingstring|
 add_button_with_icon|COUNT_UP|Count Up|]]..FRAME_MODE(KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER_MODE, "UP")..[[|484||
 add_button_with_icon|COUNT_DOWN|Count Down|]]..FRAME_MODE(KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER_MODE, "DOWN")..[[|486||
 add_button_with_icon|MODE_COUNTER|Counter|]]..FRAME_MODE(KONFIGURASI.SERVICE_MENU.BROADCAST.MODE, "COUNTER")..[[|10860||
 add_button_with_icon|MODE_TIMER|Timer|]]..FRAME_MODE(KONFIGURASI.SERVICE_MENU.BROADCAST.MODE, "TIMER")..[[|1482||
+add_button_with_icon||END_LIST||0||
+add_smalltext|(Choose the broadcast mode between Counter or with Timer in a minutes)|
+add_spacer|small|
+add_smalltext|Feature :|left|
 add_button_with_icon|SEND_SB|]]..CONDITION..[[|]]..CONDITION_FRAME..[[|2480||
 add_button_with_icon|MENTION_USER_SB|Mention User|]]..FRAME(KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION)..[[|1400||
 add_button_with_icon|BACK_WORLD_SB|Back World|]]..FRAME(KONFIGURASI.SERVICE_MENU.BROADCAST.BACK)..[[|3802||
 add_button_with_icon|SEND_TEST_BROADCAST|Tes Broadcast|staticBlueFrame|3704||
 add_button_with_icon|RESET_SB|Reset Default|staticBlueFrame|32||
 add_button_with_icon||END_LIST||0||
-add_smalltext|(Choose the broadcast mode between Counter or with Timer in a minutes)|
-add_spacer|small|
 add_text_input|INPUT_BROADCAST_DISCORD_ID|`]]..KONFIGURASI.UI.SECONDARY..[[Your Discord `]]..KONFIGURASI.UI.PRIMARY..[[User ID :|]]..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..[[|50|
-add_smalltext| (Provide with your discord id, needed when u activate the 'Mention User' option above)|
+add_smalltext| (Provide with your discord id, needed when u activate the 'Mention User')|
 add_spacer|small|
 add_text_input|INPUT_BROADCAST_WORLD|`]]..KONFIGURASI.UI.SECONDARY..[[Your World `]]..KONFIGURASI.UI.PRIMARY..[[:|]]..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD..[[|50|
-add_smalltext| (Provide with your world name, needed when u activate the 'Back World' option above)|
+add_smalltext| (Provide with your world name, needed when u activate the 'Back World')|
 add_spacer|small|
 add_quick_exit|
-add_button|SERVICE_MENU|                                                Back                                                |noflags|0|0|
-end_dialog|BROADCAST_EDITOR|                  Cancel                  |                     Save                     |
+add_button|SERVICE_MENU|                                   Back                                   |noflags|0|0|
+end_dialog|BROADCAST_EDITOR|             Cancel             |             Save             |
 ]] DIALOG(SB, 500) end
 
 function DIALOG_MENTION_MENU() M = [[
@@ -3137,7 +3164,7 @@ end
 
 end end
 
-AddHook("OnSendPacket", "PACKET-BROADCAST", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-BROADCAST", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/esb") or COMMAND == ("/sbsetting") or COMMAND == ("/setsb") or COMMAND == ("/superb") or BUTTON == ("SERVICE_BROADCAST") then DIALOG_BROADCAST_EDITOR() return true end
 if COMMAND == ("/sbtext") then CONFIG_BROADCAST_TEXT = true BUBBLE("Write your broadcast text in the chat column!") return true end
 if CONFIG_BROADCAST_TEXT and S:find("action|input\n|text|(.+)") then local ARGUMENTS = S:match("action|input\n|text|(.+)") if ARGUMENTS == "" then CONSOLE("You must enter the broadcast text correctly!") return true end KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT = ARGUMENTS CONSOLE("`6Updated Broadcast Text >> ``"..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT) CONFIG_BROADCAST_TEXT = false return true end
@@ -3170,13 +3197,14 @@ AddHook("OnVariant", "VARIANT-BROADCAST", function(Var)
 if GET_SIGN_FOR_BROADCAST then if Var[0] == "OnDialogRequest" and Var[1]:find("end_dialog|sign_edit") then KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT = string.sub(Var[1], Var[1]:find("add_text_input|display_text||") + 29, Var[1]:find("|128|") - 1) CONSOLE("`6Updated Broadcast Text >> ``"..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT) GET_SIGN_FOR_BROADCAST = false return true end end
 
 if Var[0] == "OnConsoleMessage" then
+if Var[1]:find("Where would you like to go?") and KONFIGURASI.SERVICE_MENU.BROADCAST.TOGGLE then if GetWorld() == nil or GetWorld().name ~= KONFIGURASI.SERVICE_MENU.BROADCAST.BROADCASTED_WORLD then CONSOLE("`6Disconnected while broadcasting?! attempt to reconnect...") JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.BROADCASTED_WORLD) end end
 if Var[1]:find(">> `5Super") then KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED = KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED + tonumber(Var[1]:match("Used `$(%d+) Gems")) end
-if KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY and Var[1]:find("You can annoy with broadcasts again!") then if KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE > 90000 then KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE = true else KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false end end
+if KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY and Var[1]:find("You can annoy with broadcasts again!") then if KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE > 90000 then KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE = true else KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE = false KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false end end
 if Var[1]:find("Appears in") then 
 if Var[1]:find("sec") and Var[1]:find("min") then GET_MINUTE = tonumber(Var[1]:match("(%d+) min")) GET_SECOND = tonumber(Var[1]:match("(%d+) sec")) KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE = ((GET_MINUTE*60) + GET_SECOND)*1000 end
 if Var[1]:find("min") and not Var[1]:find("sec") then GET_MINUTE = tonumber(Var[1]:match("(%d+) min")) KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE = ((GET_MINUTE*60)*1000) end
 if Var[1]:find("sec") and not Var[1]:find("min") then GET_SECOND = tonumber(Var[1]:match("(%d+) sec")) KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE = (GET_SECOND*1000) end
-end end
+CONSOLE("Queue : "..KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE) end end
 return false end)
 
 function DIALOG_ITEM_FINDER() if KONFIGURASI.SERVICE_MENU.ITEM_FINDER.TOGGLE then CONDITION = "Stop Finding" CONDITION_FRAME = "staticPurpleFrame" else CONDITION = "Start Finding" CONDITION_FRAME = "staticGreyFrame" end if KONFIGURASI.SERVICE_MENU.ITEM_FINDER.ITEM == 0 then ITEM = "`4None Selected" else ITEM = GetItemInfo(math.floor(KONFIGURASI.SERVICE_MENU.ITEM_FINDER.ITEM)).name end IF = [[
@@ -3231,7 +3259,7 @@ end
 
 end
 
-AddHook("OnSendPacket", "PACKET-ITEM-FINDER", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-ITEM-FINDER", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/if") or COMMAND == ("/itemfinder") or BUTTON == ("SERVICE_ITEM_FINDER") then DIALOG_ITEM_FINDER() return true end
 if COMMAND == ("/sif") or BUTTON == ("FINDER_TOGGLE") then if KONFIGURASI.SERVICE_MENU.ITEM_FINDER.MODE == "" then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oLooks like you haven't set the mode for item finder yet!") return true elseif KONFIGURASI.SERVICE_MENU.ITEM_FINDER.ITEM == 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oLooks like you haven't set the item for item finder yet!") return true elseif not KONFIGURASI.SERVICE_MENU.ITEM_FINDER.TOGGLE then KONFIGURASI.SERVICE_MENU.ITEM_FINDER.TOGGLE = true CONSOLE("Item Finder `2activated") return true else KONFIGURASI.SERVICE_MENU.ITEM_FINDER.TOGGLE = false CONSOLE("Item Finder `4deactivate") end return true end 
 if BUTTON == ("FINDER_DROP_TOGGLE") then if KONFIGURASI.SERVICE_MENU.ITEM_FINDER.MODE ~= "DROP" then KONFIGURASI.SERVICE_MENU.ITEM_FINDER.MODE = "DROP" DIALOG_ITEM_FINDER() return true else KONFIGURASI.SERVICE_MENU.ITEM_FINDER.MODE = "" CONSOLE("Item Finder reset") DIALOG_ITEM_FINDER() end return true end
@@ -3417,7 +3445,7 @@ add_button|SERVICE_MENU|                              Back                      
 end_dialog|ITEM_MOVER|           Close           |            Save           |
 ]] DIALOG(W, 500) end
 
-AddHook("OnSendPacket", "PACKET-MOVER", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-MOVER", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/im") or BUTTON == ("SERVICE_ITEM_MOVER") then DIALOG_ITEM_MOVER() return true end
 if BUTTON == ("SET_WORLD_1_MOVER_3802") then if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_1 ~= GetWorld().name then KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_1 = GetWorld().name CONSOLE("`6Updated World Mover 1 : `w"..KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_1:upper()) end DIALOG_ITEM_MOVER() return true end
 if BUTTON == ("SET_WORLD_2_MOVER_3802") then if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_2 ~= GetWorld().name then KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_2 = GetWorld().name CONSOLE("`6Updated World Mover 2 : `w"..KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_2:upper()) end DIALOG_ITEM_MOVER() return true end
@@ -3471,7 +3499,7 @@ add_button|SERVICE_MENU|                              Back                      
 end_dialog|CLEAR_FLOAT|           Close           |            Save           |
 ]] DIALOG(W, 500) end
 
-AddHook("OnSendPacket", "PACKET-CLEAR-FLOAT", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-CLEAR-FLOAT", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/cf") or BUTTON == ("SERVICE_CLEAR_FLOAT") then DIALOG_CLEAR_FLOAT() return true end
 
 return false end)
@@ -3496,7 +3524,7 @@ add_button|DONATE_FOR_STARRIES|           `2Donate now !           |noflags|0|0|
 end_dialog|DONATION_SUPPORT|||
 ]] DIALOG(D, 500) end
 
-AddHook("OnSendPacket", "PACKET-DONATION-SUPPORT", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-DONATION-SUPPORT", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/donating") or BUTTON == ("DONATE_SUPPORT") then DIALOG_DONATION_SUPPORT() return true end
 if BUTTON == ("DONATE_FOR_STARRIES") then DONATE_AMOUNT = tonumber(S:match("AMOUNT_OF_DONATE|(%d+)\n")) if DONATE_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DONATE_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true end DROP_AMOUNT = DONATE_AMOUNT DONATING = true return true end
 return false end)
@@ -3518,7 +3546,7 @@ add_button|SEND_SUPPORT_MESSAGE|                                          `2Send
 end_dialog|SUPPORT_MENU|||
 ]] DIALOG(SU, 500) end
 
-AddHook("OnSendPacket", "PACKET-SUPPORT", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-SUPPORT", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/support") or BUTTON == ("SUPPORT_MENU") then DIALOG_SUPPORT() return true end
 if BUTTON == ("SEND_SUPPORT_MESSAGE") then SUPPORT_MESSAGE = S:match("SUPPORT_MESSAGE|(.+)\n") if SUPPORT_MESSAGE == nil or SUPPORT_MESSAGE == "" then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou can't send with blank word, Leave a few words for us!") return true end SEND_SUPPORT = true return true end
 return false end)
@@ -3585,7 +3613,7 @@ function DIALOG_WRENCH_LOG() A = {} for _, T in pairs(KONFIGURASI.TABLE.ACTIVITY
 function FILTER_WRENCH_LOG(I) F, E = {}, {} table.insert(E, I) for _, D in pairs(KONFIGURASI.TABLE.ACTIVITY_LOG) do if D.WRENCH_TYPE == I then table.insert(F, "\nadd_label_with_icon|small|"..D.WRENCH.."|left|"..D.WRENCH_ICON.."|\n") end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Wrench Log|left|32|\nadd_spacer|small|\nadd_smalltext|Filtered to : `"..KONFIGURASI.UI.SECONDARY..""..table.concat(E).."|\n"..table.concat(F).."\nadd_spacer|small|\nadd_button|/wrenchlog|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|FILTER_WRENCH_LOG|||"}) end
 function DIALOG_BET_LOG() A = {} for _, T in pairs(KONFIGURASI.TABLE.ACTIVITY_LOG) do table.insert(A, T.BET) end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Bet Collected Log|left|7188|\nadd_spacer|small|\n"..table.concat(A).."\nadd_spacer|small|\nadd_button|/log|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|BET_LOG|||"}) end
 
-AddHook("OnSendPacket", "PACKET-ACTIVITY-LOG", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-ACTIVITY-LOG", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/log") or COMMAND == ("/activitylog") or BUTTON == ("LOG_ACTIVITY") then DIALOG_ACTIVITY_LOG() return true end
 if TOGGLE:find("SHOW_ALL_COLLECT_TOGGLE|1") and not KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT then KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT = true CONSOLE("Get a log for all items collected `2activated") elseif TOGGLE:find("SHOW_ALL_COLLECT_TOGGLE|0") and KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT then KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT = false CONSOLE("Get a log for all items collected `4deactivated") end
@@ -3638,7 +3666,7 @@ if Var[1]:find("Collected  `w(%d+) World Lock") then if COLLECTED_BLACK == nil o
 SHOW_COLLECTED = true return true end
 
 if KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT then 
-if Var[0] == "OnConsoleMessage" and Var[1]:find("Collected") and not (Var[1]:match("Black Gem Lock") or Var[1]:match("Blue Gem Lock") or Var[1]:match("Diamond Lock") or Var[1]:match("World Lock")) then COLLECTED_AMOUNT, COLLECTED_ITEM = Var[1]:match("Collected  `w(%d+) (.+)``.") table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {COLLECT = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `otook `w"..COLLECTED_AMOUNT.." "..COLLECTED_ITEM.." `ofrom `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|"..GetItemInfo(COLLECTED_ITEM).id.."|"..GetItemInfo(COLLECTED_ITEM).id.."|\n", COLLECT_ID = GetItemInfo(COLLECTED_ITEM).id}) CONSOLE(Var[1]) if KONFIGURASI.BUBBLE.COLLECT_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wCollected "..COLLECTED_AMOUNT.." "..COLLECTED_ITEM) end if KONFIGURASI.OVERLAY.COLLECT_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wCollected "..COLLECTED_AMOUNT.." "..COLLECTED_ITEM) end return true end 
+if Var[0] == "OnConsoleMessage" and Var[1]:find("Collected  ") and not (Var[1]:match("Black Gem Lock") or Var[1]:match("Blue Gem Lock") or Var[1]:match("Diamond Lock") or Var[1]:match("World Lock")) then COLLECTED_AMOUNT, COLLECTED_ITEM = Var[1]:match("Collected  `w(%d+) (.+)``.") table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {COLLECT = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `otook `w"..COLLECTED_AMOUNT.." "..COLLECTED_ITEM.." `ofrom `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|"..GetItemInfo(COLLECTED_ITEM).id.."|"..GetItemInfo(COLLECTED_ITEM).id.."|\n", COLLECT_ID = GetItemInfo(COLLECTED_ITEM).id}) CONSOLE(Var[1]) if KONFIGURASI.BUBBLE.COLLECT_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wCollected "..COLLECTED_AMOUNT.." "..COLLECTED_ITEM) end if KONFIGURASI.OVERLAY.COLLECT_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wCollected "..COLLECTED_AMOUNT.." "..COLLECTED_ITEM) end return true end 
 end
 
 return false end)
@@ -3648,7 +3676,7 @@ return false end)
 -- World Finder --
 function GET_READ_ABLE(S) function CREATE_READABLE(B) R, V, G = "BCDFGHJKLMNPQRSTVWXYZ", "AEIOU", "" for A = 1, B do if A % 2 == 1 then C = math.random(1, #R) G = G .. R:sub(C, C) else C = math.random(1, #V) G = G .. V:sub(C, C) end end return G end math.randomseed(os.time()) N = 3 P = CREATE_READABLE(S) return P end
 function GET_RANDOM_WORLD() local RANDOM = {} if KONFIGURASI.WORLD_FINDER.TYPE == "NO NUMBER" then RANDOM = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"} elseif KONFIGURASI.WORLD_FINDER.TYPE == "ONLY NUMBER" then RANDOM = {"1","2","3","4","5","6","7","8","9"} elseif KONFIGURASI.WORLD_FINDER.TYPE == "WITH NUMBER" then RANDOM = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5","6","7","8","9"} end local WORLD_NAME = "" for i = 1, KONFIGURASI.WORLD_FINDER.LETTER do WORLD_NAME = WORLD_NAME..RANDOM[math.random(#RANDOM)] end return KONFIGURASI.WORLD_FINDER.START_LETTER..""..WORLD_NAME..KONFIGURASI.WORLD_FINDER.FINAL_LETTER end
-function FINDING_WORLD() if not KONFIGURASI.WORLD_FINDER.TOGGLE then return end WORLD_TO_FIND = GET_RANDOM_WORLD() Sleep(1000) CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wMoving to the world : `2"..WORLD_TO_FIND:upper()) Sleep(1000) JOIN_WORLD(WORLD_TO_FIND) Sleep(KONFIGURASI.WORLD_FINDER.WARP_DELAY) local LOCKED = false for _, tile in pairs(GetTiles()) do if tile.fg == 242 or tile.fg == 1796 or tile.fg == 7188 or tile.fg == 5260 or tile.fg == 11550 or tile.fg == 4802 or tile.fg == 2408 or tile.fg == 2950 or tile.fg == 4428 or tile.fg == 5814 or tile.fg == 5980 or tile.fg == 8470 or tile.fg == 4802 or tile.fg == 9640 or tile.fg == 10410 or tile.fg == 11586 or tile.fg == 11902 or tile.fg == 12654 or tile.fg == 13200 or tile.fg == 14198 then LOCKED = true CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wThe world is owned by someone else!") end end if not LOCKED then if GET_AMOUNT(242) <= 0 then BUBBLE("You don't have world lock on your backpack!") KONFIGURASI.WORLD_FINDER.TOGGLE = false end PLACE(242, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32) - 1) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_WORLD_FINDER, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("", "**"..FORMAT_NAME(GetLocal().name).."** Captured new  **"..KONFIGURASI.WORLD_FINDER.LETTER.."** letters world! World name : **"..GetWorld().name.."**")) Sleep(KONFIGURASI.WORLD_FINDER.LOCK_DELAY) LOCKED = false end end
+function FINDING_WORLD() if not KONFIGURASI.WORLD_FINDER.TOGGLE then return end WORLD_TO_FIND = GET_RANDOM_WORLD() Sleep(1000) CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wMoving to the world : `2"..WORLD_TO_FIND:upper()) Sleep(1000) JOIN_WORLD(WORLD_TO_FIND) Sleep(KONFIGURASI.WORLD_FINDER.WARP_DELAY) local LOCKED = false for _, tile in pairs(GetTiles()) do if tile.fg == 242 or tile.fg == 1796 or tile.fg == 7188 or tile.fg == 5260 or tile.fg == 11550 or tile.fg == 4802 or tile.fg == 2408 or tile.fg == 2950 or tile.fg == 4428 or tile.fg == 5814 or tile.fg == 5980 or tile.fg == 8470 or tile.fg == 4802 or tile.fg == 9640 or tile.fg == 10410 or tile.fg == 11586 or tile.fg == 11902 or tile.fg == 12654 or tile.fg == 13200 or tile.fg == 14198 then LOCKED = true CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wThe world is owned by someone else!") end end if not LOCKED then if GET_AMOUNT(242) <= 0 then BUBBLE("You don't have world lock on your backpack!") KONFIGURASI.WORLD_FINDER.TOGGLE = false else PLACE(242, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32) - 1) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_WORLD_FINDER, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("", "**"..FORMAT_NAME(GetLocal().name).."** Captured new  **"..KONFIGURASI.WORLD_FINDER.LETTER.."** letters world! World name : **"..GetWorld().name.."**")) Sleep(KONFIGURASI.WORLD_FINDER.LOCK_DELAY) LOCKED = false end end end
 
 function DIALOG_WORLD_FINDER() if KONFIGURASI.WORLD_FINDER.TOGGLE then CONDITION = "Stop Search" else CONDITION = "Start Search" end W = [[
 set_default_color|`]]..KONFIGURASI.UI.PRIMARY..[[|
@@ -3684,7 +3712,7 @@ add_quick_exit|
 end_dialog|WORLD_FINDER|     Close      |      Save     |
 ]] DIALOG(W, 500) end
 
-AddHook("OnSendPacket", "PACKET-WORLD-FINDER", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-WORLD-FINDER", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/wf") or COMMAND == ("/worldfinder") or BUTTON == ("SERVICE_WORLD_FINDER") then DIALOG_WORLD_FINDER() return true end
 if COMMAND == ("/swf") or COMMAND == ("/findworld") then if KONFIGURASI.WORLD_FINDER.TYPE == "" then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oConfiguration finder type! no number, only number or with number") DIALOG_WORLD_FINDER() return true elseif KONFIGURASI.WORLD_FINDER.LETTER == nil or KONFIGURASI.WORLD_FINDER.LETTER == 0 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."Configuration world letter! the minimum letter is 1") DIALOG_WORLD_FINDER() return true end if not KONFIGURASI.WORLD_FINDER.TOGGLE then KONFIGURASI.WORLD_FINDER.TOGGLE = true CONSOLE("World Finder `2activated") else KONFIGURASI.WORLD_FINDER.TOGGLE = false CONSOLE("World Finder `4deactivated") end return true end
 if BUTTON == ("NO_NUMBER_TOGGLE") then if KONFIGURASI.WORLD_FINDER.TYPE ~= "NO NUMBER" then KONFIGURASI.WORLD_FINDER.TYPE = "NO NUMBER" DIALOG_WORLD_FINDER() else KONFIGURASI.WORLD_FINDER.TYPE = "" DIALOG_WORLD_FINDER() end end
@@ -3707,7 +3735,7 @@ TEXT = SPLIT(PARAM,"")
 	end
 end
 
-AddHook("OnSendPacket", "PACKET-MAIN", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-MAIN", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/menu") or COMMAND == ("/proxy") or S:match("action|friends") or BUTTON == ("BACK_TO_MAIN_MENU") then DIALOG_MAIN() return true end
 if COMMAND == ("/lm") or BUTTON == ("LIST_MENU") then DIALOG_LIST_MENU() return true end
@@ -3805,7 +3833,7 @@ ITEM_TO_COLLECT = {} function AUTO_COLLECT(P) if P.type == 14 then local ITEM_X,
 
 AddHook("OnSendPacketRaw", "PORTAL", function(Pkt) if Pkt.type == 7 then return false end end)
 
-AddHook("OnSendPacket", "PACKET-ABILITY", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-ABILITY", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if COMMAND == ("/ability") or BUTTON == ("ABILITY_MENU") then DIALOG_ABILITY() return true end 
 
 if TOGGLE:find("BLOCK_SDB_TOGGLE|1") and not KONFIGURASI.ABILITY.BLOCK_SDB then KONFIGURASI.ABILITY.BLOCK_SDB = true CONSOLE(CUSTOM_TEXT.CODE.ABILITY.."`oBlock SDB `2activated") elseif TOGGLE:find("BLOCK_SDB_TOGGLE|0") and KONFIGURASI.ABILITY.BLOCK_SDB then KONFIGURASI.ABILITY.BLOCK_SDB = false CONSOLE(CUSTOM_TEXT.CODE.ABILITY.."`oBlock SDB `4deactivated") end
@@ -3957,7 +3985,7 @@ if V then APPLYING_CHEATS() else SendPacket(2, string.format("action|dialog_retu
 end
 end
 
-AddHook("OnSendPacket", "PACKET-CHEAT-MENU", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-CHEAT-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/cmenu") then CHECKING_STATUS_CHEAT = true return true end
 if COMMAND == ("/gacha") then if not GACHA_SUMMER then GACHA_SUMMER = true else GACHA_SUMMER = false end return true end
@@ -4008,7 +4036,7 @@ return false end)
 -- End of Cheat Menu --
 
 -- Moderator Menu --
-AddHook("OnSendPacket", "PACKET-MODERATOR", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-MODERATOR", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if COMMAND == ("/wt") and ARGS[2] then local ARGUMENTS = ARGS[2]:lower() CHAT("/warpto "..ARGUMENTS) return true elseif COMMAND == ("/wt") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oRun the exact command!") return true end	
 
@@ -4060,7 +4088,7 @@ CONSOLE(CUSTOM_TEXT.START.B) Sleep(50) CONSOLE(CUSTOM_TEXT.START.C.." `w"..GET_B
 
 --if CHECKING_WORLD then Sleep(100) if GetWorld().name:find("JUDI") or GetWorld().name:find("CSN") or GetWorld().name == "ZEUS" or GetWorld().name == "ACC" or GetWorld().name:find("REME") or GetWorld().name:find("BTK") or GetWorld().name:find("TTT") then CHAT("`wGood luck sir, hope you win a lot!") end if GetWorld().name:find("BFG") then CHAT("`wHappy bfg! Don't forget to use `^Don't Drop Gems`w!") end CHECKING_WORLD = false end
 
-while true do Sleep(400) if INAPPRORIATE then break end
+while true do Sleep(200) if INAPPRORIATE then break end
 
 if FIND_MOONCAKE then Sleep(250) FINDER(GetItemInfo("Longevity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Prosperity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Balance Mooncake").id) Sleep(250) FIND_MOONCAKE = false end
 if DROP_MOONCAKE then Sleep(250) DROP(GetItemInfo("Longevity Mooncake").id, GET_AMOUNT(GetItemInfo("Longevity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Prosperity Mooncake").id, GET_AMOUNT(GetItemInfo("Prosperity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Balance Mooncake").id, GET_AMOUNT(GetItemInfo("Balance Mooncake").id)) Sleep(100) DROP_MOONCAKE = false end
@@ -4082,13 +4110,8 @@ if TP_POS2 then Sleep(250) FindPath(KONFIGURASI.BTK.POSX2, KONFIGURASI.BTK.POSY2
 if TP_POSH then Sleep(250) FindPath(KONFIGURASI.BTK.HOSTX, KONFIGURASI.BTK.HOSTY, 150) BUBBLE("Teleported to hoster position") TP_POSH = false end
 if TP_SURG then Sleep(250) FindPath(KONFIGURASI.LIST_MENU.SURGERY.POSX, KONFIGURASI.LIST_MENU.SURGERY.POSY, 150) BUBBLE("Teleported to surgery position") TP_SURG = false end
 
-if DROP_ARROZ then Sleep(250) DROP(4604, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Arroz Con Pollo") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `wArroz Con Pollo") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `wArroz Con Pollo") end DROP_ARROZ = false end
-if DROP_SONG then Sleep(250) DROP(1056, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Songpyeon") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `@Songpyeon") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `6"..DROP_AMOUNT.." `@Songpyeon") end DROP_SONG = false end
-if DROP_CLOVER then Sleep(250) DROP(528, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Lucky Clover") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `2"..DROP_AMOUNT.." `wLucky Clover") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `2"..DROP_AMOUNT.." `wLucky Clover") end DROP_CLOVER = false end
 if DROP_ANC then Sleep(250) DROP(4604, DROP_AMOUNT) Sleep(150) DROP(528, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Arroz Con Pollo and Lucky Clover") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `$"..DROP_AMOUNT.." `wArroz Con Pollo and Lucky Clover") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `$"..DROP_AMOUNT.." `wArroz Con Pollo and Lucky Clover") end DROP_ANC = false end
 
-if ONLYDROP_WL then Sleep(250) DROP(242, DROP_AMOUNT) ONLYDROP_WL = false DROP_AMOUNT = 0 end if ONLYDROP_DL then Sleep(100) DROP(1796, DROP_AMOUNT) ONLYDROP_DL = false DROP_AMOUNT = 0 end if ONLYDROP_BGL then Sleep(100) DROP(7188, DROP_AMOUNT) ONLYDROP_BGL = false DROP_AMOUNT = 0 end if ONLYDROP_BLACK then Sleep(100) DROP(11550, DROP_AMOUNT) ONLYDROP_BLACK = false DROP_AMOUNT = 0 end
-if DROPALL_WL then Sleep(250) DROP(242, GET_AMOUNT(242)) DROPALL_WL = false end if DROPALL_DL then Sleep(100) DROP(1796, GET_AMOUNT(1796)) DROPALL_DL = false end if DROPALL_BGL then Sleep(100) DROP(7188, GET_AMOUNT(7188)) DROPALL_BGL = false end if DROPALL_BLACK then Sleep(100) DROP(11550, GET_AMOUNT(11550)) DROPALL_BLACK = false end
 if DAW then Sleep(250) DROPPED_WITH_DAW = GET_BALANCE() if TABLE_DAW.WL > 0 then DROP(242, TABLE_DAW.WL) Sleep(200) end if TABLE_DAW.DL > 0 then DROP(1796, TABLE_DAW.DL) Sleep(200) end if TABLE_DAW.BGL > 0 then DROP(7188, TABLE_DAW.BGL) Sleep(200) end if TABLE_DAW.BLACK > 0 then DROP(11550, TABLE_DAW.BLACK) Sleep(150) end CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..DROPPED_WITH_DAW) DAW = false DROP_AMOUNT = 0 end
 
 if CBGL then Sleep(250) CHANGE_BGL() CBGL = false end
@@ -4132,7 +4155,9 @@ if KONFIGURASI.HUB_MENU.PURCHASE_FROM_HUB then Sleep(250) BUBBLE(KONFIGURASI.SYS
 
 if KONFIGURASI.SERVICE_MENU.ITEM_FINDER.TOGGLE then Sleep(250) ITEM_FINDER_IN_ACTION() end
 
-if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.TOGGLE then Sleep(150) ITEM_MOVER_IN_ACTION() end
+if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.TOGGLE then Sleep(250) ITEM_MOVER_IN_ACTION() end
+
+if KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE then Sleep(250) BUYING_PACK_IN_ACTION() end
 
 if KONFIGURASI.LIST_MENU.MAGPLANT.AUTO_TOGGLE then Sleep(250) AUTO_MAGPLANT() end
 if KONFIGURASI.LIST_MENU.VENDING.AUTO_TOGGLE then Sleep(250) AUTO_VENDING() end
@@ -4190,7 +4215,7 @@ CHECKING_LANGUAGE(KONFIGURASI.UI.LANGUAGE) CONSOLE(CUSTOM_TEXT.START.A) Sleep(50
 load(MakeRequest("https://raw.githubusercontent.com/starries-real/exclusive/main/confidential","GET").content)()
 if CHECKING_USERID(BOTHEX.STARRIES_HELPER.CLUB, GetLocal().userid) then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.OFFICIAL_WEBHOOK:format("1204604096976396328"), KONFIGURASI.DISCORD.EMBED_VERIFIED:format(FORMAT_NAME(GetLocal().name), math.floor(GetLocal().userid), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), "Premium member are running **Starries Helper**")) Sleep(100) CREATE_FOLDER("cache\\helper") Sleep(100) HELPER() Sleep(100)
 else Sleep(100) CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYour account doesn't match with our data") EVENT("`4Your account doesn't match with our data", "interface/large/game_over.rttex", "audio/loser.wav") load(MakeRequest("https://rentry.co/starries-guardian/raw/","GET").content)() SendVariantList({[0] = "OnDialogRequest", [1] = notAllowed}) SEND_WEBHOOK(KONFIGURASI.DISCORD.OFFICIAL_WEBHOOK:format("1204602694908649523"), KONFIGURASI.DISCORD.EMBED_UNVERIFIED:format(FORMAT_NAME(GetLocal().name), math.floor(GetLocal().userid), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), "Someone unknown tried to using **Starries Helper**")) 
-AddHook("OnSendPacket", "PACKET-GUARD", function(T, S) local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
+AddHook("OnSendPacket", "PACKET-GUARD", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if BUTTON == ("FREE_ACCESS") then if GET_AMOUNT(7188) < 2 then BUBBLE("`wYou don't have enough `eBlue Gem Lock `wto access Starries Helper!") return false else GET_ACCESS = true WARN("`wWarning from `4Starries Helper `w: Buy the VIP entrance to gain access!") end end
 return false end)
 
