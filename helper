@@ -2881,7 +2881,7 @@ if S:find("buttonClicked|DROP_THIS_ITEM_") then ITEM_ID = tonumber(S:match("butt
 if COMMAND == ("/place") then PLACE(424, GET_X(), GET_Y()) return true end
 
 if COMMAND == ("/relog") then LATEST_WORLD = GetWorld().name RELOG = true return true end 
-if COMMAND == ("/w") and ARGS[2] then if ARGS[2] == nil or ARGS[2] == "" then CONSOLE("You have to provide the valid world!") return true end WORLD_TO_WARP = ARGS[2] INSTANT_WARP = true return true end
+if COMMAND == ("/w") and ARGS[2] then if ARGS[2] == nil or ARGS[2] == "" then CONSOLE("You have to provide the valid world!") return true end WORLD_TO_WARP = ARGS[2] JOIN_WORLD(WORLD_TO_WARP) return true end
 if COMMAND == ("/xy") then CHAT("X [`5"..math.floor(GetLocal().pos.x//32).."``] Y [`5"..math.floor(GetLocal().pos.y//32).."``]") return true end
 
 if COMMAND == ("/exit") or COMMAND == ("/lobby") then JOIN_WORLD("EXIT") return true end
@@ -4060,7 +4060,7 @@ CONSOLE(CUSTOM_TEXT.START.B) Sleep(50) CONSOLE(CUSTOM_TEXT.START.C.." `w"..GET_B
 
 --if CHECKING_WORLD then Sleep(100) if GetWorld().name:find("JUDI") or GetWorld().name:find("CSN") or GetWorld().name == "ZEUS" or GetWorld().name == "ACC" or GetWorld().name:find("REME") or GetWorld().name:find("BTK") or GetWorld().name:find("TTT") then CHAT("`wGood luck sir, hope you win a lot!") end if GetWorld().name:find("BFG") then CHAT("`wHappy bfg! Don't forget to use `^Don't Drop Gems`w!") end CHECKING_WORLD = false end
 
-while true do Sleep(500) if INAPPRORIATE then break end
+while true do Sleep(400) if INAPPRORIATE then break end
 
 if FIND_MOONCAKE then Sleep(250) FINDER(GetItemInfo("Longevity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Prosperity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Balance Mooncake").id) Sleep(250) FIND_MOONCAKE = false end
 if DROP_MOONCAKE then Sleep(250) DROP(GetItemInfo("Longevity Mooncake").id, GET_AMOUNT(GetItemInfo("Longevity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Prosperity Mooncake").id, GET_AMOUNT(GetItemInfo("Prosperity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Balance Mooncake").id, GET_AMOUNT(GetItemInfo("Balance Mooncake").id)) Sleep(100) DROP_MOONCAKE = false end
