@@ -2881,14 +2881,14 @@ return false end)
 -- End of Spam Editor --
 
 function UNPACK(T) local R = "";
-for _, V in pairs(T) do if PX == nil then PX = math.floor(V//32) else PY = math.floor(V//32) end end
-return PX, PY
+for _, V in pairs(T) do if TELE_TO_X == nil then TELE_TO_X = math.floor(V) // 32 else TELE_TO_Y = math.floor(V) // 32 end end
+return TELE_TO_X, TELE_TO_Y
 end
 
 function GET_PLAYER_POSITION(N) N = N:lower()
 for _, P in pairs(GetPlayerList()) do
-if P.name:lower():find(N) then UNPACK(P.pos)
-FindPath(PY, PX, 150) -- SendVariantList({[0]="OnSetPos",[1]= P.pos}, GetLocal().netid)
+if P.name:lower():match(N) then UNPACK(P.pos) CONSOLE("Teleporting to : "..P.name.. " that stand on X "..TELE_TO_X.." Y "..TELE_TO_Y)
+FindPath(TELE_TO_X, TELE_TO_Y, 150) -- SendVariantList({[0]="OnSetPos",[1]= P.pos}, GetLocal().netid)
 end
 end
 end
