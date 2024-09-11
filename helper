@@ -241,7 +241,7 @@ CUSTOM_TEXT = {
 			STAND = "You're standing at",
 			DATETIME = "It is currently",
 			TIME = os.date("%H:%M `"..KONFIGURASI.UI.PRIMARY.."on `"..KONFIGURASI.UI.SECONDARY.."%B %d, %Y"),
-			SPACE = "------------------------------------------------------------------------",
+			SPACE = "-------------------------------------------------------------------------",
 			FEATURE = "Features",
 		},
 		BUTTON = {
@@ -510,13 +510,14 @@ CUSTOM_TEXT = {
 	INFORMATION = {
 		TITLE = "Useful Information",
 		DESCRIPTION = "Read additional information, new update and the upcoming feature",
+		SPACING = "----------------------------------------------------------------------------------",
 		CREATOR = "Creator : `"..KONFIGURASI.UI.SECONDARY.."Starries",
 		CONTRIBUTOR = "Contributor : `"..KONFIGURASI.UI.SECONDARY.."-",
 		BOTHAX = "Thanks to `bbothaxyt `"..KONFIGURASI.UI.PRIMARY.."who provide this app",
 		LIST_1 = {
 			TITLE = "Change Logs :",
-			INFO_1 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added bruteforce menu, command /bfmenu /bruteforce",
-			INFO_2 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added command /show <command> to show something"
+			INFO_1 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added bruteforce menu",
+			INFO_2 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added command /show <command>"
 		},
 		LIST_2 = {
 			TITLE = "Incoming :",
@@ -2879,6 +2880,19 @@ if GET_SIGN_FOR_SPAM then if Var[0] == "OnDialogRequest" and Var[1]:find("end_di
 return false end)
 -- End of Spam Editor --
 
+function UNPACK(T) local R = "";
+for _, V in pairs(T) do if PX == nil then PX = math.floor(V//32) else PY = math.floor(V//32) end end
+return PX, PY
+end
+
+function GET_PLAYER_POSITION(N) N = N:lower()
+for _, P in pairs(GetPlayerList()) do
+if P.name:lower():find(N) then UNPACK(P.pos)
+FindPath(PY, PX, 150) -- SendVariantList({[0]="OnSetPos",[1]= P.pos}, GetLocal().netid)
+end
+end
+end
+
 AddHook("OnSendPacket", "PACKET-UTIL", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 
 if S:find("action|log\nmsg|") then return true end
@@ -2891,6 +2905,7 @@ elseif ARGS[2] == "lray" then if GET_AMOUNT(GetItemInfo("Legendary Infinity Raym
 else CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oWear Command available are 'lkat, mray, lray'!") return true end return true
 elseif COMMAND == ("/wear") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oWear Command available are 'lkat, mray, lray'!") return true end 
 
+if COMMAND == ("/tport") and ARGS[2] then TARGET_TELEPORT = ARGS[2] TELEPORTING_TO_PLAYER = true return true end
 
 if COMMAND == ("/sign") and ARGS[2] then ARGS[2]:lower()
 if ARGS[2] == "spam" then if not GET_SIGN_FOR_SPAM then GET_SIGN_FOR_SPAM = true BUBBLE("`2Find a sign then wrench em! and see what happens..") else GET_SIGN_FOR_SPAM = false end
@@ -2931,7 +2946,7 @@ if COMMAND == ("/c") or COMMAND == ("/cbgl") then if GET_AMOUNT(1796) < 100 then
 if COMMAND == ("/hitam") or COMMAND == ("/ireng") or COMMAND == ("/black") then if GET_AMOUNT(7188) < 100 then BUBBLE("`wYou don't have enough blue gem locks to convert!") return true end CREATE_BLACK() return true end 
 if COMMAND == ("/biru") or COMMAND == ("/blue") then if GET_AMOUNT(11550) < 1 then BUBBLE("`wYou don't have enough black gem locks to convert!") return true end BREAK_BLACK() return true end 
 if COMMAND == ("/buydl") then if GetPlayerInfo().gems < 99999 then CONSOLE("`wYou don't have enough gems to buy a diamond lock!") return true end BUYDL = true return true end
-if COMMAND == ("/info") or BUTTON == ("INFORMATION") then local I = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.INFORMATION.TITLE.."|left|7074|\nadd_smalltext|------------------------------------------------------------------------------------------|\nadd_smalltext|"..CUSTOM_TEXT.INFORMATION.DESCRIPTION.."|\nadd_smalltext|------------------------------------------------------------------------------------------|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.CREATOR.."|left|1240|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.CONTRIBUTOR.."|left|7070|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.BOTHAX.."|left|12272|\nadd_spacer|small|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_1.TITLE.."|left|226|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_1.INFO_1.."|left|482|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_1.INFO_2.."|left|482|\nadd_spacer|small|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_2.TITLE.."|left|8282|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_2.INFO_1.."|left|482|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_2.INFO_2.."|left|482|\nadd_spacer|small|\nadd_quick_exit|\nadd_button|BACK_TO_MAIN_MENU|Back|noflags|0|0|\nend_dialog|INFORMATION|") DIALOG(I, 500) return true end
+if COMMAND == ("/info") or BUTTON == ("INFORMATION") then local I = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.INFORMATION.TITLE.."|left|7074|\nadd_smalltext|"..CUSTOM_TEXT.INFORMATION.SPACING.."|\nadd_smalltext|"..CUSTOM_TEXT.INFORMATION.DESCRIPTION.."|\nadd_smalltext|"..CUSTOM_TEXT.INFORMATION.SPACING.."|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.CREATOR.."|left|7070|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.CONTRIBUTOR.."|left|"..GetItemInfo("Dumb Worker").id.."|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.BOTHAX.."|left|2398|\nadd_spacer|small|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_1.TITLE.."|left|226|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_1.INFO_1.."|left|482|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_1.INFO_2.."|left|482|\nadd_spacer|small|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_2.TITLE.."|left|8282|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_2.INFO_1.."|left|482|\nadd_label_with_icon|small|"..CUSTOM_TEXT.INFORMATION.LIST_2.INFO_2.."|left|482|\nadd_spacer|small|\nadd_quick_exit|\nadd_button|BACK_TO_MAIN_MENU|Back|noflags|0|0|\nend_dialog|INFORMATION|") DIALOG(I, 500) return true end
 if BUTTON == ("CHECK_PROFILE") then CHECK_PROFILE = true return true end 
 
 if COMMAND == ("/g") then CHAT("/ghost") BUBBLE("Boo (ghost)") return true end
@@ -3045,15 +3060,15 @@ add_button|BACK_TO_MAIN_MENU|]]..CUSTOM_TEXT.SERVICE_MENU.BUTTON.BACK..[[|noflag
 end_dialog|SERVICES_MENU|||
 ]] DIALOG(S, 500) end
 
-WORLD_TYPE = type(GetTile(199, 199)) == "table"
-WORLD_X = WORLD_TYPE and 199 or 99
-WORLD_Y = WORLD_TYPE and 199 or 58
+function GET_WORLD_SIZE()
+WORLD_TYPE = type(GetTile(199, 199)) == "table" WORLD_X = WORLD_TYPE and 199 or 99 WORLD_Y = WORLD_TYPE and 199 or 58
+end
 
 function SORT_OBJECT() local old_obj = GetObjectList() local ret_obj = {} for _, v in pairs(old_obj) do table.insert(ret_obj, v) end table.sort(ret_obj, function(left, right) return (left.pos.y < right.pos.y) or (left.pos.y == right.pos.y and left.pos.x < right.pos.x) end) return ret_obj end
 
-function CLEAR_FLOAT_ON_WORLD() for _, O in pairs(SORT_OBJECT()) do if not KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT.TOGGLE then break return end FindPath(math.floor(O.pos.x//32), math.floor(O.pos.y//32), 100) Sleep(100) FindPath(math.floor(O.pos.x//32) + 1, math.floor(O.pos.y//32), 100) end BUBBLE("I didn't found floating items in this world") KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT.TOGGLE = false ChangeValue("[C] Modfly", false) end
-function CLEAR_WATER_ON_WORLD() if GET_AMOUNT(822) < 1 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have any water bucket!") return true end for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not KONFIGURASI.SERVICE_MENU.CLEAR_WATER.TOGGLE then break return end if GetTile(X , Y).flags.water then FindPath(X, Y, 100) Sleep(150) PLACE(822, X, Y) Sleep(150) end end end BUBBLE("I didn't found water in this world") KONFIGURASI.SERVICE_MENU.CLEAR_WATER.TOGGLE = false ChangeValue("[C] Modfly", false) end
-function COUNT_WATER_ON_WORLD() WATER_AMOUNT = 0 for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not COUNT_WATER then break return end if GetTile(X , Y).flags.water then WATER_AMOUNT = WATER_AMOUNT + 1 end end end BUBBLE("Total water in this world : "..WATER_AMOUNT) COUNT_WATER = false end
+function CLEAR_FLOAT_ON_WORLD() GET_WORLD_SIZE() for _, O in pairs(SORT_OBJECT()) do if not KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT.TOGGLE then break return end FindPath(math.floor(O.pos.x//32), math.floor(O.pos.y//32), 100) Sleep(100) FindPath(math.floor(O.pos.x//32) + 1, math.floor(O.pos.y//32), 100) end BUBBLE("I didn't found floating items in this world") KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT.TOGGLE = false ChangeValue("[C] Modfly", false) end
+function CLEAR_WATER_ON_WORLD() GET_WORLD_SIZE() if GET_AMOUNT(822) < 1 then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have any water bucket!") return true end for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not KONFIGURASI.SERVICE_MENU.CLEAR_WATER.TOGGLE then break return end if GetTile(X , Y).flags.water then FindPath(X, Y, 100) Sleep(150) PLACE(822, X, Y) Sleep(150) end end end BUBBLE("I didn't found water in this world") KONFIGURASI.SERVICE_MENU.CLEAR_WATER.TOGGLE = false ChangeValue("[C] Modfly", false) end
+function COUNT_WATER_ON_WORLD() GET_WORLD_SIZE() WATER_AMOUNT = 0 for X = 0, WORLD_X do for Y = 0, WORLD_Y do if not COUNT_WATER then break return end if GetTile(X , Y).flags.water then WATER_AMOUNT = WATER_AMOUNT + 1 end end end CHAT("Total water in this world : "..WATER_AMOUNT) COUNT_WATER = false end
 function GET_COMMAND(S) local A = {} for I in S:gmatch('[^%s]+') do A[#A+1]=i end return A end
 
 AddHook("OnSendPacket", "PACKET-SERVICES", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
@@ -4206,6 +4221,8 @@ if GACHA_PET then Sleep(150) CHAT("/randompets") Sleep(500) SendPacket(2,"action
 
 if SEND_WEBHOOK_DEPOSIT then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_DEPOSIT, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("<@872423690120331304>", "**"..DEPO_NAME.."** deposited "..DEPO_AMOUNT.." "..DEPO_ITEM.." into the Donation Box!")) BUBBLE("Webhook Deposit has been sent!") SEND_WEBHOOK_DEPOSIT = false end
 if SEND_WEBHOOK_DONATION then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_DONATE, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("", "**"..FORMAT_NAME(DEPO_NAME).."** has made a donation of "..DEPO_AMOUNT.." "..DEPO_ITEM)) BUBBLE("Webhook Donation has been sent!") SEND_WEBHOOK_DONATION = false end
+
+if TELEPORTING_TO_PLAYER then Sleep(100) GET_PLAYER_POSITION(TARGET_TELEPORT) Sleep(150) TELEPORTING_TO_PLAYER = false end
 
 end
 
