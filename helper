@@ -2880,15 +2880,28 @@ if GET_SIGN_FOR_SPAM then if Var[0] == "OnDialogRequest" and Var[1]:find("end_di
 return false end)
 -- End of Spam Editor --
 
-function UNPACK(T) local R = "";
-for _, V in pairs(T) do if TELE_TO_X == nil then TELE_TO_X = math.floor(V) // 32 else TELE_TO_Y = math.floor(V) // 32 end end
+function UNPACK(T) local R = ""; TELE_TO_X, TELE_TO_Y = 0, 0
+for _, V in pairs(T) do if TELE_TO_X == nil or TELE_TO_X == 0 then TELE_TO_X = math.floor(V) // 32 elseif TELE_TO_Y == nil or TELE_TO_Y == 0 then TELE_TO_Y = math.floor(V) // 32 end end
 return TELE_TO_X, TELE_TO_Y
 end
 
-function GET_PLAYER_POSITION(N) N = N:lower()
+function EXTRACT_PLAYER_POSITION(T) local R = "";
+for _, V in pairs(T) do R = R .. math.floor(V)//32 ..", " end
+return R:sub(1, R:len() - 1)
+end
+
+function GET_PLAYER_POSITION(N)
 for _, P in pairs(GetPlayerList()) do
-if P.name:lower():match(N) then UNPACK(P.pos) CONSOLE("Teleporting to : "..P.name.. " that stand on X "..TELE_TO_X.." Y "..TELE_TO_Y)
+if FORMAT_NAME(P.name):lower():match(N) then UNPACK(P.pos) CHAT("Teleporting to : "..P.name) CONSOLE("Teleporting to coordinate : X "..TELE_TO_X.." Y "..TELE_TO_Y)
 FindPath(TELE_TO_X, TELE_TO_Y, 150) -- SendVariantList({[0]="OnSetPos",[1]= P.pos}, GetLocal().netid)
+end
+end
+end
+
+function CHECK_PLAYER_INFORMATION(N) N = N:lower()
+for _, P in pairs(GetPlayerList()) do
+if FORMAT_NAME(P.name):lower():match(N) then
+CHAT("Result for "..P.name.." :") Sleep(800) CHAT("Position : "..EXTRACT_PLAYER_POSITION(P.pos)) Sleep(800) CHAT("NetID : "..P.netid) Sleep(800) CHAT("UserID : "..P.userid) Sleep(800) CHAT("Country or Flag : "..P.country)
 end
 end
 end
@@ -2905,7 +2918,8 @@ elseif ARGS[2] == "lray" then if GET_AMOUNT(GetItemInfo("Legendary Infinity Raym
 else CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oWear Command available are 'lkat, mray, lray'!") return true end return true
 elseif COMMAND == ("/wear") and not ARGS[2] then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oWear Command available are 'lkat, mray, lray'!") return true end 
 
-if COMMAND == ("/tport") and ARGS[2] then TARGET_TELEPORT = ARGS[2] TELEPORTING_TO_PLAYER = true return true end
+if (COMMAND == ("/tp") or COMMAND == ("/tport")) and ARGS[2] then TARGET_TELEPORT = ARGS[2] TELEPORTING_TO_PLAYER = true return true elseif (COMMAND == ("/tp") or COMMAND == ("/tport")) and not ARGS[2] then CONSOLE("You have to provide the exact name! `5/tp <name>") return true end
+if (COMMAND == ("/ipl") and ARGS[2]) then TARGET_TO_CHECK = ARGS[2] CHECKING_PLAYER_INFORMATION = true return true elseif (COMMAND == ("/ipl") and not ARGS[2]) then CONSOLE("You have to provide the exact name! `5/ipl <name>") return true end 
 
 if COMMAND == ("/sign") and ARGS[2] then ARGS[2]:lower()
 if ARGS[2] == "spam" then if not GET_SIGN_FOR_SPAM then GET_SIGN_FOR_SPAM = true BUBBLE("`2Find a sign then wrench em! and see what happens..") else GET_SIGN_FOR_SPAM = false end
@@ -4223,6 +4237,7 @@ if SEND_WEBHOOK_DEPOSIT then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK
 if SEND_WEBHOOK_DONATION then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_DONATE, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("", "**"..FORMAT_NAME(DEPO_NAME).."** has made a donation of "..DEPO_AMOUNT.." "..DEPO_ITEM)) BUBBLE("Webhook Donation has been sent!") SEND_WEBHOOK_DONATION = false end
 
 if TELEPORTING_TO_PLAYER then Sleep(100) GET_PLAYER_POSITION(TARGET_TELEPORT) Sleep(150) TELEPORTING_TO_PLAYER = false end
+if CHECKING_PLAYER_INFORMATION then Sleep(100) CHECK_PLAYER_INFORMATION(TARGET_TO_CHECK) Sleep(150) CHECKING_PLAYER_INFORMATION = false end
 
 end
 
@@ -4236,13 +4251,13 @@ AddHook("OnSendPacket", "PACKET-GUARD", function(T, S) if S == nil then return e
 if BUTTON == ("FREE_ACCESS") then if GET_AMOUNT(7188) < 2 then BUBBLE("`wYou don't have enough `eBlue Gem Lock `wto access Starries Helper!") return false else GET_ACCESS = true WARN("`wWarning from `4Starries Helper `w: Buy the VIP entrance to gain access!") end end
 return false end)
 
-AddHook("OnVariant", "VARIANT-GUARD", function(Var)
-if Var[0] == "OnConsoleMessage" then
-if Var[1]:find("(.+) bought 1 VIP Entrance for 50000 World Locks.``") then DEPOSITED = true end
+AddHook("OnVariant", "VARIANT-GUARD", function(V)
+if V[0] == "OnConsoleMessage" then
+if V[1]:find("(.+) bought 1 VIP Entrance for 50000 World Locks.``") then DEPOSITED = true end
 end
 return false end)
 
-while SEARCH do Sleep(150)
+while true do Sleep(150)
 if GET_ACCESS then Sleep(50) if GetWorld() == nil then Sleep(100) WARN("`wWarning from `4Starries Helper `w: DON'T TRY TO RUN!") JOIN_WORLD("STARRIES") Sleep(2000) elseif GetWorld().name ~= "STARRIES" then CONSOLE("Warping to STARRIES") JOIN_WORLD("STARRIES") Sleep(2000) end end
 if DEPOSITED then Sleep(50) HELPER() RemoveHook("PACKET-GUARD") RemoveHook("VARIANT-GUARD") DEPOSITED = false return false end
 end
