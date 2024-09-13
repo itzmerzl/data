@@ -1,6 +1,6 @@
 -- RemoveHooks() -- Removing Hooks
 
--- Last Update : 9/11/2024
+-- Last Update : 13/09/2024
 
 -- Function --
 function OPEN_LINK(C) H = io.popen(C) O = H:read("*a") H:close() return O end
