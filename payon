@@ -1,0 +1,66 @@
+function BUBBLE(S) SendVariantList({[0] = "OnTalkBubble", [1] = GetLocal().netid, [2] = S}) return true end
+function CONSOLE(S) SendVariantList({[0] = "OnConsoleMessage", [1] = "`w[`1P`2a`3y`4o`5n`w] `o"..S }) end 
+
+function MAIN_MENU() D = [[
+set_default_color|`w|
+add_label_with_icon|big|`1P`2a`3y`4o`5n `wProject|left|1780|
+add_spacer|small|
+text_scaling_string|textscalingstring|
+add_button_with_icon|CONVERT_BLUE_GEMS_LOCK|Convert BGL|staticBlueFrame|7188||
+add_button_with_icon|TAX_TO_UWS|Convert Tax|staticBlueFrame|13818||
+add_button_with_icon|PGEMS_TO_UWS|Convert Pink Gems|staticBlueFrame|]]..GetItemInfo("Pink Gemstone").id..[[||
+add_button_with_icon|CLEAR_FLOATING|Clear Float|staticBlueFrame|1898||
+add_button_with_icon||END_LIST|noflags|0||
+add_spacer|small|
+add_quick_exit|
+end_dialog|MAIN_MENU|               Close                ||
+]] SendVariantList({[0] = "OnDialogRequest", [1] = D}, -1, S)
+end
+
+MAIN_MENU() NUM = 0
+
+AddHook("OnSendPacket", "Packet", function(T, S)
+if S:find("/menu") then MAIN_MENU() return true end
+if S:find("buttonClicked|CONVERT_BLUE_GEMS_LOCK") then if not SETUP_CONVERT_BGL and not CONVERT_BGL then SETUP_CONVERT_BGL = true BUBBLE("Please wrench the telephone to start!") AddHook("OnVariant", "NYETING_TELEPHONE", NYETING_TELEPHONE) else RemoveHook("NYETING_TELEPHONE") SETUP_CONVERT_BGL = false BUBBLE("Converting Gems to BGL `4deactivated") end if CONVERT_BGL and not SETUP_CONVERT_BGL then CONVERT_BGL = false CONSOLE("Converting Blue Gem Locks has been stopped!") end return true end
+if S:find("buttonClicked|TAX_TO_UWS") then if not SETUP_CONVERT_TAX and not CONVERT_BGL then SETUP_CONVERT_TAX = true BUBBLE("Please wrench the telephone to start!") AddHook("OnVariant", "NYETING_TELEPHONE", NYETING_TELEPHONE) else RemoveHook("NYETING_TELEPHONE") SETUP_CONVERT_TAX = false BUBBLE("Converting Gems to BGL `4deactivated") end if CONVERT_BGL and not SETUP_CONVERT_TAX then CONVERT_BGL = false CONSOLE("Converting Blue Gem Locks has been stopped!") end return true end
+if S:find("buttonClicked|PGEMS_TO_UWS") then end
+if S:find("buttonClicked|CLEAR_FLOATING") then end
+return false end)
+
+AddHook("OnVariant", "Variant", function(V)
+if V[0] == "OnDialogRequest" and (V[1]:find("Telephone") or V[1]:find("Wow, that's fast delivery.")) then
+if CONVERT_BGL then return true end
+end
+
+if V[0] == "OnDialogRequest" then 
+if V[1]:find("Crazy Jim's Tax Trade") then 
+   if CONVERT_TAX then TAX_CREDIT = string.sub(V[1], V[1]:find("add_smalltext|You currently have ") + 33, V[1]:find(" Tax Credits.|\nadd_button|tax_to_gtoken|") - 1) return true end 
+end
+end
+
+return false end)
+
+function NYETING_TELEPHONE(V) 
+if V[0] == "OnDialogRequest" then 
+
+if V[1]:find("Telephone") then 
+   if SETUP_CONVERT_BGL then SETUP_CONVERT_BGL = false TELE_X, TELE_Y = string.sub(V[1], V[1]:find("embed_data|x|") + 13, V[1]:find("embed_data|y|") - 2), string.sub(V[1], V[1]:find("embed_data|y|") + 13, V[1]:find("add_label_with_icon|big|`wTelephone````|left|3898|") - 2) CONSOLE("Telephone locked to X : `2"..TELE_X.. " `oY : `2"..TELE_Y) RemoveHook("NYETING_TELEPHONE") CONVERT_BGL = true return true end 
+end
+
+if SETUP_CONVERT_TAX then
+if V[1]:find("Telephone") then TELE_X, TELE_Y = string.sub(V[1], V[1]:find("embed_data|x|") + 13, V[1]:find("embed_data|y|") - 2), string.sub(V[1], V[1]:find("embed_data|y|") + 13, V[1]:find("add_label_with_icon|big|`wTelephone````|left|3898|") - 2) 
+ --SendPacket(2,"action|dialog_return\ndialog_name|telephone\nx|"..TELE_X.."|\ny|"..TELE_Y.."|\nnum|12345")
+ SendPacket(2, "action|dialog_return\ndialog_name|telephone\nnum|12345|\nx|"..TELE_X.."|\ny|"..TELE_Y.."|\nbuttonClicked|tax_convert") 
+return true end
+if V[1]:find("Crazy Jim's Tax Trade") then 
+   if SETUP_CONVERT_TAX then SETUP_CONVERT_TAX = false TELE_X, TELE_Y, TAX_CREDIT = string.sub(V[1], V[1]:find("embed_data|x|") + 13, V[1]:find("embed_data|y|") - 2), string.sub(V[1], V[1]:find("embed_data|y|") + 13, V[1]:find("add_label_with_icon|big|`wCrazy Jim's Tax Trade````|left|3902|") - 2), string.sub(V[1], V[1]:find("add_smalltext|You currently have ") + 33, V[1]:find(" Tax Credits.|\nadd_button|tax_to_gtoken|") - 1) CONSOLE("Telephone locked to X : `2"..TELE_X.. " `oY : `2"..TELE_Y) CONSOLE("You currently have `5"..TAX_CREDIT.." `oTax Credits.") CONSOLE("Estimated pink gems earned for all tax credits : "..math.floor(TAX_CREDIT/10000)) RemoveHook("NYETING_TELEPHONE") CONVERT_TAX = true return true end 
+end
+end
+
+end
+end
+
+while true do Sleep(250)
+if CONVERT_BGL then if GetPlayerInfo().gems < 1 then CONSOLE("`oYou don't have `w11.000.000 `5Gems `oto exchange!") CONVERT_BGL = false else SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|"..TELE_X.."|\ny|"..TELE_Y.."|\nbuttonClicked|bglconvert2") NUM = NUM + 1 CONSOLE("Converting Blue Gem Locks [`2"..NUM.."`o]") end end
+if CONVERT_TAX then if TAX_CREDIT < 9999 then CONSOLE("`oYou don't have `w10.000 `2Tax Credits `oto exchange!") CONVERT_TAX = false else SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|12345|\nx|"..TELE_X.."|\ny|"..TELE_Y.."|\nbuttonClicked|tax_to_pgems") end end
+end
