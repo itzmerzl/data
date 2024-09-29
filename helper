@@ -3817,8 +3817,16 @@ end
 if Var[0] == "OnTalkBubble" then 
 --if Var[2]:find("`6<(.+)") then return true end
 --`5<`2TempoDoeloe`` left, `w0 ``others here>``
-if Var[2]:match("left,") and Var[2]:match("``others here>``") then SPLIT_NAME = Var[2]:find("left,") - 1 if SPLIT_NAME == nil or SPLIT_NAME == "" then return end NAME = Var[2]:sub(2, SPLIT_NAME) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {EXIT = "\nadd_label_with_icon_button|small|"..NAME.." `oleft `4"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1400|"..GET_USERID(Var[1]).."|\n", USER_ID = GET_USERID(Var[1])}) SendVariantList({[0] = "OnTalkBubble", [1] = Var[1], [2] = "`w[`4LEFT`w] " .. Var[2]}) if KONFIGURASI.FILE_LOGS.EXIT then EXIT_LOG(NAME, GetWorld().name.." at "..os.date("%H:%M on %d/%m")) end return true end
-if Var[2]:match("entered,") and Var[2]:match("``others here>``") then SPLIT_NAME = Var[2]:find("entered,") - 1 if SPLIT_NAME == nil or SPLIT_NAME == "" then return end NAME = Var[2]:sub(2, SPLIT_NAME) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {ENTER = "\nadd_label_with_icon_button|small|"..NAME.." `oentered `2"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1400|"..GET_USERID(Var[1]).."|\n", USER_ID = GET_USERID(Var[1])}) SendVariantList({[0] = "OnTalkBubble", [1] = Var[1], [2] = "`w[`2ENTERED`w] " .. Var[2]}) if KONFIGURASI.FILE_LOGS.ENTER then ENTER_LOG(NAME, GetWorld().name.." at "..os.date("%H:%M on %d/%m")) end return true end
+if Var[2]:match("left,") and Var[2]:match("``others here>``") then 
+	--SPLIT_NAME = Var[2]:find("left,") - 1 if SPLIT_NAME == nil or SPLIT_NAME == "" then return end NAME = Var[2]:sub(2, SPLIT_NAME) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {EXIT = "\nadd_label_with_icon_button|small|"..NAME.." `oleft `4"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1400|"..GET_USERID(Var[1]).."|\n", USER_ID = GET_USERID(Var[1])}) 
+	SendVariantList({[0] = "OnTalkBubble", [1] = Var[1], [2] = "`w[`4LEFT`w] " .. Var[2]}) 
+	--if KONFIGURASI.FILE_LOGS.EXIT then EXIT_LOG(NAME, GetWorld().name.." at "..os.date("%H:%M on %d/%m")) end 
+return true end
+if Var[2]:match("entered,") and Var[2]:match("``others here>``") then 
+	--SPLIT_NAME = Var[2]:find("entered,") - 1 if SPLIT_NAME == nil or SPLIT_NAME == "" then return end NAME = Var[2]:sub(2, SPLIT_NAME) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {ENTER = "\nadd_label_with_icon_button|small|"..NAME.." `oentered `2"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1400|"..GET_USERID(Var[1]).."|\n", USER_ID = GET_USERID(Var[1])}) 
+	SendVariantList({[0] = "OnTalkBubble", [1] = Var[1], [2] = "`w[`2ENTERED`w] " .. Var[2]}) 
+	--if KONFIGURASI.FILE_LOGS.ENTER then ENTER_LOG(NAME, GetWorld().name.." at "..os.date("%H:%M on %d/%m")) end 
+return true end
 if Var[2]:find("healed!") then return true end
 if Var[2]:find("`1O`2h`3, `4l`5o`6o`wk `8w`9h`ba`!t `$y`3o`2u`4'`ev`pe `#f`6o`8u`1n`wd`w!") then return true end
 if AutoReco and (Var[2]:find("Reco") or Var[2]:find("reco")) then Chat("/modage 60") end
