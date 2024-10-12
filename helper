@@ -1863,7 +1863,7 @@ add_label_with_icon|big|Custom Skin|left|13000|
 add_spacer|small|
 add_text_input|red|`4Red     :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.RED..[[|3|
 add_text_input|green|`2Green :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.GREEN..[[|3|
-add_text_input|blue|`1Blue    :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.BLUE..[[|3|
+add_text_input|blue|`1Blue     :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.BLUE..[[|3|
 add_text_input|transparency|`wTransparency (max. 50) :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.TRANS..[[|3|
 add_spacer|small|
 add_quick_exit|
