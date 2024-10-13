@@ -1,675 +1,603 @@
--- RemoveHooks() -- Removing Hooks
-
--- Last Update : 13/09/2024
-
--- Function --
-function OPEN_LINK(C) H = io.popen(C) O = H:read("*a") H:close() return O end
-function AWAIT(F, T) if type(F) ~= "string" then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oCondition must be string!") end local S = os.clock() * 1000 repeat if T and os.clock() * 1000 - S >= T then return end Sleep(10) until F end
-
 function GET_X() return math.floor(GetLocal().pos.x // 32) end function GET_Y() return math.floor(GetLocal().pos.y // 32) end
-
 function GET_AMOUNT(ID) for _, I in pairs(GetInventory()) do if I.id == ID then return math.floor(I.amount) end end return 0 end
-function GET_FLOAT_AMOUNT(I) C = 0 for _, object in pairs(GetObjectList()) do if object.id == I then C = C + object.amount end end return C end
-
-function GET_REMOTE() for _, T in pairs(GetTiles()) do if T.fg == 5638 then SendPacket(2,"action|dialog_return\ndialog_name|magplant_edit\nx|"..math.floor(T.x).."|\ny|"..math.floor(T.y).."|\nbuttonClicked|getRemote") end end end
-
-function HAS_VALUE_FROM_ARRAY(A, V) for _, AV in ipairs(A) do if string.lower(V) == string.lower(AV) then return true end end return false end
 function GET_DATA(N) tonumber(N) local W, D, B, I, DATA = N % 100, math.floor(N / 100) % 100, math.floor(N / 10000) % 100, math.floor(N / 1000000) % 100, "`w" if I == 0 and B == 0 and D == 0 and W == 0 then return "-" end if I ~= 0 then if B ~= 0 or D ~= 0 or W ~= 0 then DATA = DATA ..I.. " `bBlack Gem Lock `w" else DATA = DATA ..I.. " `bBlack Gem Lock" end end if B ~= 0 then if D ~= 0 or W ~= 0 then DATA = DATA ..B.. " `eBlue Gem Lock `w" else DATA = DATA ..B.. " `eBlue Gem Lock" end end if D ~= 0 then if W ~= 0 then DATA = DATA ..D.. " `1Diamond Lock `w" else DATA = DATA ..D.. " `1Diamond Lock" end end if W ~= 0 then DATA = DATA ..W.. " `9World Lock" end return DATA end 
 function SHOW_DATA(N) tonumber(N) local W, D, B, I, DATA = N % 100, math.floor(N / 100) % 100, math.floor(N / 10000) % 100, math.floor(N / 1000000) % 100, "" if I == 0 and B == 0 and D == 0 and W == 0 then return "-" end if I ~= 0 then if B ~= 0 or D ~= 0 or W ~= 0 then DATA = DATA ..I.. " Black Gem Lock " else DATA = DATA ..I.. " Black Gem Lock" end end if B ~= 0 then if D ~= 0 or W ~= 0 then DATA = DATA ..B.. " Blue Gem Lock " else DATA = DATA ..B.. " Blue Gem Lock" end end if D ~= 0 then if W ~= 0 then DATA = DATA ..D.. " Diamond Lock " else DATA = DATA ..D.. " Diamond Lock" end end if W ~= 0 then DATA = DATA ..W.. " World Lock" end return DATA end 
 function GET_ID(I) if math.floor(I) < 0 then return math.floor(14578 - I) else return math.floor(I) end end
 function GIVE_ID(I) if math.floor(I) > 14578 then return -math.floor(I - 14578) else return math.floor(I) end end
 function VALIDATE(N) if N == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif N == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true end end
 function GET_BALANCE() local W, D, B, I, DATA = GET_AMOUNT(242), GET_AMOUNT(1796), GET_AMOUNT(7188), GET_AMOUNT(11550), "`w" if I == 0 and B == 0 and D == 0 and W == 0 then return "-" end if I ~= 0 then if B ~= 0 or D ~= 0 or W ~= 0 then DATA = DATA ..I.. " `bBlack Gem Lock `w" else DATA = DATA ..I.. " `bBlack Gem Lock" end end if B ~= 0 then if D ~= 0 or W ~= 0 then DATA = DATA ..B.. " `eBlue Gem Lock `w" else DATA = DATA ..B.. " `eBlue Gem Lock" end end if D ~= 0 then if W ~= 0 then DATA = DATA ..D.. " `1Diamond Lock `w" else DATA = DATA ..D.. " `1Diamond Lock" end end if W ~= 0 then DATA = DATA ..W.. " `9World Lock" end return DATA end 
-function GET_PLAYER_COUNT() C = 0 for _, player in pairs(GetPlayerList()) do C = C + 1 end return C end
-
 function CHECKING_USERID(U, L) for _, V in pairs(U) do if V == L then return true end end return false end
 function FORMAT_NAME(S) S = S:gsub("``","") S = S:gsub("`.","") S = S:gsub("Dr.","") S = S:gsub("@",""):gsub(" of Legend",""):gsub("%[BOOST%]","") S = S:gsub("%[ELITE%]",""):gsub(" ","") return S end
 function FORMAT_NUMBER(N) N = math.floor(N + 0.5) local formatted = tostring(N) local n = 3 while n < #formatted do formatted = formatted:sub(1, #formatted - n) .. "." .. formatted:sub(#formatted - n + 1) n = n + 4 end return formatted end
 function FORMAT_LOCK(L) local BL = 0 local B = 0 local D = 0 local W = 0 while L >= 1000000 do L = L - 1000000 BL = BL + 1 end while L >= 10000 do L = L - 10000 B = B + 1 end while L >= 100 do L = L - 100 D = D + 1 end while L >= 1 do L = L - 1 W = W + 1 end return BL, B, D, W end
-
 function SEND_WEBHOOK(U, D) MakeRequest(U,"POST",{["Content-Type"] = "application/json"}, D) end
-function WARN(S) SendVariantList({[0] = "OnAddNotification", [1] = "interface/atomic_button.rttex", [2] = S, [3] = "audio/hub_open.wav"}) end
-function EVENT(S, E, A) SendVariantList({[0] = "OnAddNotification", [1] = E, [2] = S, [3] = A}) end
 function CHAT(S) SendPacket(2, "action|input\n|text|" ..S) end 
 function CONSOLE(S) SendVariantList({[0] = "OnConsoleMessage", [1] = KONFIGURASI.SYSTEM.CREDIT.."`o"..S }) end 
 function BUBBLE(S) SendVariantList({[0] = "OnTalkBubble", [1] = GetLocal().netid, [2] = S}) return true end
 function OVERLAY(S) SendVariantList({[0] = "OnTextOverlay", [1] = S}) end 
 function DIALOG(D, S) SendVariantList({[0] = "OnDialogRequest", [1] = D}, -1, S) end
-function COUNT_PLAYER() C = 0 for _, P in pairs(GetPlayerList()) do C = C + 1 end return C end
-function COUNT_FLOAT(id) C = 0 for _, O in pairs(GetObjectList()) do if O.id == id then C = C + O.amount end end return C end
 function TIME_SPLIT(T) local H = math.floor((T % 86400) / 3600) local M = math.floor((T % 3600) / 60) local S = math.floor((T % 60)) return H.." %s "..M.." %s "..S.." %s" end
 function CAPITALIZE(S) return S:lower():gsub("^%l", string.upper) end
 function JOIN_WORLD(W) SendPacket(3,"action|join_request\nname|"..W.."\ninvitedWorld|0") end
 function RECONNECTED(W) if GetWorld() == nil then OVERLAY("Disconnected") Sleep(1000) JOIN_WORLD(W) Sleep(1000) OVERLAY("Reconnected") end end
-function BUYING_PACK(S) SendPacket(2,"action|buy\nitem|"..S) end
 function COMPRESS() if GET_AMOUNT(242) > 99 then SHATTER(242) end  if GET_AMOUNT(1796) > 99 then SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|".. telex .."|\ny|".. teley .."|\nbuttonClicked|bglconvert") end if GET_AMOUNT(7188) > 99 then CREATE_BLACK() end end
-
-function CHANGE_BGL() local POS_X, POS_Y = math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32) for _, tile in pairs(GetTiles()) do if tile.fg == 3898 then STATE(tile.x, tile.y, "left") Sleep(100) SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|"..math.floor(tile.x).."|\ny|"..math.floor(tile.y).."|\nbuttonClicked|bglconvert") Sleep(100) STATE(POS_X, POS_Y, "left") end end end
-function BUYING_DL() for _, tile in pairs(GetTiles()) do if tile.fg == 3898 then SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|"..math.floor(tile.x).."|\ny|"..math.floor(tile.y).."|\nbuttonClicked|dlconvert") end end end
-function CREATE_BLACK() SendPacket(2,"action|dialog_return\ndialog_name|info_box\nbuttonClicked|make_bgl") Sleep(100) end
-function BREAK_BLACK() SendPacket(2,"action|dialog_return\ndialog_name|info_box\nbuttonClicked|make_bluegl") Sleep(100) end
-function COLLECT_OID(O, X, Y) SendPacketRaw(false, {type = 11, value = O, x = X, y = Y}) end 
-function COLLECT(X, Y) for _,item in pairs(GetObjectList()) do if item.pos.x // 32 == X and item.pos.y // 32 == Y then COLLECT_OID(item.oid, item.pos.x, item.pos.y) end end end 
-function COLLECT_IN_RANGE() for _, item in pairs(GetObjectList()) do COLLECT_OID(item.oid, item.pos.x, item.pos.y) end BUBBLE("Collecting in Range") end 
-function COLLECT_CUSTOM_RANGE(CR) if not item then R = (R or CR) * 32 end for _, item in pairs(GetObjectList()) do CPX, CPY = math.abs(GetLocal().pos.x - item.pos.x), math.abs(GetLocal().pos.y - item.pos.y) if CPX < R and CPY < R then COLLECT_OID(item.oid, item.pos.x, item.pos.y) end end end
-function COUNT_TAX(B, T) BP, CT = tonumber(B), tonumber(T) RCT = tonumber(CT / 100 * BP) return math.floor(BP - RCT) end 
-function FINDER(I) SendPacket(2,"action|dialog_return\ndialog_name|item_search\n"..I.."|1") end
-
---function STEAL(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\save.dat" FILE = io.open(PATH, "r")  for LINE in FILE:lines() do print(LINE) end FILE:close() end
-
-function CREATE_FOLDER(P) local PATH = P local CMD = "mkdir " .. PATH local S, E = os.execute(CMD) if S then print("Created a new folder named 'helper'! this will be used as a data/logs for Starries Helper.") else return end end
-function FILE_EXISTED(F) local FILE = io.open(F, "r") if FILE then io.close(FILE) return true else return false end end
-
-function DOWNLOAD_BANNER() end
---CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`4unable to create the file on the desktop.")
-function DROP_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Drop.txt" FILE = io.open(PATH, "a")  FILE:write("Dropped "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
-function COLLECT_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Collect.txt" FILE = io.open(PATH, "a")  FILE:write("Collected "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
-function ENTER_LOG(N, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Enter.txt" FILE = io.open(PATH, "a")  FILE:write(N.." entered "..D.."\n") FILE:close() end
-function EXIT_LOG(N, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Exit.txt" FILE = io.open(PATH, "a")  FILE:write(N.." exited "..D.."\n") FILE:close() end
-function VEND_LOG(I, A, D) PATH = os.getenv("USERPROFILE") .. "\\AppData\\Local\\Growtopia\\cache\\helper\\Drop.txt" FILE = io.open(PATH, "a")  FILE:write("Dropped "..A.." "..GetItemInfo(I).name.." "..D.."\n") FILE:close() end
-
 function GETTING_NETID(N) for _, P in pairs(GetPlayerList()) do if string.sub(P.name, 3, string.len(P.name) - 2) == N then return math.floor(P.netid) end end return GetLocal().netid end
 function STATE(X, Y, Z) local F = -1 if Z == "left" then F = 48 elseif Z == "right" then F = 32 end SendPacketRaw(false, {type = 0, x = (X) * 32, y = (Y) * 32, state = F}) Sleep(80) end
 function GET_NAME_BY_NETID(I) S = "Unknown" for _, P in pairs(GetPlayerList()) do if P.netid == I then S = P.name end end return S end 
 function GET_NAME_BY_USERID(I) S = "Unknown" for _, P in pairs(GetPlayerList()) do if P.userid == I then S = P.name end end return S end 
 function GET_NETID(N) for _, P in pairs(GetPlayerList()) do if P.name == N then return P.netid end end end 
 function GET_USERID(N) for _, P in pairs(GetPlayerList()) do if P.netid == N then return P.userid end end end 
-
-function SPLIT_OLD(STR, SUB) local T = {} local A = "(.-)" .. SUB local L = 1 local B, C, D = STR:find(A, 1) while B do if B ~= 1 or D ~= "" then table.insert(T,D) end L = C+1 B, C, D = STR:find(A, L) end if L then D = STR:sub(L) table.insert(T, D) end return T end 
 function SPLIT(STR, SUB) local T = {} for STR in string.gmatch(STR, "([^"..SUB.."]+)") do table.insert(T, STR) end return T end
-
 function PLACE(I, X, Y) SendPacketRaw(false,{type = 3, value = I, x = GetLocal().pos.x, y = GetLocal().pos.y, px = X, py = Y}) end 
 function SHATTER(I) SendPacketRaw(false, {type = 10, value = I}) end 
 function DROP(I, C) SendPacket(2,"action|dialog_return\ndialog_name|drop\nitem_drop|".. I .. "|\nitem_count|".. C) end 
-
 function TRASH(I, C) SendPacket(2,"action|dialog_return\ndialog_name|trash\nitem_trash|".. I .. "|\nitem_count|".. C) end 
-function SURGERY_TOOLS(I) SendPacket(2,"action|dialog_return\ndialog_name|surgery\nbuttonClicked|command_"..I) end
-function CHECK_WEAR(I) for _, item in pairs(GetInventory()) do if item.id == I then return math.floor(item.flags) end end return 0 end
-function CHANGE_NICKNAME(S, N) SendVariantList({[0] = "OnNameChanged", [1] = S, [netid] = N}) end -- Can't run on Bothex
 function CHECKBOX(B) local R = "" if B then R =  "1" else R = "0" end return R end
 function CHECKBOX_MODE(B, C) local R = "" if B == C then R =  "1" else R = "0" end return R end
 function FRAME(B) local R = "" if B then R =  "staticPurpleFrame" else R = "staticGreyFrame" end return R end 
 function FRAME_MODE(V, S) local R = "" if V == S then R = "staticPurpleFrame" else R = "staticGreyFrame" end return R end
 function TEXT_MODE(S, T, U, V, W) local R = "" if S then R = U elseif T then R = V else R = W end return R end
-function GET_TAX() TAX_WL = COUNT_TAX(GET_AMOUNT(242), 50) TAX_DL = COUNT_TAX(GET_AMOUNT(1796), 50) TAX_BGL = COUNT_TAX(GET_AMOUNT(7188), 50) TAX_BLACK = COUNT_TAX(GET_AMOUNT(11550), 50) CONSOLE(TAX_WL+(TAX_DL*100)+(TAX_BGL*10000)+(TAX_BLACK*1000000)) end
-
 function REME_COUNT(N) tonumber(N) if N == 19 or N == 28 or N == 0 then R = "`20 (lucky)" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
 function QEME_COUNT(N) tonumber(N) if N == 10 or N == 20 or N == 30 then R = "`20 (lucky)" elseif N == 0 then R = "1" elseif N >= 10 then R = string.sub(N, -1) else R = N end return R end
 function PEME_COUNT(N) tonumber(N) if N == 9 or N == 18 or N == 27 or N == 36 then R = "9 (cry)" elseif N == 19 or N == 28 or N == 0 then R = "`20 (lucky)" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
-function LEME_COUNT(N) tonumber(N) if N == 9 or N == 18 or N == 27 or N == 36 then R = "9 (cry)" elseif N == 19 or N == 28 or N == 0 then R = "`20 (lucky) X4" elseif N == 1 or N == 10 or N == 29 then R = "`21 (lucky) X3" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
-
---function GET_GAME(N)  if KONFIGURASI.LIST_MENU.HOSTER.REME and not KONFIGURASI.LIST_MENU.HOSTER.QEME then return "`5REME `w: `5"..REME_COUNT(tonumber(N)) elseif not KONFIGURASI.LIST_MENU.HOSTER.REME and KONFIGURASI.LIST_MENU.HOSTER.QEME then return "`6QEME `w: `6"..QEME_COUNT(tonumber(N)) elseif KONFIGURASI.LIST_MENU.HOSTER.REME and KONFIGURASI.LIST_MENU.HOSTER.QEME then return "`5REME `w: `5"..REME_COUNT(tonumber(N)).." `wI `6QEME `w: `6"..QEME_COUNT(tonumber(N)) else return "" end end
-
+function LEME_COUNT(N) tonumber(N) if N == 9 or N == 18 or N == 27 or N == 36 then R = "9 (cry)" elseif N == 19 or N == 28 or N == 0 then R = "`20 (lucky) X4" elseif N == 1 or N == 10 or N == 29 then R = "`20 (lucky) X3" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
 function GET_GAME(N) REME_GAME, QEME_GAME, PEME_GAME, LEME_GAME, TO_RETURN = "", "", "", "", "%s%s%s%s" if KONFIGURASI.LIST_MENU.HOSTER.REME then REME_GAME = "`5REME `w: `5"..REME_COUNT(tonumber(N)).." " else REME_GAME = "" end if KONFIGURASI.LIST_MENU.HOSTER.QEME then QEME_GAME = "`6QEME `w: `6"..QEME_COUNT(tonumber(N)).." " else QEME_GAME = "" end if KONFIGURASI.LIST_MENU.HOSTER.PEME then PEME_GAME = "`1PEME `w: `1"..PEME_COUNT(tonumber(N)).." " else PEME_GAME = "" end if KONFIGURASI.LIST_MENU.HOSTER.LEME then LEME_GAME = "`rLEME `w: `r"..LEME_COUNT(tonumber(N)).." " else LEME_GAME = "" end return TO_RETURN:format(REME_GAME, QEME_GAME, PEME_GAME, LEME_GAME) end
-
 function DIALOG_SPIN_LOG() SHOW_UID_STRING, SHOW_WORLD_STRING, SHOW_TIME_STRING, SHOW_REME_STRING, SHOW_QEME_STRING, SL = "", "", "", "", "", {}  for _, T in pairs(KONFIGURASI.TABLE.SPIN_LOG) do if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_WORLD then SHOW_WORLD_STRING = T.WORLD else SHOW_WORLD_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_TIME then SHOW_TIME_STRING = T.TIME else SHOW_TIME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_UID then SHOW_UID_STRING = T.UID else SHOW_UID_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_REME then SHOW_REME_STRING = T.REME else SHOW_REME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_QEME then SHOW_QEME_STRING = T.QEME else SHOW_QEME_STRING = "" end table.insert(SL, T.SPIN:format(SHOW_WORLD_STRING, SHOW_TIME_STRING, SHOW_UID_STRING, SHOW_REME_STRING, SHOW_QEME_STRING)) end SendVariantList({[0] = "OnDialogRequest", [1] = tostring("set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|Spin Log|left|1436|\nadd_spacer|small|\ntext_scaling_string|textscalingstring|\nadd_button_with_icon|CLEAR_SPIN_LOG|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.CLEAR.."|staticBlueFrame|4940|\nadd_button_with_icon|FILTER_BY_REAL_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.REAL.."|staticBlueFrame|4938|\nadd_button_with_icon|FILTER_BY_FAKE_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.FAKE.."|staticBlueFrame|4936|\nadd_button_with_icon||END_LIST||0||\nadd_button_with_icon|SHOW_UID_ON_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.SHOW_UID.."|"..FRAME(KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_UID).."|10794|\nadd_button_with_icon|SHOW_WORLD_ON_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.SHOW_WORLD.."|"..FRAME(KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_WORLD).."|3802|\nadd_button_with_icon|SHOW_TIME_ON_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.SHOW_TIME.."|"..FRAME(KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_TIME).."|1482|\nadd_button_with_icon|SHOW_REME_ON_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.SHOW_REME.."|"..FRAME(KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_REME).."|2836|\nadd_button_with_icon|SHOW_QEME_ON_SPIN|"..CUSTOM_TEXT.LIST_MENU.HOSTER.BUTTON.SHOW_QEME.."|"..FRAME(KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_QEME).."|2838|\nadd_button_with_icon||END_LIST||0||\nadd_smalltext|Click the Roulette Wheel icon to filter the spin by user or player|\n"..table.concat(SL).."\nadd_spacer|small|\nadd_quick_exit|\nadd_button|HOSTER_MENU|Back|noflags|0|0|\nend_dialog|SPIN_LOG|||")}) end
 function FILTER_SPIN_BY_USER(I) SL = {} for _, T in pairs(KONFIGURASI.TABLE.SPIN_LOG) do if T.USER_ID == I then if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_WORLD then SHOW_WORLD_STRING = T.WORLD else SHOW_WORLD_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_TIME then SHOW_TIME_STRING = T.TIME else SHOW_TIME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_UID then SHOW_UID_STRING = T.UID else SHOW_UID_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_REME then SHOW_REME_STRING = T.REME else SHOW_REME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_QEME then SHOW_QEME_STRING = T.QEME else SHOW_QEME_STRING = "" end table.insert(SL, T.SPIN:format(SHOW_WORLD_STRING, SHOW_TIME_STRING, SHOW_UID_STRING, SHOW_REME_STRING, SHOW_QEME_STRING)) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|User Spin|left|1400|\nadd_spacer|small|\n"..table.concat(SL).."\nadd_spacer|small|\nadd_button|SPIN_LOG|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|FILTER_SPIN_BY_USER|||"}) end
 function FILTER_SPIN_BY_STATUS(S) local ICON if S == "REAL" then ICON = "4938" elseif S == "FAKE" then ICON = "4936" end SL = {} for _, T in pairs(KONFIGURASI.TABLE.SPIN_LOG) do if T.STATUS == S then if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_WORLD then SHOW_WORLD_STRING = T.WORLD else SHOW_WORLD_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_TIME then SHOW_TIME_STRING = T.TIME else SHOW_TIME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_REME then SHOW_REME_STRING = T.REME else SHOW_REME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_QEME then SHOW_QEME_STRING = T.QEME else SHOW_QEME_STRING = "" end table.insert(SL, T.SPIN:format(SHOW_WORLD_STRING, SHOW_TIME_STRING, SHOW_UID_STRING, SHOW_REME_STRING, SHOW_QEME_STRING)) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CAPITALIZE(S).." Spin|left|"..ICON.."|\nadd_spacer|small|\n"..table.concat(SL).."\nadd_spacer|small|\nadd_button|SPIN_LOG|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|FILTER_SPIN_BY_STATUS|||"}) end
-
 function CUSTOM_DROP() tonumber(DROP_AMOUNT) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true end TABLE_FORMAT = {1000000, 10000, 100, 1} BLACK, BGL, DL, WL = 0, 0, 0, 0 RESULT = GET_DATA(DROP_AMOUNT) RES = SHOW_DATA(DROP_AMOUNT) for D = 1, 4 do while DROP_AMOUNT >= TABLE_FORMAT[D] do if TABLE_FORMAT[D] == TABLE_FORMAT[1] then BLACK = BLACK + 1 DROP_AMOUNT = DROP_AMOUNT - 1000000 elseif TABLE_FORMAT[D] == TABLE_FORMAT[2] then BGL = BGL + 1 DROP_AMOUNT = DROP_AMOUNT - 10000 elseif TABLE_FORMAT[D] == TABLE_FORMAT[3] then DL = DL + 1 DROP_AMOUNT = DROP_AMOUNT - 100 elseif TABLE_FORMAT[D] == TABLE_FORMAT[4] then WL = WL + 1 DROP_AMOUNT = DROP_AMOUNT - 1 end end end ITEM_ID = {11550, 7188, 1796, 242} ITEM_AMOUNT = {BLACK, BGL, DL, WL} if GET_AMOUNT(11550) < BLACK then CREATE_BLACK() Sleep(80) end  if GET_AMOUNT(7188) < BGL then SHATTER(242) Sleep(80) BREAK_BLACK() Sleep(80) SHATTER(242) Sleep(80) BREAK_BLACK() Sleep(80) end  if GET_AMOUNT(1796) < DL then SHATTER(7188) Sleep(80) SHATTER(242) Sleep(80) SHATTER(7188) Sleep(80) SHATTER(242) Sleep(80) end  if GET_AMOUNT(242) < WL then SHATTER(7188) Sleep(80) SHATTER(1796) Sleep(80) SHATTER(7188) Sleep(80) SHATTER(1796) Sleep(80) end if KONFIGURASI.UI.LANGUAGE == "EN" then DROP_BLACK_TEXT, DROP_BGL_TEXT, DROP_DL_TEXT, DROP_WL_TEXT = "Dropped "..BLACK.." `bBlack Gem Lock", "Dropped `w" ..BGL.. " `eBlue Gem Lock", "Dropped `w" ..DL.. " `1Diamond Lock", "Dropped `w" ..WL.. " `9World Lock" elseif KONFIGURASI.UI.LANGUAGE == "ID" then DROP_BLACK_TEXT, DROP_BGL_TEXT, DROP_DL_TEXT, DROP_WL_TEXT = "Menjatuhkan "..BLACK.." `bBlack Gem Lock", "Menjatuhkan `w" ..BGL.. " `eBlue Gem Lock", "Menjatuhkan `w" ..DL.. " `1Diamond Lock", "Menjatuhkan `w" ..WL.. " `9World Lock" end if BLACK > 0 then DROP(ITEM_ID[1], ITEM_AMOUNT[1]) CONSOLE(DROP_BLACK_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(11550, BLACK, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..BLACK.." Black Gem Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|11550|11550|\n", DROP_ID = 11550}) Sleep(100) end end if BGL > 0 then  if GET_AMOUNT(7188) >= BGL then DROP(ITEM_ID[2], ITEM_AMOUNT[2]) else DROP(ITEM_ID[3], ITEM_AMOUNT[2]*100) end CONSOLE(DROP_BGL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(7188, BGL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..BGL.." Blue Gem Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|7188|7188|\n", DROP_ID = 7188}) Sleep(100) end end if DL > 0 then DROP(ITEM_ID[3], ITEM_AMOUNT[3]) CONSOLE(DROP_DL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(1796, DL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..DL.." Diamond Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1796|1796|\n", DROP_ID = 1796}) Sleep(100) end end if WL > 0 then DROP(ITEM_ID[4], ITEM_AMOUNT[4]) CONSOLE(DROP_WL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(242, WL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..WL.." World Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|242|242|\n", DROP_ID = 242}) Sleep(100) end end  if not KONFIGURASI.DROP.DONT_SHOW then if KONFIGURASI.UI.LANGUAGE == "EN" then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..RESULT) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..RESULT) end elseif KONFIGURASI.UI.LANGUAGE == "ID" then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wMenjatuhkan "..RESULT) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wMenjatuhkan "..RESULT) end end else KONFIGURASI.DROP.DONT_SHOW = false return true end end
-
 function CHECKING_LANGUAGE(BAHASA) 
 if BAHASA == "EN" then 
 
 CUSTOM_TEXT = {
-	MENU = {
-		INFO = "\nadd_spacer|small|\nadd_smalltext|Additional information :|\nadd_smalltext|`5Purple frame `"..KONFIGURASI.UI.PRIMARY..": Feature activated|\nadd_smalltext|`wGrey frame `"..KONFIGURASI.UI.PRIMARY..": Feature is currently inactive|\nadd_spacer|small|",
-		A = "Shortcut to this menu",
-		B = "Back",
-		C = "Close",
-		D = "Update",
-		E = "Nevermind",
-		F = "Save",
-		G = "Submit",
-		BACK = {
-			A = "                      Back                      "
-		}
-		
-	},
-	START = {
-		A = "Checking userid to make sure you have access",
-		B = "Player authentication `2successful`o!",
-		C = "Your balance :",
-		D = "Type `5/menu `oto show feature, or click `5Social `obutton",
-		E = "Starries Helper by `5@starries.real"
-	},
-	BUBBLE = {
-		WRENCH = {
-			PULL_BUBBLE = "`w(peace) Gas Sir",
-		},
-		BTK = {
-			COLLECT_BET = "`^Go Break (punch)",
-			DROP_WINNER = "`^Come on, more sir (oops)"
-		}
-	},
-	ALERT = {
-		C = "Collecting in Range",
-		OOPS = "`w[`4OOPS`w] ",
-		NEXT_UPDATE = "This feature aren't available right now! please wait for next update (halo)",
-		AMOUNT_NIL = "`w[`4OOPS`w] `oYou must enter a valid number",
-		AMOUNT_NOL = "`w[`4OOPS`w] `oWhat do you want to do with the number 0?",
-		AMOUNT_LESS = "`w[`4OOPS`w] `oYou don't have enough items to drop according to that amount!"
-	},
-	CODE = {
-		BTK = "", --BTK = "`w[`"..KONFIGURASI.UI.SECONDARY.."BTK`w] ",
-		ABILITY = "", --ABILITY = "`w[`"..KONFIGURASI.UI.SECONDARY.."ABILITY`w] ",
-		CONSUME = "", --CONSUME = "`w[`"..KONFIGURASI.UI.SECONDARY.."CONSUME`w] ",
-		DONATION = "", --DONATION = "`w[`"..KONFIGURASI.UI.SECONDARY.."DONATION`w] ",
-		TELEPHONE = "", --TELEPHONE = "`w[`"..KONFIGURASI.UI.SECONDARY.."TELEPHONE`w] ",
-		WRENCH = "", --WRENCH = "`w[`"..KONFIGURASI.UI.SECONDARY.."WRENCH`w] ",
-		VENDING = "", --VENDING = "`w[`"..KONFIGURASI.UI.SECONDARY.."VENDING`w] ",
-		AUTO_JOIN = "" --AUTO_JOIN = "`w[`"..KONFIGURASI.UI.SECONDARY.."AUTO JOIN`w] "
-	},
-	BROADCAST = {
-		A = "Broadcast will be sent in countdown",
-		B = "Broadcasting completed! total broadcast",
-		C = "Thanks",
-		D = "Broadcasting",
-		E = "out of",
-		F = "total broadcast",
-		G = "remaining",
-		H = "to",
-		I = "broadcast predictions",
-		J = "Remaining time",
-		K = "Time spent",
-		L = "hours",
-		M = "minutes",
-		N = "seconds"
-	},
-	MAIN_MENU = {
-		TEXT = {
-			TITLE = "CreativePS Helper",
-			DESC_1 = "This Helper was made by",
-			DESC_2 = "Thanks for using this script !",
-			HI = "Hi",
-			WORLD = "You're currently at",
-			STAND = "You're standing at",
-			DATETIME = "It is currently",
-			TIME = os.date("%H:%M `"..KONFIGURASI.UI.PRIMARY.."on `"..KONFIGURASI.UI.SECONDARY.."%B %d, %Y"),
-			SPACE = "-------------------------------------------------------------------------",
-			FEATURE = "Features",
-		},
-		BUTTON = {
-			CLOSE = "Nevermind.",
-			SOCIAL = "Social Portal",
-			COMMAND = "Command List",
-			ABILITY = "Your Ability",
-			LIST_MENU = "List Menu",
-			SPAM = "Spam Editor",
-			INFO = "Information",
-			GROWSCAN = "Growscan",
-			JASA = "Services Menu",
-			DONATION = "Donation",
-			SUPPORT = "Support",
-			ACTIVITY = "Activity Log",
-			PROFILE = "Your Profile"
-		},
-	},
-	BTK_MENU = {
-		TITLE = "BTK Helper x Starries ",
-		BUTTON = {
-			TB = "Take Bet",
-			SCAN = "Scan Gems",
-			TG = "Take Gems",
-			PC = "Put Chand",
-			WIN1 = "Player 1 Wins",
-			WIN2 = "Player 2 Wins",
-			BBET = "Back Bet",
-			GIVETAX = "Pay Taxes",
-			POSBET = "Bet Position",
-			POSCHAND = "Chand Position",
-			POSH = "Host Position",
-			POSTAX = "Tax Position",
-			SETTING_TAX = "Setting Tax",
-			PUTMODE = "Put Mode",
-			AUTOPOS = "Auto Position",
-			CONFIGBTK = "Configuration",
-			CLOSE = "               Close                "
-		},
-		AUTOPOS = {
-			H = "Horizontal",
-			V = "Vertical",
-			H1 = "Horizontal V1",
-			H2 = "Horizontal V2",
-			H3 = "Horizontal V3",
-			H4 = "Horizontal V4",
-			V1 = "Vertical V1",
-			V2 = "Vertical V2",
-			V3 = "Vertical V3",
-			V4 = "Vertical V4"
-		},
-		POS_CHAND_MODE = {
-			TITLE = "Select",
-			BUTTON = {
-				HORIZONTAL = "Horizontal",
-				VERTICAL = "Vertical",
-				BACK = "    Back    "
-			}
-		},
-	},
-	COMMAND_LIST = {
-		TEXT = {
-			TITLE = "Command List",
-			DESCRIPTION = "List commands to simplify and easier your playing experience",
-			SHORTCUT = "Shortcut to this menu"
-		},
-		BUTTON = {
-			BTK = "BTK Command",
-			CSN = "CSN Command",
-			UTILITY = "Utility Command",
-			DROP = "Drop Command",
-			ABILITY = "Ability Shortcut",
-			MENU = "Menu Shortcut",
-			SB = "SB Command",
-			FUN = "Fun Command",
-			BACK = "Back"
-		},
-		BTK = {
-			TEXT = {
-				SHORTCUT = "Shortcut to this menu : `"..KONFIGURASI.UI.SECONDARY.."/cmd btk"
-			},
-			BUTTON = {
-				BACK = "Back"
-			},
-			LIST_1 = {
-				TITLE = "Menu Shortcut",
-				TB = "Take a bet or lock from the player",
-				SCAN = "Scan the gems without collecting",
-				TG = "Collecting gems (have options auto drop winner)",
-				PC = "Put or placing chand to position chand",
-				WIN1 = "Give the bet to player 1 as a winner",
-				WIN2 = "Give the bet to player 2 as a winner",
-				BBET = "Back bet or lock to both player when they canceling",
-				GIVETAX = "Give 50% percentage of all lock to donation box",
-				POSBET = "Setting position display box or bet",
-				POSCHAND = "Setting position of the chandelier",
-				POSH = "Setting position hoster for back position",
-				POSTAX = "Setting position of donation box for paid tax",
-				PUTMODE = "Open put chandelier mode menu",
-				AUTOPOS = "Open auto pos menu to automatically set position",
-				CONFIGBTK = "Open configuration menu to show optional feature"
-			},
-			LIST_2 = {
-				TITLE = "Shortcut Setting Position",
-				FPOS = "Fast setting position bet, chandelier and hoster",
-				POSCH = "Shortcut setting position chandelier for horizontal",
-				POSCV = "Shortcut setting position chandelier for vertical",
-				POSHORIZONTAL = "Open auto position menu for horizontal",
-				H1 = "Shortcut setting position horizontal v1",
-				H2 = "Shortcut setting position horizontal v2",
-				H3 = "Shortcut setting position horizontal v3",
-				H4 = "Shortcut setting position horizontal v4",
-				POSVERTICAL = "Open auto position menu for vertical",
-				V1 = "Shortcut setting position vertical v1",
-				V2 = "Shortcut setting position vertical v2",
-				V3 = "Shortcut setting position vertical v3",
-				V4 = "Shortcut setting position vertical v4"
-			}
-		},
-		CSN = {
-			TEXT = {
+    MENU = {
+        INFO = "\nadd_spacer|small|\nadd_smalltext|Additional information :|\nadd_smalltext|`5Purple frame `"..KONFIGURASI.UI.PRIMARY..": Feature activated|\nadd_smalltext|`wGrey frame `"..KONFIGURASI.UI.PRIMARY..": Feature is currently inactive|\nadd_spacer|small|",
+        A = "Shortcut to this menu",
+        B = "Back",
+        C = "Close",
+        D = "Update",
+        E = "Nevermind",
+        F = "Save",
+        G = "Submit",
+        BACK = {
+            A = "                      Back                      "
+        }
+        
+    },
+    START = {
+        A = "Checking userid to make sure you have access",
+        B = "Player authentication `2successful`o!",
+        C = "Your balance :",
+        D = "Type `5/menu `oto show feature, or click `5Social `obutton",
+        E = "Starries Helper by `5@starries.real"
+    },
+    BUBBLE = {
+        WRENCH = {
+            PULL_BUBBLE = "`w(peace) Gas Sir",
+        },
+        BTK = {
+            COLLECT_BET = "`^Go Break (punch)",
+            DROP_WINNER = "`^Come on, more sir (oops)"
+        }
+    },
+    ALERT = {
+        C = "Collecting in Range",
+        OOPS = "`w[`4OOPS`w] ",
+        NEXT_UPDATE = "This feature aren't available right now! please wait for next update (halo)",
+        AMOUNT_NIL = "`w[`4OOPS`w] `oYou must enter a valid number",
+        AMOUNT_NOL = "`w[`4OOPS`w] `oWhat do you want to do with the number 0?",
+        AMOUNT_LESS = "`w[`4OOPS`w] `oYou don't have enough items to drop according to that amount!"
+    },
+    CODE = {
+        BTK = "", --BTK = "`w[`"..KONFIGURASI.UI.SECONDARY.."BTK`w] ",
+        ABILITY = "", --ABILITY = "`w[`"..KONFIGURASI.UI.SECONDARY.."ABILITY`w] ",
+        CONSUME = "", --CONSUME = "`w[`"..KONFIGURASI.UI.SECONDARY.."CONSUME`w] ",
+        DONATION = "", --DONATION = "`w[`"..KONFIGURASI.UI.SECONDARY.."DONATION`w] ",
+        TELEPHONE = "", --TELEPHONE = "`w[`"..KONFIGURASI.UI.SECONDARY.."TELEPHONE`w] ",
+        WRENCH = "", --WRENCH = "`w[`"..KONFIGURASI.UI.SECONDARY.."WRENCH`w] ",
+        VENDING = "", --VENDING = "`w[`"..KONFIGURASI.UI.SECONDARY.."VENDING`w] ",
+        AUTO_JOIN = "" --AUTO_JOIN = "`w[`"..KONFIGURASI.UI.SECONDARY.."AUTO JOIN`w] "
+    },
+    BROADCAST = {
+        A = "Broadcast will be sent in countdown",
+        B = "Broadcasting completed! total broadcast",
+        C = "Thanks",
+        D = "Broadcasting",
+        E = "out of",
+        F = "total broadcast",
+        G = "remaining",
+        H = "to",
+        I = "broadcast predictions",
+        J = "Remaining time",
+        K = "Time spent",
+        L = "hours",
+        M = "minutes",
+        N = "seconds"
+    },
+    MAIN_MENU = {
+        TEXT = {
+            TITLE = "Casino Helper",
+            DESC_1 = "This Helper was made by",
+            DESC_2 = "Thanks for using this script !",
+            HI = "Hi",
+            WORLD = "You're currently at",
+            STAND = "You're standing at",
+            DATETIME = "It is currently",
+            TIME = os.date("%H:%M `"..KONFIGURASI.UI.PRIMARY.."on `"..KONFIGURASI.UI.SECONDARY.."%B %d, %Y"),
+            SPACE = "-------------------------------------------------------------------------",
+            FEATURE = "Features",
+        },
+        BUTTON = {
+            CLOSE = "Nevermind.",
+            SOCIAL = "Social Portal",
+            COMMAND = "Command List",
+            ABILITY = "Your Ability",
+            HOSTER_MENU = "Hoster Menu",
+            SPAM = "Spam Editor",
+            INFO = "Information",
+        },
+    },
+    BTK_MENU = {
+        TITLE = "BTK Helper x Starries ",
+        BUTTON = {
+            TB = "Take Bet",
+            SCAN = "Scan Gems",
+            TG = "Take Gems",
+            PC = "Put Chand",
+            WIN1 = "Player 1 Wins",
+            WIN2 = "Player 2 Wins",
+            BBET = "Back Bet",
+            GIVETAX = "Pay Taxes",
+            POSBET = "Bet Position",
+            POSCHAND = "Chand Position",
+            POSH = "Host Position",
+            POSTAX = "Tax Position",
+            SETTING_TAX = "Setting Tax",
+            PUTMODE = "Put Mode",
+            AUTOPOS = "Auto Position",
+            CONFIGBTK = "Configuration",
+            CLOSE = "               Close                "
+        },
+        AUTOPOS = {
+            H = "Horizontal",
+            V = "Vertical",
+            H1 = "Horizontal V1",
+            H2 = "Horizontal V2",
+            H3 = "Horizontal V3",
+            H4 = "Horizontal V4",
+            V1 = "Vertical V1",
+            V2 = "Vertical V2",
+            V3 = "Vertical V3",
+            V4 = "Vertical V4"
+        },
+        POS_CHAND_MODE = {
+            TITLE = "Select",
+            BUTTON = {
+                HORIZONTAL = "Horizontal",
+                VERTICAL = "Vertical",
+                BACK = "    Back    "
+            }
+        },
+    },
+    COMMAND_LIST = {
+        TEXT = {
+            TITLE = "Command List",
+            DESCRIPTION = "List commands to simplify and easier your playing experience",
+            SHORTCUT = "Shortcut to this menu"
+        },
+        BUTTON = {
+            BTK = "BTK Command",
+            CSN = "CSN Command",
+            UTILITY = "Utility Command",
+            DROP = "Drop Command",
+            ABILITY = "Ability Shortcut",
+            MENU = "Menu Shortcut",
+            SB = "SB Command",
+            FUN = "Fun Command",
+            BACK = "Back"
+        },
+        BTK = {
+            TEXT = {
+                SHORTCUT = "Shortcut to this menu : `"..KONFIGURASI.UI.SECONDARY.."/cmd btk"
+            },
+            BUTTON = {
+                BACK = "Back"
+            },
+            LIST_1 = {
+                TITLE = "Menu Shortcut",
+                TB = "Take a bet or lock from the player",
+                SCAN = "Scan the gems without collecting",
+                TG = "Collecting gems (have options auto drop winner)",
+                PC = "Put or placing chand to position chand",
+                WIN1 = "Give the bet to player 1 as a winner",
+                WIN2 = "Give the bet to player 2 as a winner",
+                BBET = "Back bet or lock to both player when they canceling",
+                GIVETAX = "Give 50% percentage of all lock to donation box",
+                POSBET = "Setting position display box or bet",
+                POSCHAND = "Setting position of the chandelier",
+                POSH = "Setting position hoster for back position",
+                POSTAX = "Setting position of donation box for paid tax",
+                PUTMODE = "Open put chandelier mode menu",
+                AUTOPOS = "Open auto pos menu to automatically set position",
+                CONFIGBTK = "Open configuration menu to show optional feature"
+            },
+            LIST_2 = {
+                TITLE = "Shortcut Setting Position",
+                FPOS = "Fast setting position bet, chandelier and hoster",
+                POSCH = "Shortcut setting position chandelier for horizontal",
+                POSCV = "Shortcut setting position chandelier for vertical",
+                POSHORIZONTAL = "Open auto position menu for horizontal",
+                H1 = "Shortcut setting position horizontal v1",
+                H2 = "Shortcut setting position horizontal v2",
+                H3 = "Shortcut setting position horizontal v3",
+                H4 = "Shortcut setting position horizontal v4",
+                POSVERTICAL = "Open auto position menu for vertical",
+                V1 = "Shortcut setting position vertical v1",
+                V2 = "Shortcut setting position vertical v2",
+                V3 = "Shortcut setting position vertical v3",
+                V4 = "Shortcut setting position vertical v4"
+            }
+        },
+        CSN = {
+            TEXT = {
 
-			},
-			BUTTON = {
+            },
+            BUTTON = {
 
-			},
-			LIST_1 = {
-				TITLE = ""
-			}
-		}
-	},
-	ABILITY = {
-		TEXT = {
-			A = "Your Ability",
-			B = "Those ability very useful to easier your job or work",
-			C = "`5Purple Frame `"..KONFIGURASI.UI.PRIMARY..": Feature activated",
-			D = "`wGrey Frame `"..KONFIGURASI.UI.PRIMARY..": Feature is currently inactive",
-			E = "Additional information :"
-		},
-		BUTTON = {
-			BLOCK_SDB = "Block SDB",
-			ANTI_POCKET = "Anti Pocket",
-			PULL_GAS = "Auto Pull Gas",
-			SHOW_GEMS = "Show Gems",
-			EXTRACTOR = "Extractor",
-			FAST_DROP = "Fast Drop",
-			FAST_TRASH = "Fast Trash",
-			MODFLY = "Modfly",
-			NO_PICKUP = "No Pickup",
-			NO_LAG = "No Lag",
-			FAST_DBLOCK = "Fast Dblock",
-			BLOCK_ADVENTURE = "Block Adventure",
-			AUTO_COLLECT = "Auto Collect",
-			BLOCK_EVENT = "Block Event",
-			ANTI_BUNNIES = "Anti Bunnies",
-			BACK = "                      Back                      ",
-			CLOSE = "       Close      ",
-			SAVE = "        Save        " 
-		}
-	},
-	LIST_MENU = {
-		TEXT = {
-			DESCRIPTION = "Several menus that can make your work easier"
-		},
-		BUTTON = {
-			CONSUME = "Consume Menu",
-			DONATION = "Donation Menu",
-			TELEPHONE = "Telephone Menu",
-			WRENCH = "Wrench Menu",
-			VENDING = "Vending Menu",
-			SKIN_MENU = "Skin Menu",
-			MAGPLANT_MENU = "Magplant Menu",
-			AUTO_JOIN = "Auto Join",
-			GIVE_ACCESS = "Give Access",
-			WORLD_FEATURE = "World Feature",
-			WEATHER_LIST = "Weather List",
-			BUBBLE = "Bubble Menu",
-			OVERLAY = "Overlay Menu",
-			UI = "UI Menu",
-			STORE = "Store Menu",
-			HUB = "Activity Hub",
-			HOSTER = "Hoster Menu",
-			SURGERY = "Surgery Menu",
-			PACK_MENU = "Pack Menu",
-			BRUTEFORCE_MENU = "Brutefore Menu",
-			PRINCESS_MENU = "Princess Menu",
-			BACK = "                      Back                      ",
-			CLOSE = "       Close      ",
-			SAVE = "        Save        " 
-		},
-		CONSUME = {
-			TEXT = {
-				TITLE = "Consume Menu",
-				TOGGLE = "Auto Consume",
-				STATUS = "",
-				BACK = "                     Back                      ",
-				CLOSE = "       Close       ",
-				SAVE = "       Save       "
-			},
-		},
-		DONATION = {
-			TEXT = {
-				TITLE = "Donation Menu",
-				TOGGLE = "Fast Donation Box",
-				CURRENT_ITEM = "Item :",
-				SELECT_ITEM = "Choose an item to put on donation!``",
-				CHANGE_AMOUNT = "Change Donate Amount :",
-				BACK = "                   Back                  ",
-				CLOSE = "      Close     ",
-				SAVE = "     Save      "
-			},
-			BUTTON = {
-				SELECT_ITEM = "     Select Donation Item     ",
-				GIFT = "Give Donation",
-				RETRIEVE = "Retrieve Gift",
-				TROLL = "Troll Donation"
-			}
-		},
-		GIVE_ACCESS = {
-			TEXT = {
-				TITLE = "Give Access",
-				DESCRIPTION = "This Give Access feature can be used to give access to other people without having to look for a lock and no need for a wrench. You only need to select the player who will be given access"
-			}
-		},
-		WEATHER_LIST = {
-			BACK = "                            Back                            "
-		},
-		HOSTER = {
-			BUTTON = {
-				CLEAR = "Clear Log",
-				REAL = "Real Spin",
-				FAKE = "Fake Spin",
-				SHOW_UID = "Show UID",
-				SHOW_WORLD = "Show World",
-				SHOW_TIME = "Show Time",
-				SHOW_REME = "Show Reme",
-				SHOW_QEME = "Show Qeme"
-			}
-		}
-	},
-	SERVICE_MENU = {
-		TEXT = {
-			TITLE = "Service Menu"
-		},
-		BUTTON = {
-			SUPER_BROADCAST = "Super Broadcast",
-			ITEM_FINDER = "Item Finder",
-			ITEM_MOVER = "Item Mover",
-			CLEAR_FLOAT = "Clear Float",
-			CLEAR_WATER = "Clear Water",
-			SETUP_PLATFORM = "Setup Platform",
-			WORLD_FINDER = "World Finder",
-			CLEAR_WORLD = "Clear World",
-			BACK = "                            Back                            "
-		}
-	},
-	SETTING = {
-		A = "Load All",
-		B = "BTK Helper",
-		C = "Casino Helper",
-		D = "Service Helper",
-		E = "Cooking Helper",
-		F = "Copy World Helper",
-		G = "Helper Setting"
-	},
-	INFORMATION = {
-		TITLE = "Useful Information",
-		DESCRIPTION = "Read additional information, new update and the upcoming feature",
-		SPACING = "----------------------------------------------------------------------------------",
-		CREATOR = "Creator : `"..KONFIGURASI.UI.SECONDARY.."Starries",
-		CONTRIBUTOR = "Contributor : `"..KONFIGURASI.UI.SECONDARY.."-",
-		BOTHAX = "Thanks to `bbothaxyt `"..KONFIGURASI.UI.PRIMARY.."who provide this app",
-		LIST_1 = {
-			TITLE = "Change Logs :",
-			INFO_1 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added bruteforce menu",
-			INFO_2 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added command /show <command>"
-		},
-		LIST_2 = {
-			TITLE = "Incoming :",
-			INFO_1 = "`8SOON`"..KONFIGURASI.UI.PRIMARY..": -",
-			INFO_2 = "`8SOON`"..KONFIGURASI.UI.PRIMARY..": -"
-		}
-	},
-	GROWSCAN = {
-		TITLE = "World Stats",
-		DESCRIPTION = "This amazing block can show the stats for the whole world!",
+            },
+            LIST_1 = {
+                TITLE = ""
+            }
+        }
+    },
+    ABILITY = {
+        TEXT = {
+            A = "Your Ability",
+            B = "Those ability very useful to easier your job or work",
+            C = "`5Purple Frame `"..KONFIGURASI.UI.PRIMARY..": Feature activated",
+            D = "`wGrey Frame `"..KONFIGURASI.UI.PRIMARY..": Feature is currently inactive",
+            E = "Additional information :"
+        },
+        BUTTON = {
+            BLOCK_SDB = "Block SDB",
+            ANTI_POCKET = "Anti Pocket",
+            PULL_GAS = "Auto Pull Gas",
+            SHOW_GEMS = "Show Gems",
+            EXTRACTOR = "Extractor",
+            FAST_DROP = "Fast Drop",
+            FAST_TRASH = "Fast Trash",
+            MODFLY = "Modfly",
+            NO_PICKUP = "No Pickup",
+            NO_LAG = "No Lag",
+            FAST_DBLOCK = "Fast Dblock",
+            BLOCK_ADVENTURE = "Block Adventure",
+            AUTO_COLLECT = "Auto Collect",
+            BLOCK_EVENT = "Block Event",
+            ANTI_BUNNIES = "Anti Bunnies",
+            BACK = "                      Back                      ",
+            CLOSE = "       Close      ",
+            SAVE = "        Save        " 
+        }
+    },
+    LIST_MENU = {
+        TEXT = {
+            DESCRIPTION = "Several menus that can make your work easier"
+        },
+        BUTTON = {
+            CONSUME = "Consume Menu",
+            DONATION = "Donation Menu",
+            TELEPHONE = "Telephone Menu",
+            WRENCH = "Wrench Menu",
+            VENDING = "Vending Menu",
+            SKIN_MENU = "Skin Menu",
+            MAGPLANT_MENU = "Magplant Menu",
+            AUTO_JOIN = "Auto Join",
+            GIVE_ACCESS = "Give Access",
+            WORLD_FEATURE = "World Feature",
+            WEATHER_LIST = "Weather List",
+            BUBBLE = "Bubble Menu",
+            OVERLAY = "Overlay Menu",
+            UI = "UI Menu",
+            STORE = "Store Menu",
+            HUB = "Activity Hub",
+            HOSTER = "Hoster Menu",
+            SURGERY = "Surgery Menu",
+            PACK_MENU = "Pack Menu",
+            BRUTEFORCE_MENU = "Brutefore Menu",
+            PRINCESS_MENU = "Princess Menu",
+            BACK = "                      Back                      ",
+            CLOSE = "       Close      ",
+            SAVE = "        Save        " 
+        },
+        CONSUME = {
+            TEXT = {
+                TITLE = "Consume Menu",
+                TOGGLE = "Auto Consume",
+                STATUS = "",
+                BACK = "                     Back                      ",
+                CLOSE = "       Close       ",
+                SAVE = "       Save       "
+            },
+        },
+        DONATION = {
+            TEXT = {
+                TITLE = "Donation Menu",
+                TOGGLE = "Fast Donation Box",
+                CURRENT_ITEM = "Item :",
+                SELECT_ITEM = "Choose an item to put on donation!``",
+                CHANGE_AMOUNT = "Change Donate Amount :",
+                BACK = "                   Back                  ",
+                CLOSE = "      Close     ",
+                SAVE = "     Save      "
+            },
+            BUTTON = {
+                SELECT_ITEM = "     Select Donation Item     ",
+                GIFT = "Give Donation",
+                RETRIEVE = "Retrieve Gift",
+                TROLL = "Troll Donation"
+            }
+        },
+        GIVE_ACCESS = {
+            TEXT = {
+                TITLE = "Give Access",
+                DESCRIPTION = "This Give Access feature can be used to give access to other people without having to look for a lock and no need for a wrench. You only need to select the player who will be given access"
+            }
+        },
+        WEATHER_LIST = {
+            BACK = "                            Back                            "
+        },
+        HOSTER = {
+            BUTTON = {
+                CLEAR = "Clear Log",
+                REAL = "Real Spin",
+                FAKE = "Fake Spin",
+                SHOW_UID = "Show UID",
+                SHOW_WORLD = "Show World",
+                SHOW_TIME = "Show Time",
+                SHOW_REME = "Show Reme",
+                SHOW_QEME = "Show Qeme"
+            }
+        }
+    },
+    SERVICE_MENU = {
+        TEXT = {
+            TITLE = "Service Menu"
+        },
+        BUTTON = {
+            SUPER_BROADCAST = "Super Broadcast",
+            ITEM_FINDER = "Item Finder",
+            ITEM_MOVER = "Item Mover",
+            CLEAR_FLOAT = "Clear Float",
+            CLEAR_WATER = "Clear Water",
+            SETUP_PLATFORM = "Setup Platform",
+            WORLD_FINDER = "World Finder",
+            CLEAR_WORLD = "Clear World",
+            BACK = "                            Back                            "
+        }
+    },
+    SETTING = {
+        A = "Load All",
+        B = "BTK Helper",
+        C = "Casino Helper",
+        D = "Service Helper",
+        E = "Cooking Helper",
+        F = "Copy World Helper",
+        G = "Helper Setting"
+    },
+    INFORMATION = {
+        TITLE = "Useful Information",
+        DESCRIPTION = "Read additional information, new update and the upcoming feature",
+        SPACING = "----------------------------------------------------------------------------------",
+        CREATOR = "Creator : `"..KONFIGURASI.UI.SECONDARY.."Starries",
+        CONTRIBUTOR = "Contributor : `"..KONFIGURASI.UI.SECONDARY.."-",
+        BOTHAX = "Thanks to `bbothaxyt `"..KONFIGURASI.UI.PRIMARY.."who provide this app",
+        LIST_1 = {
+            TITLE = "Change Logs :",
+            INFO_1 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added bruteforce menu",
+            INFO_2 = "`2NEW`"..KONFIGURASI.UI.PRIMARY..": Added command /show <command>"
+        },
+        LIST_2 = {
+            TITLE = "Incoming :",
+            INFO_1 = "`8SOON`"..KONFIGURASI.UI.PRIMARY..": -",
+            INFO_2 = "`8SOON`"..KONFIGURASI.UI.PRIMARY..": -"
+        }
+    },
+    GROWSCAN = {
+        TITLE = "World Stats",
+        DESCRIPTION = "This amazing block can show the stats for the whole world!",
 
-	}
+    }
 }
-
+    
 elseif BAHASA == "ID" then 
-
+    
 CUSTOM_TEXT = {
-	MENU = {
-		A = "Pintasan ke menu ini",
-		B = "Kembali",
-		C = "Tutup",
-		D = "Perbarui",
-		E = "Lupakan",
-		F = "Simpan",
-		G = "Kirim",
-		BACK = {
-			A = "                   Kembali                   "
-		}
-	},
-	START = {
-		A = "Mengecek userid untuk memastikan kamu memiliki akses!",
-		B = "Autentikasi pemain `2berhasil`o!",
-		C = "Kamu memiliki :",
-		D = "Ketik `5/menu `ountuk menampilkan fitur, atau klik tombol `5Sosial",
-		E = "Starries Helper oleh `5@starries.real"
-	},
-	ALERT = {
-		A = "Jumlah drop harus berupa angka",
-		B = "Kamu tidak bisa drop dengan amount 0 bodoh!",
-		C = "Mengumpulkan dalam Jangkauan"
-	},
-	BROADCAST = {
-		A = "Siaran akan dikirim dalam hitungan mundur",
-		B = "Penyiaran selesai! jumlah siaran",
-		C = "Terimakasih",
-		D = "Penyiaran",
-		E = "dari",
-		F = "jumlah siaran",
-		G = "tersisa",
-		H = "ke",
-		I = "prediksi siaran",
-		J = "Waktu tersisa",
-		K = "Waktu dihabiskan",
-		L = "jam",
-		M = "menit",
-		N = "detik"
-	},
-	MAIN_MENU = {
-		TEXT = {
-			A = "Helper ini dibuat oleh",
-			B = "Makasih telah memakai script ini!",
-			C = "Hai",
-			D = "Kamu saat ini berada di",
-			E = "Kamu berdiri di",
-			F = "Saat ini pukul",
-			G = os.date("%H:%M `"..KONFIGURASI.UI.PRIMARY.."pada `"..KONFIGURASI.UI.SECONDARY.."%d %B %Y"),
-			H = "------------------------------------------------------------------------",
-			I = "Fitur-fitur",
-			J = "Lupakan."
-		},
-		BUTTON = {
-			SOCIAL = "Portal Sosial",
-			COMMAND = "Daftar Command",
-			ABILITY = "Kemampuan",
-			HOSTER = "Menu Hoster",
-			SPAM = "Editor Spam",
-			INFO = "Informasi",
-			GROWSCAN = "Growscan",
-			JASA = "Jasa",
-			DONATION = "Donasi",
-			SUPPORT = "Bantuan",
-			ACTIVITY = "Log Aktivitas",
-			UI = "Menu UI",
-			WORLD_FINDER = "Pencari World",
-			PROFILE = "Profilemu",
-			BUBBLE = "Menu Bubble",
-			STORE = "Menu Store",
-			HUB = "Hub Aktivitas"
-		},
-	},
-	COMMAND_LIST = {
-		TEXT = {
-			TITLE = "Daftar Command",
-			DESCRIPTION = "Daftar command untuk memudahkan pengalaman bermain",
-			SHORTCUT = "Pintasan ke menu ini"
-		},
-		BUTTON = {
-			BTK = "Command BTK",
-			CSN = "Command CSN",
-			UTILITY = "Command Utility",
-			DROP = "Command Drop",
-			ABILITY = "Pintasan Ability",
-			MENU = "Pintasan Menu",
-			SB = "Command SB",
-			FUN = "Command Seru",
-			BACK = "Kembali"
-		},
-		BTK = {
-			TEXT = {
-				SHORTCUT = "Pintasan ke menu ini : `"..KONFIGURASI.UI.SECONDARY.."/cmd btk"
-			},
-			BUTTON = {
-				BACK = "Kembali"
-			},
-			LIST_1 = {
-				TITLE = "Pintasan Menu",
-				TB = "Ambil bet atau lock dari pemain",
-				SCAN = "Pindai gems tanpa mengambilnya",
-				TG = "Mengambil gems (memiliki opsi drop pemenang otomatis)",
-				PC = "Meletakkan atau menempatkan chand pada posisi chand",
-				WIN1 = "Berikan bet kepada pemain 1 sebagai pemenang",
-				WIN2 = "Berikan bet kepada pemain 2 sebagai pemenang",
-				BBET = "Kembalikan bet atau kunci ke kedua pemain saat mereka batal",
-				GIVETAX = "Berikan persentase 50% dari seluruh lock ke donation box",
-				POSBET = "Mengatur posisi display box atau bet",
-				POSCHAND = "Mengatur posisi untuk chandelier",
-				POSH = "Mengatur posisi kembali untuk hoster",
-				POSTAX = "Menetapkan posisi donation untuk bayar tax",
-				PUTMODE = "Buka menu mode put chandelier",
-				AUTOPOS = "Buka menu pos otomatis untuk mengatur posisi secara otomatis",
-				CONFIGBTK = "Buka menu konfigurasi untuk menampilkan fitur opsional"
-				},
-			LIST_2 = {
-				TITLE = "Pintasan Mengatur Posisi",
-				FPOS = "Mengatur posisi secara cepat, bet, chandelier dan hoster",
-				POSCH = "Pintasan pengaturan posisi chandelier untuk horizontal",
-				POSCV = "Pintasan pengaturan posisi chandelier untuk vertikal",
-				POSHORIZONTAL = "Buka menu posisi otomatis untuk horizontal",
-				H1 = "Pintasan mengatur posisi horizontal v1",
-				H2 = "Pintasan mengatur posisi horizontal v2",
-				H3 = "Pintasan mengatur posisi horizontal v3",
-				H4 = "Pintasan mengatur posisi horizontal v4",
-				POSVERTICAL = "Buka menu posisi otomatis untuk vertikal",
-				V1 = "Pintasan mengatur posisi vertical v1",
-				V2= "Pintasan mengatur posisi vertical v2",
-				V3 = "Pintasan mengatur posisi vertical v3",
-				V4 = "Pintasan mengatur posisi vertical v4"
-			},
-		}
-	},
-	ABILITY = {
-		TEXT = {
-			A = "Kemampuanmu",
-			B = "Kemampuan dibawah ini untuk memudahkan mu",
-			C = "`5Bingkai Ungu `"..KONFIGURASI.UI.PRIMARY..": Fitur telah diaktifkan",
-			D = "`wBingkai Abu-abu `"..KONFIGURASI.UI.PRIMARY..": Fitur telah dinonaktifkan",
-			E = "Informasi Tambahan :" 
-		},
-		BUTTON = {
-			BLOCK_SDB = "Block SDB",
-			ANTI_POCKET = "Anti Api",
-			PULL_GAS = "Auto Pull Gas",
-			SHOW_GEMS = "Tunjukkan Gems",
-			EXTRACTOR = "Extractor",
-			CONSUME = "Menu Konsumsi",
-			DONATION = "Menu Donasi",
-			TELEPHONE = "Menu Telepon",
-			WRENCH = "Menu Wrench",
-			VENDING = "Menu Vending",
-			FAST_DROP = "Fast Drop",
-			FAST_TRASH = "Fast Trash",
-			MODFLY = "Modfly",
-			NO_PICKUP = "No Pickup",
-			NO_LAG = "No Lag",
-			SKIN_MENU = "Opsi Skin",
-			AUTO_JOIN = "Auto Join",
-			GIVE_ACCESS = "Beri Akses",
-			WORLD_FEATURE = "Fitur World",
-			WEATHER_LIST = "Daftar Weather",
-			BACK = "                   Kembali                   ",
-			CLOSE = "       Tutup      ",
-			SAVE = "      Simpan      " 
-		},
-		CONSUME = {
-			A = "Menu Konsumsi",
-			B = "Auto Konsumsi",
-			C = "                   Kembali                   ",
-			D = "       Tutup      ",
-			E = "      Simpan      " 
-		},
-	},
-	SETTING = {
-		A = "Load Semua",
-		B = "BTK Helper",
-		C = "Casino Helper",
-		D = "Jasa Helper",
-		E = "Cooking Helper",
-		F = "Copy World Helper",
-		G = "Pengaturan Helper"
-	}
+    MENU = {
+        A = "Pintasan ke menu ini",
+        B = "Kembali",
+        C = "Tutup",
+        D = "Perbarui",
+        E = "Lupakan",
+        F = "Simpan",
+        G = "Kirim",
+        BACK = {
+            A = "                   Kembali                   "
+        }
+    },
+    START = {
+        A = "Mengecek userid untuk memastikan kamu memiliki akses!",
+        B = "Autentikasi pemain `2berhasil`o!",
+        C = "Kamu memiliki :",
+        D = "Ketik `5/menu `ountuk menampilkan fitur, atau klik tombol `5Sosial",
+        E = "Starries Helper oleh `5@starries.real"
+    },
+    ALERT = {
+        A = "Jumlah drop harus berupa angka",
+        B = "Kamu tidak bisa drop dengan amount 0 bodoh!",
+        C = "Mengumpulkan dalam Jangkauan"
+    },
+    BROADCAST = {
+        A = "Siaran akan dikirim dalam hitungan mundur",
+        B = "Penyiaran selesai! jumlah siaran",
+        C = "Terimakasih",
+        D = "Penyiaran",
+        E = "dari",
+        F = "jumlah siaran",
+        G = "tersisa",
+        H = "ke",
+        I = "prediksi siaran",
+        J = "Waktu tersisa",
+        K = "Waktu dihabiskan",
+        L = "jam",
+        M = "menit",
+        N = "detik"
+    },
+    MAIN_MENU = {
+        TEXT = {
+            A = "Helper ini dibuat oleh",
+            B = "Makasih telah memakai script ini!",
+            C = "Hai",
+            D = "Kamu saat ini berada di",
+            E = "Kamu berdiri di",
+            F = "Saat ini pukul",
+            G = os.date("%H:%M `"..KONFIGURASI.UI.PRIMARY.."pada `"..KONFIGURASI.UI.SECONDARY.."%d %B %Y"),
+            H = "------------------------------------------------------------------------",
+            I = "Fitur-fitur",
+            J = "Lupakan."
+        },
+        BUTTON = {
+            SOCIAL = "Portal Sosial",
+            COMMAND = "Daftar Command",
+            ABILITY = "Kemampuan",
+            HOSTER = "Menu Hoster",
+            SPAM = "Editor Spam",
+            INFO = "Informasi",
+            GROWSCAN = "Growscan",
+            JASA = "Jasa",
+            DONATION = "Donasi",
+            SUPPORT = "Bantuan",
+            ACTIVITY = "Log Aktivitas",
+            UI = "Menu UI",
+            WORLD_FINDER = "Pencari World",
+            PROFILE = "Profilemu",
+            BUBBLE = "Menu Bubble",
+            STORE = "Menu Store",
+            HUB = "Hub Aktivitas"
+        },
+    },
+    COMMAND_LIST = {
+        TEXT = {
+            TITLE = "Daftar Command",
+            DESCRIPTION = "Daftar command untuk memudahkan pengalaman bermain",
+            SHORTCUT = "Pintasan ke menu ini"
+        },
+        BUTTON = {
+            BTK = "Command BTK",
+            CSN = "Command CSN",
+            UTILITY = "Command Utility",
+            DROP = "Command Drop",
+            ABILITY = "Pintasan Ability",
+            MENU = "Pintasan Menu",
+            SB = "Command SB",
+            FUN = "Command Seru",
+            BACK = "Kembali"
+        },
+        BTK = {
+            TEXT = {
+                SHORTCUT = "Pintasan ke menu ini : `"..KONFIGURASI.UI.SECONDARY.."/cmd btk"
+            },
+            BUTTON = {
+                BACK = "Kembali"
+            },
+            LIST_1 = {
+                TITLE = "Pintasan Menu",
+                TB = "Ambil bet atau lock dari pemain",
+                SCAN = "Pindai gems tanpa mengambilnya",
+                TG = "Mengambil gems (memiliki opsi drop pemenang otomatis)",
+                PC = "Meletakkan atau menempatkan chand pada posisi chand",
+                WIN1 = "Berikan bet kepada pemain 1 sebagai pemenang",
+                WIN2 = "Berikan bet kepada pemain 2 sebagai pemenang",
+                BBET = "Kembalikan bet atau kunci ke kedua pemain saat mereka batal",
+                GIVETAX = "Berikan persentase 50% dari seluruh lock ke donation box",
+                POSBET = "Mengatur posisi display box atau bet",
+                POSCHAND = "Mengatur posisi untuk chandelier",
+                POSH = "Mengatur posisi kembali untuk hoster",
+                POSTAX = "Menetapkan posisi donation untuk bayar tax",
+                PUTMODE = "Buka menu mode put chandelier",
+                AUTOPOS = "Buka menu pos otomatis untuk mengatur posisi secara otomatis",
+                CONFIGBTK = "Buka menu konfigurasi untuk menampilkan fitur opsional"
+                },
+            LIST_2 = {
+                TITLE = "Pintasan Mengatur Posisi",
+                FPOS = "Mengatur posisi secara cepat, bet, chandelier dan hoster",
+                POSCH = "Pintasan pengaturan posisi chandelier untuk horizontal",
+                POSCV = "Pintasan pengaturan posisi chandelier untuk vertikal",
+                POSHORIZONTAL = "Buka menu posisi otomatis untuk horizontal",
+                H1 = "Pintasan mengatur posisi horizontal v1",
+                H2 = "Pintasan mengatur posisi horizontal v2",
+                H3 = "Pintasan mengatur posisi horizontal v3",
+                H4 = "Pintasan mengatur posisi horizontal v4",
+                POSVERTICAL = "Buka menu posisi otomatis untuk vertikal",
+                V1 = "Pintasan mengatur posisi vertical v1",
+                V2= "Pintasan mengatur posisi vertical v2",
+                V3 = "Pintasan mengatur posisi vertical v3",
+                V4 = "Pintasan mengatur posisi vertical v4"
+            },
+        }
+    },
+    ABILITY = {
+        TEXT = {
+            A = "Kemampuanmu",
+            B = "Kemampuan dibawah ini untuk memudahkan mu",
+            C = "`5Bingkai Ungu `"..KONFIGURASI.UI.PRIMARY..": Fitur telah diaktifkan",
+            D = "`wBingkai Abu-abu `"..KONFIGURASI.UI.PRIMARY..": Fitur telah dinonaktifkan",
+            E = "Informasi Tambahan :" 
+        },
+        BUTTON = {
+            BLOCK_SDB = "Block SDB",
+            ANTI_POCKET = "Anti Api",
+            PULL_GAS = "Auto Pull Gas",
+            SHOW_GEMS = "Tunjukkan Gems",
+            EXTRACTOR = "Extractor",
+            CONSUME = "Menu Konsumsi",
+            DONATION = "Menu Donasi",
+            TELEPHONE = "Menu Telepon",
+            WRENCH = "Menu Wrench",
+            VENDING = "Menu Vending",
+            FAST_DROP = "Fast Drop",
+            FAST_TRASH = "Fast Trash",
+            MODFLY = "Modfly",
+            NO_PICKUP = "No Pickup",
+            NO_LAG = "No Lag",
+            SKIN_MENU = "Opsi Skin",
+            AUTO_JOIN = "Auto Join",
+            GIVE_ACCESS = "Beri Akses",
+            WORLD_FEATURE = "Fitur World",
+            WEATHER_LIST = "Daftar Weather",
+            BACK = "                   Kembali                   ",
+            CLOSE = "       Tutup      ",
+            SAVE = "      Simpan      " 
+        },
+        CONSUME = {
+            A = "Menu Konsumsi",
+            B = "Auto Konsumsi",
+            C = "                   Kembali                   ",
+            D = "       Tutup      ",
+            E = "      Simpan      " 
+        },
+    },
+    SETTING = {
+        A = "Load Semua",
+        B = "BTK Helper",
+        C = "Casino Helper",
+        D = "Jasa Helper",
+        E = "Cooking Helper",
+        F = "Copy World Helper",
+        G = "Pengaturan Helper"
+    }
 }
-else return false
-end
-end
--- End of Function --
+else return false end end
 
--- Variable --
 KONFIGURASI = {
 	FILE_LOGS = {
 		DROP = true,
@@ -1107,42 +1035,10 @@ KONFIGURASI = {
 		}
 	}
 }
--- End of Variable --
-
-if GetLocal().userid == 85923 then
-function VARIANT_DEVELOPER(Var)
-if Var[0] == "OnTalkBubble" and Var[2]:match("`5[```w(.+) places `5(%d+)`` `2(.+)`` into the Donation Box`5]``") then
-if GetWorld().name == "STARRIES" then DEPO_NAME, DEPO_AMOUNT, DEPO_ITEM = Var[2]:match("`w(%w+) places `5(%d+)`` `2(.+)`` into the Donation Box`5]``") 
-if DEPO_NAME and DEPO_AMOUNT and DEPO_ITEM then 
-if DEPO_ITEM == "Black Gem Lock" or DEPO_ITEM == "Blue Gem Lock" then SEND_WEBHOOK_DEPOSIT = true else SEND_WEBHOOK_DONATION = true end
-end
-end
-end
-end
-end
-
-FIND_MOONCAKE, DROP_MOONCAKE = false, false
-
-AddHook("OnSendPacket", "O", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
-
-if COMMAND == ("/mf") then if not FIND_MOONCAKE then FIND_MOONCAKE = true else FIND_MOONCAKE = false end return true end
-if COMMAND == ("/md") then if not DROP_MOONCAKE then DROP_MOONCAKE = true else DROP_MOONCAKE = false end return true end
-if COMMAND == ("/ds") then DROP(GetItemInfo("Songpyeon").id, GET_AMOUNT(GetItemInfo("Songpyeon").id)) return true end
-if COMMAND == ("/pet") then if not GACHA_PET then GACHA_PET = true else GACHA_PET = false end return true end
-
-return false end)
-
-AddHook("OnVariant", "O", function(V)
-if FIND_MOONCAKE then
-if V[0] == "OnDialogRequest" and V[1]:find("Item Finder") then return true end 
-end
-return false end)
-
---AddHook("OnVariant", "VARIANT-DEVELOPER", VARIANT_DEVELOPER)
 
 function HELPER()
 -- Dialog Main Menu --
-function DIALOG_MAIN() M = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.MAIN_MENU.TEXT.TITLE.."|left|3524|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.SPACE.."|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.DESC_1.." `"..KONFIGURASI.UI.SECONDARY.."Starries`"..KONFIGURASI.UI.PRIMARY..", "..CUSTOM_TEXT.MAIN_MENU.TEXT.DESC_2.."|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.SPACE.."|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.HI.." "..GetLocal().name.."|left|7232|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.WORLD.." `"..KONFIGURASI.UI.SECONDARY..""..GetWorld().name.."|left|3802|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.STAND.." `"..KONFIGURASI.UI.PRIMARY.."X : `"..KONFIGURASI.UI.SECONDARY.."".. math.floor(GetLocal().pos.x // 32)  .. "`"..KONFIGURASI.UI.PRIMARY..", Y : `"..KONFIGURASI.UI.SECONDARY.."" .. math.floor(GetLocal().pos.y // 32)  .. "|left|4472|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.DATETIME.." : `"..KONFIGURASI.UI.SECONDARY..""..CUSTOM_TEXT.MAIN_MENU.TEXT.TIME.."|left|1482|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.SPACE.."|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.FEATURE.." :|left|11304|\nadd_spacer|small|\ntext_scaling_string|textscalingstring|\nadd_button_with_icon|SOCIAL_PORTAL|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.SOCIAL.."|staticBlueFrame|1366|\nadd_button_with_icon|COMMAND_LIST|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.COMMAND.."|staticBlueFrame|1752|\nadd_button_with_icon|ABILITY_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.ABILITY.."|staticBlueFrame|"..GetItemInfo("Dumb Roles Icon").id.."|\nadd_button_with_icon|LIST_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.LIST_MENU.."|staticBlueFrame|4856|\nadd_button_with_icon|SPAM_EDITOR|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.SPAM.."|staticBlueFrame|12436|\nadd_button_with_icon|INFORMATION|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.INFO.."|staticBlueFrame|7074|\nadd_button_with_icon||END_LIST||0||\nadd_button_with_icon|GROWSCAN_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.GROWSCAN.."|staticBlueFrame|6016|\nadd_button_with_icon|SERVICE_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.JASA.."|staticBlueFrame|7070|\nadd_button_with_icon|DONATE_SUPPORT|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.DONATION.."|staticBlueFrame|1452|\nadd_button_with_icon|SUPPORT_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.SUPPORT.."|staticBlueFrame|656|\nadd_button_with_icon|LOG_ACTIVITY|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.ACTIVITY.."|staticBlueFrame|2376|\nadd_button_with_icon|CHECK_PROFILE|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.PROFILE.."|staticBlueFrame|10192|\nadd_button_with_icon||END_LIST||0||\nadd_quick_exit|\nend_dialog|MAIN_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.CLOSE.."||" DIALOG(M, 500) end
+function DIALOG_MAIN() M = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.MAIN_MENU.TEXT.TITLE.."|left|3524|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.SPACE.."|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.DESC_1.." `"..KONFIGURASI.UI.SECONDARY.."Starries`"..KONFIGURASI.UI.PRIMARY..", "..CUSTOM_TEXT.MAIN_MENU.TEXT.DESC_2.."|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.SPACE.."|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.HI.." "..GetLocal().name.."|left|7232|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.WORLD.." `"..KONFIGURASI.UI.SECONDARY..""..GetWorld().name.."|left|3802|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.STAND.." `"..KONFIGURASI.UI.PRIMARY.."X : `"..KONFIGURASI.UI.SECONDARY.."".. math.floor(GetLocal().pos.x // 32)  .. "`"..KONFIGURASI.UI.PRIMARY..", Y : `"..KONFIGURASI.UI.SECONDARY.."" .. math.floor(GetLocal().pos.y // 32)  .. "|left|4472|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.DATETIME.." : `"..KONFIGURASI.UI.SECONDARY..""..CUSTOM_TEXT.MAIN_MENU.TEXT.TIME.."|left|1482|\nadd_smalltext|"..CUSTOM_TEXT.MAIN_MENU.TEXT.SPACE.."|\nadd_label_with_icon|small|"..CUSTOM_TEXT.MAIN_MENU.TEXT.FEATURE.." :|left|11304|\nadd_spacer|small|\ntext_scaling_string|textscalingstring|\nadd_button_with_icon|SOCIAL_PORTAL|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.SOCIAL.."|staticBlueFrame|1366|\nadd_button_with_icon|COMMAND_LIST|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.COMMAND.."|staticBlueFrame|1752|\nadd_button_with_icon|ABILITY_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.ABILITY.."|staticBlueFrame|"..GetItemInfo("Dumb Roles Icon").id.."|\nadd_button_with_icon|HOSTER_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.HOSTER_MENU.."|staticBlueFrame|756|\nadd_button_with_icon|SPAM_EDITOR|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.SPAM.."|staticBlueFrame|12436|\nadd_button_with_icon|INFORMATION|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.INFO.."|staticBlueFrame|7074|\nadd_button_with_icon||END_LIST||0||\nadd_quick_exit|\nend_dialog|MAIN_MENU|"..CUSTOM_TEXT.MAIN_MENU.BUTTON.CLOSE.."||" DIALOG(M, 500) end
 function DIALOG_COMMAND_LIST() C = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.COMMAND_LIST.TEXT.TITLE.."|left|1752|\nadd_smalltext|------------------------------------------------------------------------|\nadd_smalltext|"..CUSTOM_TEXT.COMMAND_LIST.TEXT.DESCRIPTION.."|\nadd_smalltext|------------------------------------------------------------------------|\ntext_scaling_string|textscalingstrings|\nadd_button_with_icon|COMMAND_LIST_BTK|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.BTK.."|staticBlueFrame|340|\nadd_button_with_icon|CommandCSN|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.CSN.."|staticBlueFrame|756|\nadd_button_with_icon|CommandUTILITY|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.UTILITY.."|staticBlueFrame|3558|\nadd_button_with_icon|CommandDROP|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.DROP.."|staticBlueFrame|13810|\nadd_button_with_icon|CommandABILITY|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.ABILITY.."|staticBlueFrame|"..GetItemInfo("Dumb Roles Icon").id.."|\nadd_button_with_icon|CommandMENU|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.MENU.."|staticBlueFrame|8282|\nadd_button_with_icon||END_LIST||0||\nadd_button_with_icon|CommandSB|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.SB.."|staticBlueFrame|2480|\nadd_button_with_icon|CommandFUN|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.FUN.."|staticBlueFrame|6276|\nadd_button_with_icon||END_LIST||0||\nadd_spacer|small|\nadd_smalltext|"..CUSTOM_TEXT.COMMAND_LIST.TEXT.SHORTCUT.." : `"..KONFIGURASI.UI.SECONDARY.."/cmd|\nadd_spacer|small|\nadd_quick_exit|\nadd_button|BACK_TO_MAIN_MENU|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.BACK.."|noflags|0|0|\nend_dialog|StarriesHelper|" DIALOG(C, 500) end
 function DIALOG_BTK_COMMAND() B = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.COMMAND_LIST.BUTTON.BTK.."|left|1752|\nadd_spacer|small|\nadd_label|small|"..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.TITLE.." :|left|\nadd_spacer|small|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/tb `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.TB.."|left|6140|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/scan `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.SCAN.."|left|6016|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/tg `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.TG.."|left|9438|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/pc `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.PC.."|left|18|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/win1 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.WIN1.."|left|2816|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/win2 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.WIN2.."|left|2818|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/bbet `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.BBET.."|left|7188|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/paytax `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.GIVETAX.."|left|9428|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/posbet `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.POSBET.."|left|1422|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/poschand `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.POSCHAND.."|left|340|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/posh `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.POSH.."|left|1400|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/postax `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.POSTAX.."|left|1452|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/putmode `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.PUTMODE.."|left|3684|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/autopos `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.AUTOPOS.."|left|10814|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/configbtk `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_1.CONFIGBTK.."|left|4630|\nadd_spacer|small|\nadd_label|small|"..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.TITLE.." :|left|\nadd_spacer|small|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/fpos `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.FPOS.."|left|902|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/posch `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.POSCH.."|left|482|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/poscv `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.POSCV.."|left|484|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/poshorizontal `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.POSHORIZONTAL.."|left|7156|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/h1 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.H1.."|left|2836|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/h2 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.H2.."|left|2838|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/h3 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.H3.."|left|2840|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/h4 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.H4.."|left|2842|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/posvertical `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.POSVERTICAL.."|left|1100|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/v1 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.V1.."|left|2836|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/v2 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.V2.."|left|2838|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/v3 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.V3.."|left|2840|\nadd_label_with_icon|small|`"..KONFIGURASI.UI.SECONDARY.."/v4 `"..KONFIGURASI.UI.PRIMARY..": "..CUSTOM_TEXT.COMMAND_LIST.BTK.LIST_2.V4.."|left|2842|\nadd_spacer|small|\nadd_smalltext|"..CUSTOM_TEXT.COMMAND_LIST.BTK.TEXT.SHORTCUT.."|\nadd_spacer|small|\nadd_quick_exit|\nadd_button|COMMAND_LIST|"..CUSTOM_TEXT.COMMAND_LIST.BTK.BUTTON.BACK.."|noflags|0|0|\nend_dialog|StarriesHelper|||" DIALOG(B, 500) end
 function DIALOG_ABILITY() A = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CUSTOM_TEXT.ABILITY.TEXT.A.."|left|"..GetItemInfo("Dumb Roles Icon").id.."|\nadd_smalltext|------------------------------------------------------------|\nadd_smalltext|"..CUSTOM_TEXT.ABILITY.TEXT.B.."|\nadd_smalltext|------------------------------------------------------------|\ntext_scaling_string|textscalingstring|\nadd_checkicon|BLOCK_SDB_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.BLOCK_SDB.."|"..FRAME(KONFIGURASI.ABILITY.BLOCK_SDB).."|2480||"..CHECKBOX(KONFIGURASI.ABILITY.BLOCK_SDB).."|\nadd_checkicon|ANTI_POCKET_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.ANTI_POCKET.."|"..FRAME(KONFIGURASI.ABILITY.ANTI_POCKET).."|3062||"..CHECKBOX(KONFIGURASI.ABILITY.ANTI_POCKET).."|\nadd_checkicon|PULL_GAS_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.PULL_GAS.."|"..FRAME(KONFIGURASI.ABILITY.PULL_GAS).."|1400||"..CHECKBOX(KONFIGURASI.ABILITY.PULL_GAS).."|\nadd_checkicon|SHOW_GEMS_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.SHOW_GEMS.."|"..FRAME(KONFIGURASI.ABILITY.SHOW_GEMS).."|9438||"..CHECKBOX(KONFIGURASI.ABILITY.SHOW_GEMS).."|\nadd_checkicon|EXTRACTOR_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.EXTRACTOR.."|"..FRAME(KONFIGURASI.ABILITY.EXTRACTOR).."|6140||"..CHECKBOX(KONFIGURASI.ABILITY.EXTRACTOR).."|\nadd_button_with_icon||END_LIST||0||\nadd_checkicon|FAST_DROP_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.FAST_DROP.."|"..FRAME(KONFIGURASI.ABILITY.FAST_DROP).."|4758||"..CHECKBOX(KONFIGURASI.ABILITY.FAST_DROP).."|\nadd_checkicon|FAST_TRASH_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.FAST_TRASH.."|"..FRAME(KONFIGURASI.ABILITY.FAST_TRASH).."|6068||"..CHECKBOX(KONFIGURASI.ABILITY.FAST_TRASH).."|\nadd_checkicon|MODFLY_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.MODFLY.."|"..FRAME(KONFIGURASI.ABILITY.MODFLY).."|7502||"..CHECKBOX(KONFIGURASI.ABILITY.MODFLY).."|\nadd_checkicon|NO_PICKUP_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.NO_PICKUP.."|"..FRAME(KONFIGURASI.ABILITY.NO_PICKUP).."|4320||"..CHECKBOX(KONFIGURASI.ABILITY.NO_PICKUP).."|\nadd_checkicon|NO_LAG_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.NO_LAG.."|"..FRAME(KONFIGURASI.ABILITY.NO_LAG).."|7234||"..CHECKBOX(KONFIGURASI.ABILITY.NO_LAG).."|\nadd_button_with_icon||END_LIST||0||\nadd_checkicon|FAST_DBLOCK_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.FAST_DBLOCK.."|"..FRAME(KONFIGURASI.ABILITY.FAST_DBLOCK).."|2946||"..CHECKBOX(KONFIGURASI.ABILITY.FAST_DBLOCK).."|\nadd_checkicon|BLOCK_ADVENTURE_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.BLOCK_ADVENTURE.."|"..FRAME(KONFIGURASI.ABILITY.BLOCK_ADVENTURE).."|4722||"..CHECKBOX(KONFIGURASI.ABILITY.BLOCK_ADVENTURE).."|\nadd_checkicon|BLOCK_EVENT_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.BLOCK_EVENT.."|"..FRAME(KONFIGURASI.ABILITY.BLOCK_EVENT).."|10536||"..CHECKBOX(KONFIGURASI.ABILITY.BLOCK_EVENT).."|\nadd_checkicon|ANTI_BUNNIES_TOGGLE|"..CUSTOM_TEXT.ABILITY.BUTTON.ANTI_BUNNIES.."|"..FRAME(KONFIGURASI.ABILITY.ANTI_BUNNIES).."|618||"..CHECKBOX(KONFIGURASI.ABILITY.ANTI_BUNNIES).."|\nadd_button_with_icon||END_LIST||0||\nadd_spacer|small|\nadd_smalltext|"..CUSTOM_TEXT.ABILITY.TEXT.E.."|\nadd_smalltext|"..CUSTOM_TEXT.ABILITY.TEXT.C.."|\nadd_smalltext|"..CUSTOM_TEXT.ABILITY.TEXT.D.."|\nadd_spacer|small|\nadd_quick_exit|\nadd_button|BACK_TO_MAIN_MENU|"..CUSTOM_TEXT.ABILITY.BUTTON.BACK.."|noflags|0|0|\nend_dialog|YOUR_ABILITY|"..CUSTOM_TEXT.ABILITY.BUTTON.CLOSE.."|"..CUSTOM_TEXT.ABILITY.BUTTON.SAVE.."|" DIALOG(A, 500) end
@@ -2676,14 +2572,14 @@ COOKING = { 4568, 4570, 4572, 956, 4562, 962, 4602, 4588, 4578, 4586, 874, 868, 
 }
 
 function BUYING_PACK_IN_ACTION() if not KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE then return end
-	if KONFIGURASI.LIST_MENU.PACK_MENU.MODE == "COOKING" then
-		BUYING_PACK("buy_cookingpack") Sleep(100)
-			for _, I in pairs(LIST_ITEM.COOKING) do 
-				if KONFIGURASI.LIST_MENU.PACK_MENU.AUTO_DROP then
-					if GET_AMOUNT(I) >= 240 then DROP(I, GET_AMOUNT(I)) Sleep(100) end 
-				else KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE = false BUBBLE("Backpack Full!") CONSOLE("Buying Pack has been `4deactivated") return end 
-			end 
-	end 
+    if KONFIGURASI.LIST_MENU.PACK_MENU.MODE == "COOKING" then
+        BUYING_PACK("buy_cookingpack") Sleep(100)
+            for _, I in pairs(LIST_ITEM.COOKING) do 
+                if KONFIGURASI.LIST_MENU.PACK_MENU.AUTO_DROP then
+                    if GET_AMOUNT(I) >= 240 then DROP(I, GET_AMOUNT(I)) Sleep(100) end 
+                else KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE = false BUBBLE("Backpack Full!") CONSOLE("Buying Pack has been `4deactivated") return end 
+            end 
+    end 
 end
 
 AddHook("OnSendPacket", "PACKET-PACK-MENU", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
@@ -3115,32 +3011,32 @@ function BROADCASTING()
 if GetWorld() == nil or GetWorld().name ~= KONFIGURASI.SERVICE_MENU.BROADCAST.BROADCASTED_WORLD then CONSOLE("`6Disconnected while broadcasting?! attempt to reconnect...") Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.BROADCASTED_WORLD)
 else
 if KONFIGURASI.SERVICE_MENU.BROADCAST.MODE == "COUNTER" then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER = true
-	if not KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY then
-		if KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER_MODE == "UP" then
-			local M = KONFIGURASI.SYSTEM.CREDIT.."`w(megaphone) "..CUSTOM_TEXT.BROADCAST.A.." : `%s" CHAT(M:format(53)) Sleep(1000) CHAT(M:format(52)) Sleep(1000) CHAT(M:format(51)) Sleep(1500)
-			CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT.."") Sleep(1000) KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER + 1 
-			if KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER and (KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER == 0 ) then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(nuke) "..CUSTOM_TEXT.BROADCAST.B.." : `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.."`w, "..CUSTOM_TEXT.BROADCAST.C.."! (halo)") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION or KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "END" and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."), "Super Broadcasting finished, enjoy your break!", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED, KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = 0, 0 if KONFIGURASI.SERVICE_MENU.BROADCAST.BACK then CHAT(KONFIGURASI.SYSTEM.CREDIT.."(fireworks) `wBack to "..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) end KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING = false KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false return true else CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(eyes) "..CUSTOM_TEXT.BROADCAST.D.." `2"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.E.." `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.." `w"..CUSTOM_TEXT.BROADCAST.F..", `e"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.G..".") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."),"Super Broadcasting! **"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.."** broadcast left until it stopped", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = true end
-			Sleep(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE)
-		end
+    if not KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY then
+        if KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER_MODE == "UP" then
+            local M = KONFIGURASI.SYSTEM.CREDIT.."`w(megaphone) "..CUSTOM_TEXT.BROADCAST.A.." : `%s" CHAT(M:format(53)) Sleep(1000) CHAT(M:format(52)) Sleep(1000) CHAT(M:format(51)) Sleep(1500)
+            CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT.."") Sleep(1000) KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER + 1 
+            if KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER and (KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER == 0 ) then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(nuke) "..CUSTOM_TEXT.BROADCAST.B.." : `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.."`w, "..CUSTOM_TEXT.BROADCAST.C.."! (halo)") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION or KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "END" and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."), "Super Broadcasting finished, enjoy your break!", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED, KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = 0, 0 if KONFIGURASI.SERVICE_MENU.BROADCAST.BACK then CHAT(KONFIGURASI.SYSTEM.CREDIT.."(fireworks) `wBack to "..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) end KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING = false KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false return true else CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(eyes) "..CUSTOM_TEXT.BROADCAST.D.." `2"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.E.." `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.." `w"..CUSTOM_TEXT.BROADCAST.F..", `e"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.G..".") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."),"Super Broadcasting! **"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.."** broadcast left until it stopped", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = true end
+            Sleep(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE)
+        end
 
-		if KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER_MODE == "DOWN" then
-			local M = KONFIGURASI.SYSTEM.CREDIT.."`w(megaphone) "..CUSTOM_TEXT.BROADCAST.A.." : `%s" CHAT(M:format(53)) Sleep(1000) CHAT(M:format(52)) Sleep(1000) CHAT(M:format(51)) Sleep(1500)
-			CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT.."") Sleep(1000) KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT = KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT - 1 
-			if KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER and (KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER-KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT == 0 ) then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(nuke) "..CUSTOM_TEXT.BROADCAST.B.." : `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.."`w, "..CUSTOM_TEXT.BROADCAST.C.."! (halo)") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION or KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "END" and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."), "Super Broadcasting finished, enjoy your break!", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED, KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = 0, 0 if KONFIGURASI.SERVICE_MENU.BROADCAST.BACK then CHAT(KONFIGURASI.SYSTEM.CREDIT.."(fireworks) `wBack to "..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) end KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING = false KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false return true else CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(eyes) "..CUSTOM_TEXT.BROADCAST.D.." `2"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.." `w"..CUSTOM_TEXT.BROADCAST.H.." `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.F..", `e"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.G..".") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."),"Super Broadcasting! **"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER-KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.."** broadcast left until it stopped", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = true end
-			Sleep(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE)
-		end
-	end
+        if KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER_MODE == "DOWN" then
+            local M = KONFIGURASI.SYSTEM.CREDIT.."`w(megaphone) "..CUSTOM_TEXT.BROADCAST.A.." : `%s" CHAT(M:format(53)) Sleep(1000) CHAT(M:format(52)) Sleep(1000) CHAT(M:format(51)) Sleep(1500)
+            CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT.."") Sleep(1000) KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT = KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT - 1 
+            if KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER and (KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER-KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT == 0 ) then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_COUNTER = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(nuke) "..CUSTOM_TEXT.BROADCAST.B.." : `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.."`w, "..CUSTOM_TEXT.BROADCAST.C.."! (halo)") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION or KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "END" and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."), "Super Broadcasting finished, enjoy your break!", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED, KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = 0, 0 if KONFIGURASI.SERVICE_MENU.BROADCAST.BACK then CHAT(KONFIGURASI.SYSTEM.CREDIT.."(fireworks) `wBack to "..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) end KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING = false KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false return true else CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(eyes) "..CUSTOM_TEXT.BROADCAST.D.." `2"..KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.." `w"..CUSTOM_TEXT.BROADCAST.H.." `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.F..", `e"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER-KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.G..".") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."),"Super Broadcasting! **"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER-KONFIGURASI.SERVICE_MENU.BROADCAST.LIMIT.."** broadcast left until it stopped", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = true end
+            Sleep(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE)
+        end
+    end
 end
-	
+    
 if KONFIGURASI.SERVICE_MENU.BROADCAST.MODE == "TIMER" then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_TIME = true
-	KONFIGURASI.SERVICE_MENU.BROADCAST.CURRENT_TIME = os.time() KONFIGURASI.SERVICE_MENU.BROADCAST.GET_TIME = os.difftime(KONFIGURASI.SERVICE_MENU.BROADCAST.CURRENT_TIME, KONFIGURASI.SERVICE_MENU.BROADCAST.TIME_START) KONFIGURASI.SERVICE_MENU.BROADCAST.TIME = (KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER * 60) - KONFIGURASI.SERVICE_MENU.BROADCAST.GET_TIME
-	if KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE then Sleep(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE-90000) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE = false end
-	if not KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY then
-		local M = KONFIGURASI.SYSTEM.CREDIT.."`w(megaphone) "..CUSTOM_TEXT.BROADCAST.A.." : `%s" CHAT(M:format(53)) Sleep(1000) CHAT(M:format(52)) Sleep(1000) CHAT(M:format(51)) Sleep(1000)
-		CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT.."") Sleep(1000) KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER + 1 
-		CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(eyes) "..CUSTOM_TEXT.BROADCAST.D.." `2"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.E.." `6"..math.floor(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER/1.5).." `w"..CUSTOM_TEXT.BROADCAST.I) Sleep(1000) CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(sleep) "..CUSTOM_TEXT.BROADCAST.J.." : `b"..TIME_SPLIT(KONFIGURASI.SERVICE_MENU.BROADCAST.TIME):format("`w"..CUSTOM_TEXT.BROADCAST.L..",`b", "`w"..CUSTOM_TEXT.BROADCAST.M..",`b", "`w"..CUSTOM_TEXT.BROADCAST.N..".")) Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(KONFIGURASI.SERVICE_MENU.BROADCAST.TIME):format("hours,", "minutes,", "seconds."),"Super Broadcasting! **"..(math.floor(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER/1.5) - KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER).."** broadcast left until it stopped", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = true return true
-	end
-	if KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_TIME and KONFIGURASI.SERVICE_MENU.BROADCAST.TIME <= 0 then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_TIME = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(nuke) "..CUSTOM_TEXT.BROADCAST.B.." : `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.."`w, "..CUSTOM_TEXT.BROADCAST.C.."! (halo)") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "END" or KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."), "Super Broadcasting finished, enjoy your break!", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED, KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = 0, 0 KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(sleep) "..CUSTOM_TEXT.BROADCAST.K.." : `b"..TIME_SPLIT(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER*60):format("`w"..CUSTOM_TEXT.BROADCAST.L..",`b", "`w"..CUSTOM_TEXT.BROADCAST.M..",`b", "`w"..CUSTOM_TEXT.BROADCAST.N..".")) Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.BACK then CHAT(KONFIGURASI.SYSTEM.CREDIT.."(fireworks) `wBack to "..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) end return true end
+    KONFIGURASI.SERVICE_MENU.BROADCAST.CURRENT_TIME = os.time() KONFIGURASI.SERVICE_MENU.BROADCAST.GET_TIME = os.difftime(KONFIGURASI.SERVICE_MENU.BROADCAST.CURRENT_TIME, KONFIGURASI.SERVICE_MENU.BROADCAST.TIME_START) KONFIGURASI.SERVICE_MENU.BROADCAST.TIME = (KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER * 60) - KONFIGURASI.SERVICE_MENU.BROADCAST.GET_TIME
+    if KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE then Sleep(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER_QUEUE-90000) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = false KONFIGURASI.SERVICE_MENU.BROADCAST.QUEUE = false end
+    if not KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY then
+        local M = KONFIGURASI.SYSTEM.CREDIT.."`w(megaphone) "..CUSTOM_TEXT.BROADCAST.A.." : `%s" CHAT(M:format(53)) Sleep(1000) CHAT(M:format(52)) Sleep(1000) CHAT(M:format(51)) Sleep(1000)
+        CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT.."") Sleep(1000) KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER + 1 
+        CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(eyes) "..CUSTOM_TEXT.BROADCAST.D.." `2"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.." `w"..CUSTOM_TEXT.BROADCAST.E.." `6"..math.floor(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER/1.5).." `w"..CUSTOM_TEXT.BROADCAST.I) Sleep(1000) CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(sleep) "..CUSTOM_TEXT.BROADCAST.J.." : `b"..TIME_SPLIT(KONFIGURASI.SERVICE_MENU.BROADCAST.TIME):format("`w"..CUSTOM_TEXT.BROADCAST.L..",`b", "`w"..CUSTOM_TEXT.BROADCAST.M..",`b", "`w"..CUSTOM_TEXT.BROADCAST.N..".")) Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(KONFIGURASI.SERVICE_MENU.BROADCAST.TIME):format("hours,", "minutes,", "seconds."),"Super Broadcasting! **"..(math.floor(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER/1.5) - KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER).."** broadcast left until it stopped", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.ALREADY = true return true
+    end
+    if KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_TIME and KONFIGURASI.SERVICE_MENU.BROADCAST.TIME <= 0 then KONFIGURASI.SERVICE_MENU.BROADCAST.CHECKING_TIME = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(nuke) "..CUSTOM_TEXT.BROADCAST.B.." : `6"..KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER.."`w, "..CUSTOM_TEXT.BROADCAST.C.."! (halo)") Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION and KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "END" or KONFIGURASI.SERVICE_MENU.BROADCAST.MENTION_MODE == "ALL" then WHO_MENTIONED = "<@"..KONFIGURASI.SERVICE_MENU.BROADCAST.DISCORD_ID..">" else WHO_MENTIONED = "" end SEND_WEBHOOK(KONFIGURASI.SERVICE_MENU.BROADCAST.WEBHOOK, KONFIGURASI.SERVICE_MENU.BROADCAST.EMBED:format(WHO_MENTIONED, FORMAT_NAME(GetLocal().name), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), FORMAT_NUMBER(KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED), KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER, TIME_SPLIT(0):format("hours,", "minutes,", "seconds."), "Super Broadcasting finished, enjoy your break!", KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT)) KONFIGURASI.SERVICE_MENU.BROADCAST.GEMS_USED, KONFIGURASI.SERVICE_MENU.BROADCAST.COUNTER = 0, 0 KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING = false CHAT(KONFIGURASI.SYSTEM.CREDIT.."`w(sleep) "..CUSTOM_TEXT.BROADCAST.K.." : `b"..TIME_SPLIT(KONFIGURASI.SERVICE_MENU.BROADCAST.TIMER*60):format("`w"..CUSTOM_TEXT.BROADCAST.L..",`b", "`w"..CUSTOM_TEXT.BROADCAST.M..",`b", "`w"..CUSTOM_TEXT.BROADCAST.N..".")) Sleep(1000) if KONFIGURASI.SERVICE_MENU.BROADCAST.BACK then CHAT(KONFIGURASI.SYSTEM.CREDIT.."(fireworks) `wBack to "..KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) Sleep(1000) JOIN_WORLD(KONFIGURASI.SERVICE_MENU.BROADCAST.WORLD) end return true end
 end
 
 end end
@@ -3306,28 +3202,28 @@ function COLLECT_THE_ITEM(MR, X, Y)
   local MX = X - MR  -- Calculate the minimum X coordinate
   local X_CHANGED = 0  -- Track how much x has changed
   ::LOOP_COLLECT::
-  		if GET_AMOUNT(KONFIGURASI.SERVICE_MENU.ITEM_MOVER.ITEM) > 0 then
-      		X_CHANGED = X - A  -- Calculate how much x has changed
-      		return true, X_CHANGED  -- Items found and collected, return xChange
-    		--else A = A - 1 --goto LOOP_COLLECT 
-    	end
+          if GET_AMOUNT(KONFIGURASI.SERVICE_MENU.ITEM_MOVER.ITEM) > 0 then
+              X_CHANGED = X - A  -- Calculate how much x has changed
+              return true, X_CHANGED  -- Items found and collected, return xChange
+            --else A = A - 1 --goto LOOP_COLLECT 
+        end
   while A >= MX do
     FindPath(A, Y, 150) Sleep(800)
     for _, OBJECT in pairs(GetObjectList()) do ::ITEM_COLLECTED::
-      	if math.floor(OBJECT.id) == KONFIGURASI.SERVICE_MENU.ITEM_MOVER.ITEM then if OBJECT.pos.x//32 == A and OBJECT.pos.y//32 == Y then
-      		if GET_AMOUNT(KONFIGURASI.SERVICE_MENU.ITEM_MOVER.ITEM) > 0 then
-      		X_CHANGED = X - A  -- Calculate how much x has changed
-      		return true, X_CHANGED  -- Items found and collected, return xChange
-    		--else A = A - 1 --goto LOOP_COLLECT 
-    		end 
-      	else A = A - 1 goto LOOP_COLLECT 
-      		KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1 = A -- Update takeX with the current x coordinate
-      		KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1 = Y  -- Update takeY (although it doesn't change in this case)
-      		if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1 ~= A and KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1 ~= Y then 
-      			CONSOLE("`6Updated Collection Coord to " .. KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1 .. ", " .. KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1) 
-      		end 
-      	end end
-      	goto ITEM_COLLECTED
+          if math.floor(OBJECT.id) == KONFIGURASI.SERVICE_MENU.ITEM_MOVER.ITEM then if OBJECT.pos.x//32 == A and OBJECT.pos.y//32 == Y then
+              if GET_AMOUNT(KONFIGURASI.SERVICE_MENU.ITEM_MOVER.ITEM) > 0 then
+              X_CHANGED = X - A  -- Calculate how much x has changed
+              return true, X_CHANGED  -- Items found and collected, return xChange
+            --else A = A - 1 --goto LOOP_COLLECT 
+            end 
+          else A = A - 1 goto LOOP_COLLECT 
+              KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1 = A -- Update takeX with the current x coordinate
+              KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1 = Y  -- Update takeY (although it doesn't change in this case)
+              if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1 ~= A and KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1 ~= Y then 
+                  CONSOLE("`6Updated Collection Coord to " .. KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1 .. ", " .. KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1) 
+              end 
+          end end
+          goto ITEM_COLLECTED
       end
   end
   BUBBLE("Items not found within the specified range")
@@ -3369,7 +3265,7 @@ WAIT_FOR_WORLD(KONFIGURASI.SERVICE_MENU.ITEM_MOVER.WORLD_1)
   
   local SUCCEDED, X_CHANGED
   while true do 
-  	SUCCEDED, X_CHANGED = COLLECT_THE_ITEM(2, KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1, KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1)
+      SUCCEDED, X_CHANGED = COLLECT_THE_ITEM(2, KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.X_1, KONFIGURASI.SERVICE_MENU.ITEM_MOVER.FLOAT.Y_1)
     if SUCCEDED then break else ChangeValue("[C] Modfly", false) CONSOLE("Item Mover `4deactivated") KONFIGURASI.SERVICE_MENU.ITEM_MOVER.TOGGLE = false return end
   end
   
@@ -3711,9 +3607,9 @@ return false end)
 
 function GET_COMMAND(PARAM, CMD, RESULT)
 TEXT = SPLIT(PARAM,"") 
-	if TEXT:find("/") then COMMAND = SPLIT("/", "")
-		if COMMAND:find(CMD) then return RESULT end
-	end
+    if TEXT:find("/") then COMMAND = SPLIT("/", "")
+        if COMMAND:find(CMD) then return RESULT end
+    end
 end
 
 AddHook("OnSendPacket", "PACKET-MAIN", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
@@ -4069,135 +3965,11 @@ CONSOLE(CUSTOM_TEXT.START.B) Sleep(50) CONSOLE(CUSTOM_TEXT.START.C.." `w"..GET_B
 
 --if CHECKING_WORLD then Sleep(100) if GetWorld().name:find("JUDI") or GetWorld().name:find("CSN") or GetWorld().name == "ZEUS" or GetWorld().name == "ACC" or GetWorld().name:find("REME") or GetWorld().name:find("BTK") or GetWorld().name:find("TTT") then CHAT("`wGood luck sir, hope you win a lot!") end if GetWorld().name:find("BFG") then CHAT("`wHappy bfg! Don't forget to use `^Don't Drop Gems`w!") end CHECKING_WORLD = false end
 
-while true do Sleep(200) if INAPPRORIATE then break end
-
-if FIND_MOONCAKE then Sleep(250) FINDER(GetItemInfo("Longevity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Prosperity Mooncake").id) Sleep(100) FINDER(GetItemInfo("Balance Mooncake").id) Sleep(250) FIND_MOONCAKE = false end
-if DROP_MOONCAKE then Sleep(250) DROP(GetItemInfo("Longevity Mooncake").id, GET_AMOUNT(GetItemInfo("Longevity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Prosperity Mooncake").id, GET_AMOUNT(GetItemInfo("Prosperity Mooncake").id)) Sleep(100) DROP(GetItemInfo("Balance Mooncake").id, GET_AMOUNT(GetItemInfo("Balance Mooncake").id)) Sleep(100) DROP_MOONCAKE = false end
-
-if KONFIGURASI.AUTO_SPAM.TOGGLE and not CDROP then Sleep(250) SPAMMING() if not CDROP then Sleep(KONFIGURASI.AUTO_SPAM.DELAY) end end
-if CDROP then Sleep(250) CUSTOM_DROP() DROP_AMOUNT = 0 CDROP = false end
-
-if TB then Sleep(250) TAKE_BET() TB = false end
-if SCAN then Sleep(250) SCAN_GEMS() SCAN = false end
-if TG then Sleep(250) TAKE_GEMS() TG = false if KONFIGURASI.BTK.OPTIONAL.TG_WIN then if KONFIGURASI.BTK.WINNER > 0 then SET_WINNER(KONFIGURASI.BTK.WINNER) NO_WINNER = false else CONSOLE("There's no winner, the game ends in a draw!") NO_WINNER = true end end if KONFIGURASI.BTK.OPTIONAL.AUTO_PAY and not NO_WINNER then if KONFIGURASI.BTK.POSTX == 0 or KONFIGURASI.BTK.POSTX == nil then CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou haven't configured the tax position, please run the command `"..KONFIGURASI.UI.SECONDARY.."/postax") else PAY_TAX = true end end if KONFIGURASI.BTK.OPTIONAL.AUTO_SB then Sleep(800) CHAT("/sb "..KONFIGURASI.SERVICE_MENU.BROADCAST.TEXT) end end
-if AUTO_TAX then Sleep(250) CUSTOM_DROP() AUTO_TAX = false DROP_AMOUNT = 0 end
-if RESCHAND_HORIZONTAL and KONFIGURASI.BTK.HORIZONTAL then Sleep(250) BUBBLE("Do not move while placing chand") ChangeValue("[C] Modfly", true) Sleep(250) FindPath(KONFIGURASI.BTK.POSCHAND.LEFT.X1, KONFIGURASI.BTK.POSCHAND.LEFT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.LEFT.X1, KONFIGURASI.BTK.POSCHAND.LEFT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.LEFT.X2, KONFIGURASI.BTK.POSCHAND.LEFT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.LEFT.X3, KONFIGURASI.BTK.POSCHAND.LEFT.Y1) Sleep(150) COLLECT_GEMS_LEFT() Sleep(150) FindPath(KONFIGURASI.BTK.POSCHAND.RIGHT.X1, KONFIGURASI.BTK.POSCHAND.RIGHT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.RIGHT.X1, KONFIGURASI.BTK.POSCHAND.RIGHT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.RIGHT.X2, KONFIGURASI.BTK.POSCHAND.RIGHT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.RIGHT.X3, KONFIGURASI.BTK.POSCHAND.RIGHT.Y1) Sleep(150) COLLECT_GEMS_RIGHT() FindPath(KONFIGURASI.BTK.HOSTX, KONFIGURASI.BTK.HOSTY) ChangeValue("[C] Modfly", false) RESCHAND_HORIZONTAL = false if not PC then if KONFIGURASI.BUBBLE.BTK_BUBBLE then CHAT(CUSTOM_TEXT.BUBBLE.BTK.DROP_WINNER) end end BUBBLE("Placing chand with "..KONFIGURASI.BTK.PUT_MODE:lower().." `2successful") PC = false end
-if RESCHAND_VERTICAL and KONFIGURASI.BTK.VERTICAL then Sleep(250) BUBBLE("Do not move while placing chand") ChangeValue("[C] Modfly", true) Sleep(250) FindPath(KONFIGURASI.BTK.POSCHAND.LEFT.X1, KONFIGURASI.BTK.POSCHAND.LEFT.Y2) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.LEFT.X1, KONFIGURASI.BTK.POSCHAND.LEFT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.LEFT.X1, KONFIGURASI.BTK.POSCHAND.LEFT.Y2) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.LEFT.X1, KONFIGURASI.BTK.POSCHAND.LEFT.Y3) Sleep(150) COLLECT_GEMS_LEFT() Sleep(150) FindPath(KONFIGURASI.BTK.POSCHAND.RIGHT.X1, KONFIGURASI.BTK.POSCHAND.RIGHT.Y2) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.RIGHT.X1, KONFIGURASI.BTK.POSCHAND.RIGHT.Y1) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.RIGHT.X1, KONFIGURASI.BTK.POSCHAND.RIGHT.Y2) Sleep(150) PLACE(KONFIGURASI.BTK.PUT_ID, KONFIGURASI.BTK.POSCHAND.RIGHT.X1, KONFIGURASI.BTK.POSCHAND.RIGHT.Y3) Sleep(150) COLLECT_GEMS_RIGHT() FindPath(KONFIGURASI.BTK.HOSTX, KONFIGURASI.BTK.HOSTY) ChangeValue("[C] Modfly", false) RESCHAND_VERTICAL = false if not PC then if KONFIGURASI.BUBBLE.BTK_BUBBLE then CHAT(CUSTOM_TEXT.BTK.BUBBLE.BTK.DROP_WINNER) end end BUBBLE("Placing chand with "..KONFIGURASI.BTK.PUT_MODE:lower().." `2successful") PC = false end
-if BBET then Sleep(250) BACK_BET() BBET = false DROP_AMOUNT = 0 end
-if PAY_TAX then Sleep(250) GET_TAX() CONSOLE("Working...") Sleep(100) PLACE(32, KONFIGURASI.BTK.POSTX, KONFIGURASI.BTK.POSTY) Sleep(100) SendPacket(2,"action|dialog_return\ndialog_name|donate_edit\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\ndonsel|242") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_item\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\nitem|242|\ndoncount|"..TAX_WL.."\noptNote|`wPay taxes") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_edit\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\ndonsel|1796") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_item\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\nitem|1796|\ndoncount|"..TAX_DL.."\noptNote|`wPay taxes") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_edit\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\ndonsel|7188") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_item\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\nitem|7188|\ndoncount|"..TAX_BGL.."\noptNote|`wPay taxes") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_edit\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\ndonsel|11550") Sleep(200) SendPacket(2,"action|dialog_return\ndialog_name|donate_item\nx|"..KONFIGURASI.BTK.POSTX.."|\ny|"..KONFIGURASI.BTK.POSTY.."|\nitem|11550|\ndoncount|"..TAX_BLACK.."\noptNote|`wPay taxes") TAX_DONATED = GET_DATA((TAX_WL)+(TAX_DL*100)+(TAX_BGL*10000)+(TAX_BLACK*1000000)) CONSOLE(TAX_DONATED.."`o, paid!") CHAT(TAX_DONATED.."`w, paid!") PAY_TAX = false end
-
-if TP_POS1 then Sleep(250) FindPath(KONFIGURASI.BTK.POSX1, KONFIGURASI.BTK.POSY1, 150) BUBBLE("Teleported to position 1") TP_POS1 = false end
-if TP_POS2 then Sleep(250) FindPath(KONFIGURASI.BTK.POSX2, KONFIGURASI.BTK.POSY2, 150) BUBBLE("Teleported to position 2") TP_POS2 = false end
-if TP_POSH then Sleep(250) FindPath(KONFIGURASI.BTK.HOSTX, KONFIGURASI.BTK.HOSTY, 150) BUBBLE("Teleported to hoster position") TP_POSH = false end
-if TP_SURG then Sleep(250) FindPath(KONFIGURASI.LIST_MENU.SURGERY.POSX, KONFIGURASI.LIST_MENU.SURGERY.POSY, 150) BUBBLE("Teleported to surgery position") TP_SURG = false end
-
-if DROP_ANC then Sleep(250) DROP(4604, DROP_AMOUNT) Sleep(150) DROP(528, DROP_AMOUNT) CONSOLE("Dropped `w"..DROP_AMOUNT.." Arroz Con Pollo and Lucky Clover") if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `$"..DROP_AMOUNT.." `wArroz Con Pollo and Lucky Clover") end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `$"..DROP_AMOUNT.." `wArroz Con Pollo and Lucky Clover") end DROP_ANC = false end
-
-if DAW then Sleep(250) DROPPED_WITH_DAW = GET_BALANCE() if TABLE_DAW.WL > 0 then DROP(242, TABLE_DAW.WL) Sleep(200) end if TABLE_DAW.DL > 0 then DROP(1796, TABLE_DAW.DL) Sleep(200) end if TABLE_DAW.BGL > 0 then DROP(7188, TABLE_DAW.BGL) Sleep(200) end if TABLE_DAW.BLACK > 0 then DROP(11550, TABLE_DAW.BLACK) Sleep(150) end CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..DROPPED_WITH_DAW) DAW = false DROP_AMOUNT = 0 end
-
-if CBGL then Sleep(250) CHANGE_BGL() CBGL = false end
-if BUYDL then Sleep(250) BUYING_DL() BUYDL = false end
-if CHECKING_SHOW_UID then Sleep(250) SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|security") Sleep(500) end
-
-if SHOW_COLLECTED then Sleep(250) SHOW_COLLECT() end
-if KONFIGURASI.LIST_MENU.SKIN_MENU.BLINK then Sleep(50) BLINK_SKIN() end
-
-if RANGE then Sleep(250) COLLECT_IN_RANGE() RANGE = false end
-if CRANGE then Sleep(250) BUBBLE("`wCollecting in `2"..COLLECT_RANGE.." `wRange") COLLECT_CUSTOM_RANGE(COLLECT_RANGE) COLLECT_RANGE = 0 CRANGE = false end
-if DROPALL_APPROVE then Sleep(250) KONFIGURASI.ABILITY.FAST_DROP = true for _, item in pairs(GetInventory()) do if not DROPALL_APPROVE then break end DROP(item.id, item.amount) Sleep(50) end DROPALL_APPROVE = false KONFIGURASI.ABILITY.FAST_DROP = false end
-
-if CONSUME then Sleep(250) CONSUME_NOW() CONSUME = false end
-if CONSUME_ARROZ then Sleep(250) PLACE(4604, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) CONSOLE(CUSTOM_TEXT.CODE.CONSUME.."`oArroz Con Pollo eaten!") CONSUME_ARROZ = false Sleep(500) end if CONSUME_EGGS then Sleep(50) PLACE(1474, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) CONSOLE(CUSTOM_TEXT.CODE.CONSUME.."`oEggs Benedict eaten!") CONSUME_EGGS = false Sleep(500) end if CONSUME_CLOVER then Sleep(50) PLACE(528, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) CONSOLE(CUSTOM_TEXT.CODE.CONSUME.."`oLucky Clover eaten!") CONSUME_CLOVER = false Sleep(500) end if CONSUME_SONGPYEON then Sleep(50) PLACE(1056, math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32)) CONSOLE(CUSTOM_TEXT.CODE.CONSUME.."`oSongpyeon eaten!") CONSUME_SONGPYEON = false Sleep(500) end
-
-if WORLD_PRESENCE then Sleep(250) CHAT("Absen Dulu Adik-Adik (lol)") Sleep(1000) for _, player in pairs(GetPlayerList()) do if player.userid ~= GetLocal().userid and not player.name:find("Slave") then CHAT("Hi "..player.name) Sleep(1000) end end CONSOLE("There are no other players beside you") CHAT("Absen Selesai (halo)") WORLD_PRESENCE = false end
-if WORLD_MESSAGE then Sleep(250) for _, player in pairs(GetPlayerList()) do if player.userid ~= GetLocal().userid then CHAT("/msg "..FORMAT_NAME(player.name).." "..KONFIGURASI.LIST_MENU.WORLD_FEATURE.MESSAGE) Sleep(1000) end end CONSOLE("Message all player done!") WORLD_MESSAGE = false end
-if WORLD_TRADE then Sleep(250) for _, player in pairs(GetPlayerList()) do if player.userid ~= GetLocal().userid then SendPacket(2,"action|dialog_return\ndialog_name|popup\nnetID|"..player.netid.."|\nbuttonClicked|trade") Sleep(50) SendPacket(2,"action|trade_cancel") Sleep(400) end end CONSOLE("Trading all player done!") WORLD_TRADE = false end
-if WORLD_PULL then Sleep(250) for _, player in pairs(GetPlayerList()) do if player.userid ~= GetLocal().userid then SendPacket(2,"action|dialog_return\ndialog_name|popup\nnetID|"..player.netid.."|\nbuttonClicked|pull") Sleep(400) end end CONSOLE("Pulling all player done!") WORLD_PULL = false end
-if WORLD_KICK then Sleep(250) for _, player in pairs(GetPlayerList()) do if player.userid ~= GetLocal().userid then SendPacket(2,"action|dialog_return\ndialog_name|popup\nnetID|"..player.netid.."|\nbuttonClicked|kick") Sleep(400) end end CONSOLE("Kicking all player done!") WORLD_KICK = false end
-if WORLD_BAN then Sleep(250) for _, player in pairs(GetPlayerList()) do if player.userid ~= GetLocal().userid then SendPacket(2,"action|dialog_return\ndialog_name|popup\nnetID|"..player.netid.."|\nbuttonClicked|world_ban") Sleep(400) end end CONSOLE("Banning all player done!") WORLD_BAN = false end
-
-if CHANGE_WEATHER then Sleep(250) SendVariantList({[0] = "OnSetCurrentWeather", [1] = WEATHER_ID}) CHANGE_WEATHER = false end
-if GIVE_ACCESS then Sleep(250) for _, tile in pairs(GetTiles()) do if (tile.fg == 242 or tile.fg == 1796 or tile.fg == 7188 or tile.fg == 5260 or tile.fg == 11550 or tile.fg == 4802 or tile.fg == 2408 or tile.fg == 2950 or tile.fg == 4428 or tile.fg == 5814 or tile.fg == 5980 or tile.fg == 8470 or tile.fg == 4802 or tile.fg == 9640 or tile.fg == 10410 or tile.fg == 11586 or tile.fg == 11902 or tile.fg == 12654 or tile.fg == 13200) then SendPacket(2,"action|dialog_return\ndialog_name|lock_edit\nx|"..tile.x.."|\ny|"..tile.y.."|\ntargetNetID|"..NET_ID) CONSOLE("You have given access lock to "..GET_NAME_BY_NETID(NET_ID)) end end GIVE_ACCESS = false end
-
-if KONFIGURASI.GROWSCAN.SCAN_BLOCKS then Sleep(250) SCAN_BLOCK() KONFIGURASI.GROWSCAN.SCAN_BLOCKS = false end
-if KONFIGURASI.GROWSCAN.SCAN_FLOATS then Sleep(250) SCAN_FLOAT() KONFIGURASI.GROWSCAN.SCAN_FLOATS = false end
-if SCAN_UR_INVENTORY then Sleep(250) SCAN_INVENTORY() SCAN_UR_INVENTORY = false end
-
-if DONATING then Sleep(250) CONSOLE("Warping to STARRIES") JOIN_WORLD("STARRIES") Sleep(5000) FindPath(49, 26, 150) KONFIGURASI.DROP.DONT_SHOW = true DROP_AMOUNT = DONATE_AMOUNT CUSTOM_DROP() CHAT("`6<`1S`2t`3a`4r`5r`6i`we`8s`6> `wThanks, i appreciate you!") CONSOLE("Donated "..GET_DATA(DONATE_AMOUNT).." `oto Starries! may God reward you for your kindness!") SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_DONATE, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("", "**"..FORMAT_NAME(GetLocal().name).."** has made a donation of "..SHOW_DATA(DONATE_AMOUNT))) DROP_AMOUNT = 0 DONATING = false end
-if SEND_SUPPORT then Sleep(250) CONSOLE("Working...") Sleep(500) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_SUPPORT, KONFIGURASI.DISCORD.EMBED_SUPPORT:format(SUPPORT_MESSAGE)) Sleep(500) CONSOLE("`6>> This message : `w"..SUPPORT_MESSAGE.."`o, sent to our Discord") SEND_SUPPORT = false end
-if CHECK_TO_TRASH then Sleep(100) CONSOLE(GIVE_ID(ITEM_ID).." I "..GET_AMOUNT(ITEM_ID)) CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wTrashed "..GET_AMOUNT(ITEM_ID).." "..GetItemInfo(ITEM_ID).name) TRASH(GIVE_ID(ITEM_ID), GET_AMOUNT(ITEM_ID)) CHECK_TO_TRASH = false end
-
-if KONFIGURASI.SERVICE_MENU.BROADCAST.STARTING then Sleep(250) BROADCASTING() end
-
-if KONFIGURASI.WORLD_FINDER.TOGGLE then Sleep(250) FINDING_WORLD() end
-
-if KONFIGURASI.STORE_MENU.PURCHASE_FROM_STORE then Sleep(250) BUBBLE(KONFIGURASI.SYSTEM.CREDIT.."`wPlease be patient during the purchasing process!") for i = 1, KONFIGURASI.STORE_MENU.AMOUNT do SendPacket(2,"action|buy\nitem|"..KONFIGURASI.STORE_MENU.CODE) Sleep(200) end CONSOLE("Purchasing the item '`5"..KONFIGURASI.STORE_MENU.ITEM.."`o' with a total of "..KONFIGURASI.STORE_MENU.AMOUNT.." `2successful`o!") CONSOLE("Total spent : `4-"..FORMAT_NUMBER(KONFIGURASI.STORE_MENU.SPENT*KONFIGURASI.STORE_MENU.AMOUNT).." `oGems!") Sleep(150) KONFIGURASI.STORE_MENU.PURCHASE_FROM_STORE = false end
-if KONFIGURASI.HUB_MENU.PURCHASE_FROM_HUB then Sleep(250) BUBBLE(KONFIGURASI.SYSTEM.CREDIT.."`wPlease be patient during the purchasing process!") for i = 1, KONFIGURASI.HUB_MENU.AMOUNT do SendPacket(2,"action|dialog_return\ndialog_name|activity_purchase\noffer|"..KONFIGURASI.HUB_MENU.CODE.."|") Sleep(200) end CONSOLE("Purchasing the item '`5"..KONFIGURASI.HUB_MENU.ITEM.."`o' with a total of "..KONFIGURASI.HUB_MENU.AMOUNT.." `2successful`o!") CONSOLE("Total spent : `4-"..FORMAT_NUMBER(KONFIGURASI.HUB_MENU.SPENT*KONFIGURASI.HUB_MENU.AMOUNT).." `oActivity Credits!") Sleep(150) KONFIGURASI.HUB_MENU.PURCHASE_FROM_HUB = false end
-
-if KONFIGURASI.SERVICE_MENU.ITEM_FINDER.TOGGLE then Sleep(250) ITEM_FINDER_IN_ACTION() end
-
-if KONFIGURASI.SERVICE_MENU.ITEM_MOVER.TOGGLE then Sleep(250) ITEM_MOVER_IN_ACTION() end
-
-if KONFIGURASI.LIST_MENU.PACK_MENU.TOGGLE then Sleep(250) BUYING_PACK_IN_ACTION() end
-
-if KONFIGURASI.LIST_MENU.MAGPLANT.AUTO_TOGGLE then Sleep(250) AUTO_MAGPLANT() end
-if KONFIGURASI.LIST_MENU.VENDING.AUTO_TOGGLE then Sleep(250) AUTO_VENDING() end
-
-if CHECK_PROFILE then Sleep(250) SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|bgls") Sleep(500) CHAT("/kit") Sleep(500) SendPacket(2,"action|wrench\n|netid|"..GetLocal().netid) Sleep(1000) CHECK_PROFILE = false end
-
-if DEPOSIT then Sleep(250) SendPacket(2,"action|dialog_return\ndialog_name|bank_deposit\nbgl_count|"..AMOUNT_DEPOSIT) AMOUNT_DESPOTI = 0 DEPOSIT = false end
-if DEPOSIT_ALL then Sleep(250) if GET_AMOUNT(11550) > 0 then for i = 0, 2 do BREAK_BLACK() end else SendPacket(2,"action|dialog_return\ndialog_name|bank_deposit\nbgl_count|"..GET_AMOUNT(7188)) DEPOSIT_ALL = false end end
-if WITHDRAW_ALL then Sleep(250) SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|bgls") Sleep(500) if KONFIGURASI.OTHERS.BGL_ON_BANK ~= 0 then SendPacket(2, "action|dialog_return\ndialog_name|bank_withdraw\nbgl_count|"..KONFIGURASI.OTHERS.BGL_ON_BANK) else CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYou don't have enough `eBlue Gem Lock`o to withdrawn!") end WITHDRAW_ALL = false end
-
-if DROP_BGEMS then Sleep(250) for i = AMOUNT_BGEMS/250 , 1 , -1 do SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|bgem_dropall") Sleep(100) end CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped `w"..AMOUNT_BGEMS.." `bBlack Gems") Sleep(1000) DROP_BGEMS = false end
-
-if KONFIGURASI.LIST_MENU.SURGERY.BUY_KIT then Sleep(250) for i = 1, 50 do SendPacket(2,"action|buy\nitem|buy_surgkit") Sleep(180) end CONSOLE("Buying Surgical Kit `2successful`o!") KONFIGURASI.LIST_MENU.SURGERY.BUY_KIT = false if KONFIGURASI.LIST_MENU.SURGERY.AUTO_DROP_KIT then KONFIGURASI.LIST_MENU.SURGERY.DROP_KIT = true end end
-if KONFIGURASI.LIST_MENU.SURGERY.DROP_KIT then Sleep(150) if GET_AMOUNT(1240) > 0 then DROP(1240, GET_AMOUNT(1240)) end Sleep(150) if GET_AMOUNT(1256) > 0 then DROP(1256, GET_AMOUNT(1256)) end Sleep(150) if GET_AMOUNT(1258) > 0 then DROP(1258, GET_AMOUNT(1258)) end Sleep(150) if GET_AMOUNT(1260) > 0 then DROP(1260, GET_AMOUNT(1260)) end Sleep(150) if GET_AMOUNT(1262) > 0 then DROP(1262, GET_AMOUNT(1262)) end Sleep(150) if GET_AMOUNT(1264) > 0 then DROP(1264, GET_AMOUNT(1264)) end Sleep(150) if GET_AMOUNT(1266) > 0 then DROP(1266, GET_AMOUNT(1266)) end Sleep(150) if GET_AMOUNT(1268) > 0 then DROP(1268, GET_AMOUNT(1268)) end Sleep(150) if GET_AMOUNT(1270) > 0 then DROP(1270, GET_AMOUNT(1270)) end Sleep(150) CONSOLE("Dropping Surgical Kit `2successful`o!") KONFIGURASI.LIST_MENU.SURGERY.DROP_KIT = false end
-if BACK_SURGERY then Sleep(100) CHAT("/ghost") Sleep(250) FindPath(KONFIGURASI.LIST_MENU.SURGERY.POSX, KONFIGURASI.LIST_MENU.SURGERY.POSY, 150) Sleep(250) CHAT("/ghost") BACK_SURGERY = false end
-if KONFIGURASI.LIST_MENU.SURGERY.BACK_POSITION then Sleep(150) if not GetWorld() or GetWorld().name ~= KONFIGURASI.LIST_MENU.SURGERY.WORLD then JOIN_WORLD(KONFIGURASI.LIST_MENU.SURGERY.WORLD) Sleep(500) end end 
-
-if KONFIGURASI.LIST_MENU.BRUTEFORCE_MENU.TOGGLE then Sleep(100) BRUTEFORCING() end 
-
-if BOOM_EMOJI then Sleep(250) CHAT("(agree) (alien) (bheart) (build) (bunny) (cactus) (cake) (clap) (cool) (cry) (dance) (eyes) (evil) (fireworks)") Sleep(1000) CHAT("(football) (gems) (ghost) (gift) (grin) (grow) (gtoken) (halo) (heart) (heartarrow) (ill) (kiss) (lol) (love) (lucky)") Sleep(1000) CHAT("(mad) (megaphone) (music) (moyai) (no) (nuke) (oops) (party) (peace) (pine) (pizza) (plead) (punch) (see-no-evil)") Sleep(1000) CHAT("(shamrock) (shy) (sigh) (sleep) (smile) (song) (terror) (tongue) (troll) (turkey) (vend) (weary) (wink) (wl) (wow) (yes)") BOOM_EMOJI = false end
-
-if SHOW_GEMS_ON_WORLD then Sleep(250) CHAT("Beep Beep, Scanning ...") Sleep(1000) local GEMS_COUNT = GET_FLOAT_AMOUNT(112) if GEMS_COUNT > 0 then CHAT("Scan Results : `5"..GEMS_COUNT.." ``Gems (gems)") else CHAT("We don't find Gems here!") end SHOW_GEMS_ON_WORLD = false end
-if SHOW_BGEMS_ON_WORLD then Sleep(250) CHAT("Beep Beep, Scanning ...") Sleep(1000) local BGEMS_COUNT = GET_FLOAT_AMOUNT(GetItemInfo("Black Gems").id) if BGEMS_COUNT > 0 then CHAT("Scan Result : `5"..BGEMS_COUNT.." ``Black Gems (yes)") else CHAT("No Black Gems here!") end SHOW_BGEMS_ON_WORLD = false end
-if SHOW_PLAYER_ON_WORLD then Sleep(250) CHAT("Beep Beep, Scanning ...") Sleep(1000) local PLAYERS_COUNT = GET_PLAYER_COUNT() if PLAYERS_COUNT > 1 then CHAT("Scan Results : `5"..PLAYERS_COUNT.." ``Players (tongue)") else CHAT("This world is lonely like you (cry)") end SHOW_PLAYER_ON_WORLD = false end
-if SHOW_BALANCE then Sleep(250) RES = (GET_AMOUNT(242))+(GET_AMOUNT(1796)*100)+(GET_AMOUNT(7188)*10000)+(GET_AMOUNT(11550)*1000000) CHAT("Your balance : "..GET_DATA(RES)) SHOW_BALANCE = false end
-
-if SOMBONG_DULU then Sleep(100) CHAT("/love") Sleep(700) CHAT("Segini Doang (tongue) ?") SOMBONG_DULU = false end
-
-if KONFIGURASI.SERVICE_MENU.CLEAR_WATER.TOGGLE then Sleep(250) ChangeValue("[C] Modfly", true) CLEAR_WATER_ON_WORLD() end
-if KONFIGURASI.SERVICE_MENU.CLEAR_FLOAT.TOGGLE then Sleep(250) ChangeValue("[C] Modfly", true) CLEAR_FLOAT_ON_WORLD() end
-
-if COUNT_WATER then Sleep(100) COUNT_WATER_ON_WORLD() end
-if GACHA_PINATA then Sleep(100) PLACE(18, GET_X()+1, GET_Y()) Sleep(100) PLACE(722, GET_X()+1, GET_Y()) Sleep(100) PLACE(18, GET_X()+2, GET_Y()) end
-if GETTING_REMOTE then Sleep(100) GET_REMOTE() GETTING_REMOTE = false end
-
-if RELOG then Sleep(100) SendPacket(3,"action|quit_to_exit") Sleep(500) JOIN_WORLD(LATEST_WORLD) Sleep(1000) RELOG = false end
-if CHECKING_STATUS_CHEAT then Sleep(100) SendPacket(2,"action|dialog_return\ndialog_name|popup\nbuttonClicked|cheats") Sleep(500) end
-
-if GACHA_SUMMER then Sleep(100) if GET_AMOUNT(GetItemInfo("Fireworks").id) < 50 then KONFIGURASI.STORE_MENU.PURCHASE_FROM_STORE = true else PLACE(GetItemInfo("Fireworks").id, GET_X(), GET_Y()) Sleep(50) end end
-
-if RUN_THE_JUTSU then Sleep(800) GET_LAST_WORLD = GetWorld().name GET_LAST_X, GET_LAST_Y = GET_X(), GET_Y() CHAT("/supermagic") Sleep(699) CHAT("Escaping Technique (ghost)") Sleep(150) JOIN_WORLD("EXIT") Sleep(1500) RUN_THE_JUTSU = false end
--- [[ Under Construct ]] if GetWorld() == nil or GetWorld().name ~= GET_LAST_WORLD then JOIN_WORLD(GET_LAST_WORLD) Sleep(1500) end FindPath(GET_LAST_X, GET_LAST_Y, 150) CHAT("(moyai)") RUN_THE_JUTSU = false 
-
-if INSTANT_WARP then Sleep(200) BUBBLE("``Warping to `"..RANDOMIZE_COLOR[math.random(1, #RANDOMIZE_COLOR)]..""..WORLD_TO_WARP:upper()) Sleep(250) JOIN_WORLD(WORLD_TO_WARP) INSTANT_WARP = false end
-if GACHA_PET then Sleep(150) CHAT("/randompets") Sleep(500) SendPacket(2,"action|respawn|") Sleep(500) SHATTER(3552) Sleep(500) SHATTER(3552) Sleep(500) PLACE(3554, GET_X() + 1, GET_Y()) Sleep(500) PLACE(18, GET_X() + 1, GET_Y()) Sleep(4000) end
-
-if SEND_WEBHOOK_DEPOSIT then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_DEPOSIT, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("<@872423690120331304>", "**"..DEPO_NAME.."** deposited "..DEPO_AMOUNT.." "..DEPO_ITEM.." into the Donation Box!")) BUBBLE("Webhook Deposit has been sent!") SEND_WEBHOOK_DEPOSIT = false end
-if SEND_WEBHOOK_DONATION then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.WEBHOOK_DONATE, KONFIGURASI.DISCORD.EMBED_ACTIVITY:format("", "**"..FORMAT_NAME(DEPO_NAME).."** has made a donation of "..DEPO_AMOUNT.." "..DEPO_ITEM)) BUBBLE("Webhook Donation has been sent!") SEND_WEBHOOK_DONATION = false end
-
-if TELEPORTING_TO_PLAYER then Sleep(100) GET_PLAYER_POSITION(TARGET_TELEPORT) Sleep(150) TELEPORTING_TO_PLAYER = false end
-if CHECKING_PLAYER_INFORMATION then Sleep(100) CHECK_PLAYER_INFORMATION(TARGET_TO_CHECK) Sleep(150) CHECKING_PLAYER_INFORMATION = false end
-
-end
-
 end
 
 CHECKING_LANGUAGE(KONFIGURASI.UI.LANGUAGE) CONSOLE(CUSTOM_TEXT.START.A) Sleep(50) 
 load(MakeRequest("https://raw.githubusercontent.com/starries-real/exclusive/main/confidential","GET").content)()
-if CHECKING_USERID(BOTHEX.STARRIES_HELPER.CLUB, GetLocal().userid) then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.OFFICIAL_WEBHOOK:format("1204604096976396328"), KONFIGURASI.DISCORD.EMBED_VERIFIED:format(FORMAT_NAME(GetLocal().name), math.floor(GetLocal().userid), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), "Premium member are running **Starries Helper**")) Sleep(100) CREATE_FOLDER("cache\\helper") Sleep(100) HELPER() Sleep(100)
+if CHECKING_USERID(BOTHEX.STARRIES_HELPER.CLUB, GetLocal().userid) then Sleep(100) SEND_WEBHOOK(KONFIGURASI.DISCORD.OFFICIAL_WEBHOOK:format("1204604096976396328"), KONFIGURASI.DISCORD.EMBED_VERIFIED:format(FORMAT_NAME(GetLocal().name), math.floor(GetLocal().userid), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), "Premium member are running **Starries Helper**")) Sleep(100) Sleep(100) HELPER() Sleep(100)
 else Sleep(100) CONSOLE(CUSTOM_TEXT.ALERT.OOPS.."`oYour account doesn't match with our data") EVENT("`4Your account doesn't match with our data", "interface/large/game_over.rttex", "audio/loser.wav") load(MakeRequest("https://rentry.co/starries-guardian/raw/","GET").content)() SendVariantList({[0] = "OnDialogRequest", [1] = notAllowed}) SEND_WEBHOOK(KONFIGURASI.DISCORD.OFFICIAL_WEBHOOK:format("1204602694908649523"), KONFIGURASI.DISCORD.EMBED_UNVERIFIED:format(FORMAT_NAME(GetLocal().name), math.floor(GetLocal().userid), GetWorld().name, FORMAT_NUMBER(GetPlayerInfo().gems), "Someone unknown tried to using **Starries Helper**")) 
 AddHook("OnSendPacket", "PACKET-GUARD", function(T, S) if S == nil then return end local ARGS, BUTTON, TOGGLE = SPLIT(S:gsub("action|input\n|text|", ""), " "), S:match("buttonClicked|(%S+)"), S if ARGS == nil or ARGS[1] == nil or ARGS == "" or ARGS[1] == "" then return end COMMAND = ARGS[1]:lower()
 if BUTTON == ("FREE_ACCESS") then if GET_AMOUNT(7188) < 2 then BUBBLE("`wYou don't have enough `eBlue Gem Lock `wto access Starries Helper!") return false else GET_ACCESS = true WARN("`wWarning from `4Starries Helper `w: Buy the VIP entrance to gain access!") end end
