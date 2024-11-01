@@ -16,8 +16,8 @@ function GET_REMOTE() for _, T in pairs(GetTiles()) do if T.fg == 5638 then Send
 function HAS_VALUE_FROM_ARRAY(A, V) for _, AV in ipairs(A) do if string.lower(V) == string.lower(AV) then return true end end return false end
 function GET_DATA(N) tonumber(N) local W, D, B, I, DATA = N % 100, math.floor(N / 100) % 100, math.floor(N / 10000) % 100, math.floor(N / 1000000) % 100, "`w" if I == 0 and B == 0 and D == 0 and W == 0 then return "-" end if I ~= 0 then if B ~= 0 or D ~= 0 or W ~= 0 then DATA = DATA ..I.. " `bBlack Gem Lock `w" else DATA = DATA ..I.. " `bBlack Gem Lock" end end if B ~= 0 then if D ~= 0 or W ~= 0 then DATA = DATA ..B.. " `eBlue Gem Lock `w" else DATA = DATA ..B.. " `eBlue Gem Lock" end end if D ~= 0 then if W ~= 0 then DATA = DATA ..D.. " `1Diamond Lock `w" else DATA = DATA ..D.. " `1Diamond Lock" end end if W ~= 0 then DATA = DATA ..W.. " `9World Lock" end return DATA end 
 function SHOW_DATA(N) tonumber(N) local W, D, B, I, DATA = N % 100, math.floor(N / 100) % 100, math.floor(N / 10000) % 100, math.floor(N / 1000000) % 100, "" if I == 0 and B == 0 and D == 0 and W == 0 then return "-" end if I ~= 0 then if B ~= 0 or D ~= 0 or W ~= 0 then DATA = DATA ..I.. " Black Gem Lock " else DATA = DATA ..I.. " Black Gem Lock" end end if B ~= 0 then if D ~= 0 or W ~= 0 then DATA = DATA ..B.. " Blue Gem Lock " else DATA = DATA ..B.. " Blue Gem Lock" end end if D ~= 0 then if W ~= 0 then DATA = DATA ..D.. " Diamond Lock " else DATA = DATA ..D.. " Diamond Lock" end end if W ~= 0 then DATA = DATA ..W.. " World Lock" end return DATA end 
-function GET_ID(I) if math.floor(I) < 0 then return math.floor(14578 - I) else return math.floor(I) end end
-function GIVE_ID(I) if math.floor(I) > 14578 then return -math.floor(I - 14578) else return math.floor(I) end end
+function GET_ID(I) if math.floor(I) < 0 then return math.floor((GetItemInfo("Placeholder Loader").id - 2) - I) else return math.floor(I) end end
+function GIVE_ID(I) if math.floor(I) > (GetItemInfo("Placeholder Loader").id - 2) then return -math.floor(I - (GetItemInfo("Placeholder Loader").id - 2)) else return math.floor(I) end end
 function VALIDATE(N) if N == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif N == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true end end
 function GET_BALANCE() local W, D, B, I, DATA = GET_AMOUNT(242), GET_AMOUNT(1796), GET_AMOUNT(7188), GET_AMOUNT(11550), "`w" if I == 0 and B == 0 and D == 0 and W == 0 then return "-" end if I ~= 0 then if B ~= 0 or D ~= 0 or W ~= 0 then DATA = DATA ..I.. " `bBlack Gem Lock `w" else DATA = DATA ..I.. " `bBlack Gem Lock" end end if B ~= 0 then if D ~= 0 or W ~= 0 then DATA = DATA ..B.. " `eBlue Gem Lock `w" else DATA = DATA ..B.. " `eBlue Gem Lock" end end if D ~= 0 then if W ~= 0 then DATA = DATA ..D.. " `1Diamond Lock `w" else DATA = DATA ..D.. " `1Diamond Lock" end end if W ~= 0 then DATA = DATA ..W.. " `9World Lock" end return DATA end 
 function GET_PLAYER_COUNT() C = 0 for _, player in pairs(GetPlayerList()) do C = C + 1 end return C end
@@ -25,7 +25,35 @@ function GET_PLAYER_COUNT() C = 0 for _, player in pairs(GetPlayerList()) do C =
 function CHECKING_USERID(U, L) for _, V in pairs(U) do if V == L then return true end end return false end
 function FORMAT_NAME(S) S = S:gsub("``","") S = S:gsub("`.","") S = S:gsub("Dr.","") S = S:gsub("@",""):gsub(" of Legend",""):gsub("%[BOOST%]","") S = S:gsub("%[ELITE%]",""):gsub(" ","") return S end
 function FORMAT_NUMBER(N) N = math.floor(N + 0.5) local formatted = tostring(N) local n = 3 while n < #formatted do formatted = formatted:sub(1, #formatted - n) .. "." .. formatted:sub(#formatted - n + 1) n = n + 4 end return formatted end
-function FORMAT_LOCK(L) local BL = 0 local B = 0 local D = 0 local W = 0 while L >= 1000000 do L = L - 1000000 BL = BL + 1 end while L >= 10000 do L = L - 10000 B = B + 1 end while L >= 100 do L = L - 100 D = D + 1 end while L >= 1 do L = L - 1 W = W + 1 end return BL, B, D, W end
+
+function FORMAT_LOCK(L) -- Formats locks into their largest denominations
+	local BL = 0
+	local B = 0
+	local D = 0
+	local W = 0
+
+	while L >= 1000000 do
+		L = L - 1000000
+		BL = BL + 1
+	end
+
+	while L >= 10000 do
+		L = L - 10000
+		B = B + 1
+	end
+
+	while L >= 100 do
+		L = L - 100
+		D = D + 1
+	end
+
+	while L >= 1 do
+		L = L - 1
+		W = W + 1
+	end
+
+	return BL, B, D, W
+end
 
 function SEND_WEBHOOK(U, D) MakeRequest(U,"POST",{["Content-Type"] = "application/json"}, D) end
 function WARN(S) SendVariantList({[0] = "OnAddNotification", [1] = "interface/atomic_button.rttex", [2] = S, [3] = "audio/hub_open.wav"}) end
@@ -42,7 +70,12 @@ function CAPITALIZE(S) return S:lower():gsub("^%l", string.upper) end
 function JOIN_WORLD(W) SendPacket(3,"action|join_request\nname|"..W.."\ninvitedWorld|0") end
 function RECONNECTED(W) if GetWorld() == nil then OVERLAY("Disconnected") Sleep(1000) JOIN_WORLD(W) Sleep(1000) OVERLAY("Reconnected") end end
 function BUYING_PACK(S) SendPacket(2,"action|buy\nitem|"..S) end
-function COMPRESS() if GET_AMOUNT(242) > 99 then SHATTER(242) end  if GET_AMOUNT(1796) > 99 then SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|".. telex .."|\ny|".. teley .."|\nbuttonClicked|bglconvert") end if GET_AMOUNT(7188) > 99 then CREATE_BLACK() end end
+
+function COMPRESS()
+if GET_AMOUNT(242) > 99 then SHATTER(242) end 
+if GET_AMOUNT(1796) > 99 then SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|".. telex .."|\ny|".. teley .."|\nbuttonClicked|bglconvert") end
+if GET_AMOUNT(7188) > 99 then CREATE_BLACK() end
+end
 
 function CHANGE_BGL() local POS_X, POS_Y = math.floor(GetLocal().pos.x/32), math.floor(GetLocal().pos.y/32) for _, tile in pairs(GetTiles()) do if tile.fg == 3898 then STATE(tile.x, tile.y, "left") Sleep(100) SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|"..math.floor(tile.x).."|\ny|"..math.floor(tile.y).."|\nbuttonClicked|bglconvert") Sleep(100) STATE(POS_X, POS_Y, "left") end end end
 function BUYING_DL() for _, tile in pairs(GetTiles()) do if tile.fg == 3898 then SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785|\nx|"..math.floor(tile.x).."|\ny|"..math.floor(tile.y).."|\nbuttonClicked|dlconvert") end end end
@@ -96,7 +129,7 @@ function GET_TAX() TAX_WL = COUNT_TAX(GET_AMOUNT(242), 50) TAX_DL = COUNT_TAX(GE
 function REME_COUNT(N) tonumber(N) if N == 19 or N == 28 or N == 0 then R = "`20 (lucky)" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
 function QEME_COUNT(N) tonumber(N) if N == 10 or N == 20 or N == 30 then R = "`20 (lucky)" elseif N == 0 then R = "1" elseif N >= 10 then R = string.sub(N, -1) else R = N end return R end
 function PEME_COUNT(N) tonumber(N) if N == 9 or N == 18 or N == 27 or N == 36 then R = "9 (cry)" elseif N == 19 or N == 28 or N == 0 then R = "`20 (lucky)" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
-function LEME_COUNT(N) tonumber(N) if N == 9 or N == 18 or N == 27 or N == 36 then R = "9 (cry)" elseif N == 19 or N == 28 or N == 0 then R = "`20 (lucky) X4" elseif N == 1 or N == 10 or N == 29 then R = "`21 (lucky) X3" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
+function LEME_COUNT(N) tonumber(N) if N == 9 or N == 18 or N == 27 or N == 36 then R = "9 (cry)" elseif N == 19 or N == 28 or N == 0 then R = "`20 (lucky) X4" elseif N == 1 or N == 10 or N == 29 then R = "`20 (lucky) X3" else N1 = math.floor(N / 10) N2 = N % 10 R = string.sub(tostring(N1 + N2), -1) end return R end
 
 --function GET_GAME(N)  if KONFIGURASI.LIST_MENU.HOSTER.REME and not KONFIGURASI.LIST_MENU.HOSTER.QEME then return "`5REME `w: `5"..REME_COUNT(tonumber(N)) elseif not KONFIGURASI.LIST_MENU.HOSTER.REME and KONFIGURASI.LIST_MENU.HOSTER.QEME then return "`6QEME `w: `6"..QEME_COUNT(tonumber(N)) elseif KONFIGURASI.LIST_MENU.HOSTER.REME and KONFIGURASI.LIST_MENU.HOSTER.QEME then return "`5REME `w: `5"..REME_COUNT(tonumber(N)).." `wI `6QEME `w: `6"..QEME_COUNT(tonumber(N)) else return "" end end
 
@@ -106,7 +139,30 @@ function DIALOG_SPIN_LOG() SHOW_UID_STRING, SHOW_WORLD_STRING, SHOW_TIME_STRING,
 function FILTER_SPIN_BY_USER(I) SL = {} for _, T in pairs(KONFIGURASI.TABLE.SPIN_LOG) do if T.USER_ID == I then if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_WORLD then SHOW_WORLD_STRING = T.WORLD else SHOW_WORLD_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_TIME then SHOW_TIME_STRING = T.TIME else SHOW_TIME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_UID then SHOW_UID_STRING = T.UID else SHOW_UID_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_REME then SHOW_REME_STRING = T.REME else SHOW_REME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_QEME then SHOW_QEME_STRING = T.QEME else SHOW_QEME_STRING = "" end table.insert(SL, T.SPIN:format(SHOW_WORLD_STRING, SHOW_TIME_STRING, SHOW_UID_STRING, SHOW_REME_STRING, SHOW_QEME_STRING)) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|User Spin|left|1400|\nadd_spacer|small|\n"..table.concat(SL).."\nadd_spacer|small|\nadd_button|SPIN_LOG|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|FILTER_SPIN_BY_USER|||"}) end
 function FILTER_SPIN_BY_STATUS(S) local ICON if S == "REAL" then ICON = "4938" elseif S == "FAKE" then ICON = "4936" end SL = {} for _, T in pairs(KONFIGURASI.TABLE.SPIN_LOG) do if T.STATUS == S then if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_WORLD then SHOW_WORLD_STRING = T.WORLD else SHOW_WORLD_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_TIME then SHOW_TIME_STRING = T.TIME else SHOW_TIME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_REME then SHOW_REME_STRING = T.REME else SHOW_REME_STRING = "" end if KONFIGURASI.LIST_MENU.HOSTER.SPIN_LOG.SHOW_QEME then SHOW_QEME_STRING = T.QEME else SHOW_QEME_STRING = "" end table.insert(SL, T.SPIN:format(SHOW_WORLD_STRING, SHOW_TIME_STRING, SHOW_UID_STRING, SHOW_REME_STRING, SHOW_QEME_STRING)) end end SendVariantList({[0] = "OnDialogRequest", [1] = "set_default_color|`"..KONFIGURASI.UI.PRIMARY.."|\nadd_label_with_icon|big|"..CAPITALIZE(S).." Spin|left|"..ICON.."|\nadd_spacer|small|\n"..table.concat(SL).."\nadd_spacer|small|\nadd_button|SPIN_LOG|Back|noflags|0|0|\nadd_quick_exit|||\nend_dialog|FILTER_SPIN_BY_STATUS|||"}) end
 
-function CUSTOM_DROP() tonumber(DROP_AMOUNT) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true end TABLE_FORMAT = {1000000, 10000, 100, 1} BLACK, BGL, DL, WL = 0, 0, 0, 0 RESULT = GET_DATA(DROP_AMOUNT) RES = SHOW_DATA(DROP_AMOUNT) for D = 1, 4 do while DROP_AMOUNT >= TABLE_FORMAT[D] do if TABLE_FORMAT[D] == TABLE_FORMAT[1] then BLACK = BLACK + 1 DROP_AMOUNT = DROP_AMOUNT - 1000000 elseif TABLE_FORMAT[D] == TABLE_FORMAT[2] then BGL = BGL + 1 DROP_AMOUNT = DROP_AMOUNT - 10000 elseif TABLE_FORMAT[D] == TABLE_FORMAT[3] then DL = DL + 1 DROP_AMOUNT = DROP_AMOUNT - 100 elseif TABLE_FORMAT[D] == TABLE_FORMAT[4] then WL = WL + 1 DROP_AMOUNT = DROP_AMOUNT - 1 end end end ITEM_ID = {11550, 7188, 1796, 242} ITEM_AMOUNT = {BLACK, BGL, DL, WL} if GET_AMOUNT(11550) < BLACK then CREATE_BLACK() Sleep(80) end  if GET_AMOUNT(7188) < BGL then SHATTER(242) Sleep(80) BREAK_BLACK() Sleep(80) SHATTER(242) Sleep(80) BREAK_BLACK() Sleep(80) end  if GET_AMOUNT(1796) < DL then SHATTER(7188) Sleep(80) SHATTER(242) Sleep(80) SHATTER(7188) Sleep(80) SHATTER(242) Sleep(80) end  if GET_AMOUNT(242) < WL then SHATTER(7188) Sleep(80) SHATTER(1796) Sleep(80) SHATTER(7188) Sleep(80) SHATTER(1796) Sleep(80) end if KONFIGURASI.UI.LANGUAGE == "EN" then DROP_BLACK_TEXT, DROP_BGL_TEXT, DROP_DL_TEXT, DROP_WL_TEXT = "Dropped "..BLACK.." `bBlack Gem Lock", "Dropped `w" ..BGL.. " `eBlue Gem Lock", "Dropped `w" ..DL.. " `1Diamond Lock", "Dropped `w" ..WL.. " `9World Lock" elseif KONFIGURASI.UI.LANGUAGE == "ID" then DROP_BLACK_TEXT, DROP_BGL_TEXT, DROP_DL_TEXT, DROP_WL_TEXT = "Menjatuhkan "..BLACK.." `bBlack Gem Lock", "Menjatuhkan `w" ..BGL.. " `eBlue Gem Lock", "Menjatuhkan `w" ..DL.. " `1Diamond Lock", "Menjatuhkan `w" ..WL.. " `9World Lock" end if BLACK > 0 then DROP(ITEM_ID[1], ITEM_AMOUNT[1]) CONSOLE(DROP_BLACK_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(11550, BLACK, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..BLACK.." Black Gem Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|11550|11550|\n", DROP_ID = 11550}) Sleep(100) end end if BGL > 0 then  if GET_AMOUNT(7188) >= BGL then DROP(ITEM_ID[2], ITEM_AMOUNT[2]) else DROP(ITEM_ID[3], ITEM_AMOUNT[2]*100) end CONSOLE(DROP_BGL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(7188, BGL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..BGL.." Blue Gem Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|7188|7188|\n", DROP_ID = 7188}) Sleep(100) end end if DL > 0 then DROP(ITEM_ID[3], ITEM_AMOUNT[3]) CONSOLE(DROP_DL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(1796, DL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..DL.." Diamond Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1796|1796|\n", DROP_ID = 1796}) Sleep(100) end end if WL > 0 then DROP(ITEM_ID[4], ITEM_AMOUNT[4]) CONSOLE(DROP_WL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(242, WL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..WL.." World Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|242|242|\n", DROP_ID = 242}) Sleep(100) end end  if not KONFIGURASI.DROP.DONT_SHOW then if KONFIGURASI.UI.LANGUAGE == "EN" then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..RESULT) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..RESULT) end elseif KONFIGURASI.UI.LANGUAGE == "ID" then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wMenjatuhkan "..RESULT) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wMenjatuhkan "..RESULT) end end else KONFIGURASI.DROP.DONT_SHOW = false return true end end
+function CUSTOM_DROP() tonumber(DROP_AMOUNT) if DROP_AMOUNT == nil then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NIL) return true elseif DROP_AMOUNT == 0 then CONSOLE(CUSTOM_TEXT.ALERT.AMOUNT_NOL) return true end TABLE_FORMAT = {1000000, 10000, 100, 1} BLACK, BGL, DL, WL = 0, 0, 0, 0 RESULT = GET_DATA(DROP_AMOUNT) RES = SHOW_DATA(DROP_AMOUNT) for D = 1, 4 do while DROP_AMOUNT >= TABLE_FORMAT[D] do if TABLE_FORMAT[D] == TABLE_FORMAT[1] then BLACK = BLACK + 1 DROP_AMOUNT = DROP_AMOUNT - 1000000 elseif TABLE_FORMAT[D] == TABLE_FORMAT[2] then BGL = BGL + 1 DROP_AMOUNT = DROP_AMOUNT - 10000 elseif TABLE_FORMAT[D] == TABLE_FORMAT[3] then DL = DL + 1 DROP_AMOUNT = DROP_AMOUNT - 100 elseif TABLE_FORMAT[D] == TABLE_FORMAT[4] then WL = WL + 1 DROP_AMOUNT = DROP_AMOUNT - 1 end end end ITEM_ID = {11550, 7188, 1796, 242} ITEM_AMOUNT = {BLACK, BGL, DL, WL}
+
+-- CONSOLE(BLACK.." "..BGL.." "..DL.." "..WL)
+
+-- [[ Shatter ]] --
+if GET_AMOUNT(11550) < BLACK then CREATE_BLACK() Sleep(80) end 
+if GET_AMOUNT(7188) < BGL then SHATTER(242) Sleep(80) BREAK_BLACK() Sleep(80) SHATTER(242) Sleep(80) BREAK_BLACK() Sleep(80) end 
+if GET_AMOUNT(1796) < DL then SHATTER(7188) Sleep(80) SHATTER(242) Sleep(80) SHATTER(7188) Sleep(80) SHATTER(242) Sleep(80) end 
+if GET_AMOUNT(242) < WL then SHATTER(7188) Sleep(80) SHATTER(1796) Sleep(80) SHATTER(7188) Sleep(80) SHATTER(1796) Sleep(80) end
+
+-- [[ Dropping ]] --
+if KONFIGURASI.UI.LANGUAGE == "EN" then DROP_BLACK_TEXT, DROP_BGL_TEXT, DROP_DL_TEXT, DROP_WL_TEXT = "Dropped "..BLACK.." `bBlack Gem Lock", "Dropped `w" ..BGL.. " `eBlue Gem Lock", "Dropped `w" ..DL.. " `1Diamond Lock", "Dropped `w" ..WL.. " `9World Lock" elseif KONFIGURASI.UI.LANGUAGE == "ID" then DROP_BLACK_TEXT, DROP_BGL_TEXT, DROP_DL_TEXT, DROP_WL_TEXT = "Menjatuhkan "..BLACK.." `bBlack Gem Lock", "Menjatuhkan `w" ..BGL.. " `eBlue Gem Lock", "Menjatuhkan `w" ..DL.. " `1Diamond Lock", "Menjatuhkan `w" ..WL.. " `9World Lock" end
+
+if BLACK > 0 then DROP(ITEM_ID[1], ITEM_AMOUNT[1]) CONSOLE(DROP_BLACK_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(11550, BLACK, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..BLACK.." Black Gem Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|11550|11550|\n", DROP_ID = 11550}) Sleep(100) end end
+if BGL > 0 then 
+if GET_AMOUNT(7188) >= BGL then DROP(ITEM_ID[2], ITEM_AMOUNT[2]) else DROP(ITEM_ID[3], ITEM_AMOUNT[2]*100) end CONSOLE(DROP_BGL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(7188, BGL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..BGL.." Blue Gem Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|7188|7188|\n", DROP_ID = 7188}) Sleep(100) end
+end
+if DL > 0 then DROP(ITEM_ID[3], ITEM_AMOUNT[3]) CONSOLE(DROP_DL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(1796, DL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..DL.." Diamond Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|1796|1796|\n", DROP_ID = 1796}) Sleep(100) end end
+if WL > 0 then DROP(ITEM_ID[4], ITEM_AMOUNT[4]) CONSOLE(DROP_WL_TEXT) if KONFIGURASI.FILE_LOGS.DROP then DROP_LOG(242, WL, "at "..GetWorld().name.." "..os.date("%H:%M on %d/%m")) table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {DROP = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `odropped `w"..WL.." World Lock `oin `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|242|242|\n", DROP_ID = 242}) Sleep(100) end end 
+
+-- [[ Showing Dropped ]] --
+if not KONFIGURASI.DROP.DONT_SHOW then if KONFIGURASI.UI.LANGUAGE == "EN" then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..RESULT) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wDropped "..RESULT) end elseif KONFIGURASI.UI.LANGUAGE == "ID" then if KONFIGURASI.BUBBLE.DROP_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wMenjatuhkan "..RESULT) end if KONFIGURASI.OVERLAY.DROP_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wMenjatuhkan "..RESULT) end end else KONFIGURASI.DROP.DONT_SHOW = false return true end
+
+end
 
 function CHECKING_LANGUAGE(BAHASA) 
 if BAHASA == "EN" then 
@@ -1807,7 +1863,7 @@ add_label_with_icon|big|Custom Skin|left|13000|
 add_spacer|small|
 add_text_input|red|`4Red     :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.RED..[[|3|
 add_text_input|green|`2Green :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.GREEN..[[|3|
-add_text_input|blue|`1Blue     :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.BLUE..[[|3|
+add_text_input|blue|`1Blue    :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.BLUE..[[|3|
 add_text_input|transparency|`wTransparency (max. 50) :|]]..KONFIGURASI.LIST_MENU.SKIN_MENU.TRANS..[[|3|
 add_spacer|small|
 add_quick_exit|
@@ -3649,6 +3705,8 @@ SHOW_COLLECTED = true return true end
 if KONFIGURASI.ACTIVITY_LOG.SHOW_ALL_COLLECT then 
 if Var[0] == "OnConsoleMessage" and Var[1]:find("Collected  ") and not (Var[1]:match("Black Gem Lock") or Var[1]:match("Blue Gem Lock") or Var[1]:match("Diamond Lock") or Var[1]:match("World Lock")) then COLLECTED_AMOUNT, COLLECTED_ITEM = Var[1]:match("Collected  `w(%d+) (.+)``.") table.insert(KONFIGURASI.TABLE.ACTIVITY_LOG, {COLLECT = "\nadd_label_with_icon_button|small|"..GetLocal().name.." `otook `w"..COLLECTED_AMOUNT.." "..COLLECTED_ITEM.." `ofrom `5"..GetWorld().name.." `oat "..os.date("%H:%M on %d/%m").."|left|"..GetItemInfo(COLLECTED_ITEM).id.."|"..GetItemInfo(COLLECTED_ITEM).id.."|\n", COLLECT_ID = GetItemInfo(COLLECTED_ITEM).id}) CONSOLE(Var[1]) if KONFIGURASI.BUBBLE.COLLECT_BUBBLE then CHAT(KONFIGURASI.SYSTEM.CREDIT.."`wCollected "..COLLECTED_AMOUNT.." "..COLLECTED_ITEM) end if KONFIGURASI.OVERLAY.COLLECT_OVERLAY then OVERLAY(KONFIGURASI.SYSTEM.CREDIT.."`wCollected "..COLLECTED_AMOUNT.." "..COLLECTED_ITEM) end return true end 
 end
+
+if Var[0] == "OnConsoleMessage" and Var[1]:find("Collected  ") then return true end
 
 return false end)
 
